@@ -5,13 +5,27 @@ A game created for PyWeek 14
 
 Assignments
 -----------
- * Rendering - Rory
- * Character Generation - Rory
- * Pathfinding - Saxon
- * Timing - Saxon
- * Input/GUI - Finn & Colin
- * Integration - Finn
- * Entities - Harriet
- * Audio - Josh
- * Building - Josh
- * Saving/Loading - Josh
+ ### Josh
+ * Audio
+ * Building
+ * Saving/Loading
+
+ ### Rory
+ * Character Generation
+ * Rendering
+
+ ### Saxon
+ * Pathfinding
+ * Timing
+
+ ### Finn / Colin
+ * Input/GUI
+ 
+ ### Finn
+ * Integration
+
+ ### Harriet
+ * Entities
+
+ ### Jaime
+ * Game Design

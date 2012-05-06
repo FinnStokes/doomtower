@@ -30,6 +30,7 @@ function HireMenu(sprite, x,y,w,h){
   this.w = 384;
   this.h = 384;
   this.destroy = false;
+  this.visible = true;
   
   this.alreadyDown = false;
   this.offset = { x:0, y:0 };
@@ -41,28 +42,34 @@ function HireMenu(sprite, x,y,w,h){
     };
 
   this.update = function(){
-    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
-    
-    if (isMouseDown){
-      if (isCollide(cursor, this)){
-        this.x = latestCoords[0].x - this.offset.x;
-        this.y = latestCoords[0].y - this.offset.y;
+    if (this.visible){
+      var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+      
+      if (isMouseDown){
+        if (isCollide(cursor, this)){
+          this.x = latestCoords[0].x - this.offset.x;
+          this.y = latestCoords[0].y - this.offset.y;
+        }
+        if (isCollide(cursor, this.closeButton))
+          this.visible = false;
       }
-    }
-    this.offset = { x: latestCoords[0].x - this.x, y: latestCoords[0].y - this.y };
+      this.offset = { x: latestCoords[0].x - this.x, y: latestCoords[0].y - this.y };
 
-    this.closeButton.x = this.x + 335;
-    this.closeButton.y = this.y + 10;
+      this.closeButton.x = this.x + 335;
+      this.closeButton.y = this.y + 10;
+    }
   };
   this.draw = function(){
-    context.drawImage(sprite, 0, 0, this.w, this.h, this.x, this.y, this.w, this.h);
-    
-    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
-    
-    if (isCollide(cursor, this.closeButton))
-      context.drawImage(sprite, this.w + this.closeButton.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
-    else
-      context.drawImage(sprite, this.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+    if (this.visible){
+      context.drawImage(sprite, 0, 0, this.w, this.h, this.x, this.y, this.w, this.h);
+      
+      var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+      
+      if (isCollide(cursor, this.closeButton))
+        context.drawImage(sprite, this.w + this.closeButton.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+      else
+        context.drawImage(sprite, this.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+    }
   };
 }
 
@@ -98,25 +105,28 @@ function GUI(sprite){
     h: 43,
     };
   
-  this.update = function(){
-    // document.getElementById("output").innerHTML = latestCoords[0].x + "," + latestCoords[0].y;
-  };
+  this.update = function(){};
+  
   this.draw = function(){
     context.drawImage(sprite, this.x, this.y);
     
-    // Draw Buttons (Highlight logic is in there)
+    // Draw Hire Button (Highlight logic is in there)
     this.drawButton(this.hireButton);
+    
+    // Draw Build Button (Highlight logic is in there)
     this.drawButton(this.buildButton);
     
     // Draw Money
     this.drawMoney(this.money);
-  }; 
+  };
+  
   this.drawMoney = function(obj){
     context.fillStyle = "#FFF";
     context.textAlign = "center";
     context.font = 'normal bold 24px sans-serif';
     context.fillText(obj.text, obj.x, obj.y + 18);
   };
+  
   this.drawButton = function(obj){
     var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
     if (isCollide(cursor, obj))
