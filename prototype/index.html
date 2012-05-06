@@ -1,0 +1,386 @@
+<html>
+<body></body>
+<h3 id='output'>Output</h3>
+<canvas id='canvas' width='1024' height='600' style='background: #DDD'>Your browser does not support canvas.</canvas>
+<script src='assetmanager.js' type='text/javascript'></script>
+<script src='engine.js' type='text/javascript'></script>
+<script src='keyboard.js' type='text/javascript'></script>
+<script>
+function isCollide(a,b){
+	if (a.x <= (b.x + b.w) 
+		&& b.x <= (a.x + a.w) 
+		&& a.y <= (b.y + b.h) 
+		&& b.y <= (a.y + a.h)){
+		return true
+	} else {
+		return false;
+	}
+}
+
+function lineDistance(point1, point2){
+	var dx = point1.x - point2.x;
+	var dy = point1.y - point2.y;
+	return Math.sqrt(dx*dx + dy*dy);
+}
+
+function HireMenu(sprite, x,y,w,h){
+  this.sprite = sprite;
+  this.x = 512 - 384/2;
+  this.y = 32;
+  this.w = 384;
+  this.h = 384;
+  this.destroy = false;
+  
+  this.alreadyDown = false;
+  this.offset = { x:0, y:0 };
+  this.closeButton = {
+    x: this.x + 335,
+    y: this.y + 10,
+    w: 39,
+    h: 28,
+    };
+
+  this.update = function(){
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+    
+    if (isMouseDown){
+      if (isCollide(cursor, this)){
+        this.x = latestCoords[0].x - this.offset.x;
+        this.y = latestCoords[0].y - this.offset.y;
+      }
+    }
+    this.offset = { x: latestCoords[0].x - this.x, y: latestCoords[0].y - this.y };
+
+    this.closeButton.x = this.x + 335;
+    this.closeButton.y = this.y + 10;
+  };
+  this.draw = function(){
+    context.drawImage(sprite, 0, 0, this.w, this.h, this.x, this.y, this.w, this.h);
+    
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+    
+    if (isCollide(cursor, this.closeButton))
+      context.drawImage(sprite, this.w + this.closeButton.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+    else
+      context.drawImage(sprite, this.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+  };
+}
+
+function GUI(sprite){
+  this.sprite = sprite;
+  this.x = 0;
+  this.y = 600-64;
+  this.w = 1024;
+  this.h = 64;
+  this.destroy = false;
+  
+  this.money = {
+    text: "15,000",
+    x: this.x + 109,
+    y: this.y + 23,
+    w: 115,
+    h: 28,
+  };
+  
+  this.hireButton = {
+    text: "Hire",
+    x: this.x + 593,
+    y: this.y + 12,
+    w: 128,
+    h: 43,
+    };
+  
+  this.buildButton = {
+    text: "Build",
+    x: this.x + 445,
+    y: this.y + 12,
+    w: 128,
+    h: 43,
+    };
+  
+  this.update = function(){
+    // document.getElementById("output").innerHTML = latestCoords[0].x + "," + latestCoords[0].y;
+  };
+  this.draw = function(){
+    context.drawImage(sprite, this.x, this.y);
+    
+    // Draw Buttons (Highlight logic is in there)
+    this.drawButton(this.hireButton);
+    this.drawButton(this.buildButton);
+    
+    // Draw Money
+    this.drawMoney(this.money);
+  }; 
+  this.drawMoney = function(obj){
+    context.fillStyle = "#FFF";
+    context.textAlign = "center";
+    context.font = 'normal bold 24px sans-serif';
+    context.fillText(obj.text, obj.x, obj.y + 18);
+  };
+  this.drawButton = function(obj){
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+    if (isCollide(cursor, obj))
+      context.fillStyle = "#29ABE2";
+      else
+      context.fillStyle = "#2E3192";
+    context.fillRect(obj.x, obj.y, obj.w, obj.h);
+    
+    context.fillStyle = "#FFF";
+    context.textAlign = "center";
+    context.font = 'normal bold 24px sans-serif';
+    context.fillText(obj.text, obj.x + obj.w/2, obj.y + obj.h/2 + 8);
+  };
+}
+
+function Floor(floor, sprite){
+  this.sprite = sprite;
+  this.x = 128;
+  this.y = (256 + 10) * -floor; // Negative so it starts from the bottom
+  this.w = 704;
+  this.h = 256;
+  this.destroy = false;
+  this.update = function(){
+    document.getElementById("output").innerHTML = latestCoords[0].x + "," + latestCoords[0].y;
+  };
+  this.draw = function(){
+    context.drawImage(sprite, this.x, this.y);
+  }; 
+}
+</script>
+<script>
+// MOUSE
+var latestCoords = [{x: 0, y: 0}];
+
+function getCoords(e) {
+  if (e.offsetX)
+    return { x: e.offsetX, y: e.offsetY };
+  else if (e.layerX)
+    return { x: e.layerX, y: e.layerY };
+  else
+    return { x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop };
+}
+
+function mouseMove(e){
+  if (e.touches) {
+    // Touch Events
+    for (var i=1; i <= e.touches.length; i++ ){
+      latestCoords[i] = getCoords(e.touches[i - 1]);
+    }
+  } else {
+    // Mouse Events
+    latestCoords[0] = getCoords(e);
+  }
+}
+
+var isMouseDown = false;
+function mouseDown(e){ // AKA Input Start
+  e.preventDefault();
+  isMouseDown = true;
+}
+function mouseUp(e){ // AKA Input End
+  isMouseDown = false;
+}
+
+function scroll(e){
+  e.preventDefault();
+  if ( e.wheelDelta > 0 || e.wheelDeltaY > 0 || e.detail < 0)
+    game.camera.obj.y -= 32;
+  else if ( e.wheelDelta < 0 || e.wheelDeltaY < 0 || e.detail > 0)
+    game.camera.obj.y += 32;
+}
+
+// Input Listeners
+function startListeners(){
+  // touch screen support
+  canvas.ontouchmove = mouseMove;
+  canvas.ontouchstart = mouseDown;
+  canvas.ontouchend = mouseUp;
+
+  // mouse support
+  canvas.onmousemove = mouseMove;
+  canvas.onmousedown = mouseDown;
+  canvas.onmouseup = mouseUp;
+  
+  // mouse scroll
+  window.addEventListener('DOMMouseScroll', scroll, false);
+  window.onmousewheel = document.onmousewheel = scroll;
+}
+</script>
+<script>
+// Camera
+function Camera(x,y){
+  this.x = x;
+  this.y = y;
+  this.w = 1;
+  this.h = 1;
+  this.destroy = false;
+  
+  this.name = 'player';
+  
+  this.velocity = { x: 0, y: 0 };
+  this.maxVelocity = { x: 20, y: 30 }; // this.maxVelocity.y == jump power
+  this.acceleration = { x: 1, y: 1 };
+  this.decceleration = { x: 1 , y: 1 };
+  this.friction = { x: 1, y: 1 };
+  this.gravity = 2;
+  
+  this.canJump = true;
+  this.onGround = true;
+  this.canMove = true;
+  this.spring = false;
+
+  this.state = 'isLanded';
+
+  this.move = function(dir){
+    var v = this.velocity.x * dir;
+    var a = this.acceleration.x;
+    var d = this.decceleration.x;
+    var maxv = this.maxVelocity.x;
+    
+    if (dir != 0){
+      if ( v < 0 ){
+        v += d;
+      } else if ( v < maxv ){
+        v += a;
+        if ( v > maxv ){
+          v = maxv;
+        }
+      }
+      this.velocity.x = v * dir;
+    } else {
+      this.applyGroundFriction(1,0);
+    }
+  };
+  
+  this.moveY = function(dir){
+    var v = this.velocity.y * dir;
+    var a = this.acceleration.y;
+    var d = this.decceleration.y;
+    var maxv = this.maxVelocity.y;
+    
+    if (dir != 0){
+      if ( v < 0 ){
+        v += d;
+      } else if ( v < maxv ){
+        v += a;
+        if ( v > maxv ){
+          v = maxv;
+        }
+      }
+      this.velocity.y = v * dir;
+    } else {
+      this.applyGroundFriction(0,1);
+    }
+  };
+  
+  this.applyGroundFriction = function(x,y){
+    if (x){
+      var dir;
+      var velx = this.velocity.x;
+      
+      if ( velx > 0 ){
+        dir = 1;
+      } else if ( velx < 0 ){
+        dir = -1;
+      } else {
+        dir = 0;
+      }
+      this.velocity.x -= this.friction.x * dir;
+    } else if (y){
+      var dir;
+      var vely = this.velocity.y;
+      
+      if ( vely > 0 ){
+        dir = 1;
+      } else if ( vely < 0 ){
+        dir = -1;
+      } else {
+        dir = 0;
+      }
+      this.velocity.y -= this.friction.y * dir;
+    }
+  };
+  
+  this.update = function(){
+    this.inputLeftRight();
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+  };
+  
+  // Input
+  this.keyboardState = keyboard.GetKeyDown();
+  this.prevKeyboardState = this.keyboardState;
+  
+  this.inputLeftRight = function(){
+    // bools for easy checks
+    var prevup = this.keyboardState[Keys.Up] == true;
+    var prevdown = this.keyboardState[Keys.Down] == true;
+    var prevleft = this.keyboardState[Keys.Left] == true;
+    var prevright = this.keyboardState[Keys.Right] == true;
+
+    // Update
+    this.keyboardState = keyboard.GetKeyDown();
+    
+    // bools for easy checks
+    var up = this.keyboardState[Keys.Up] == true;
+    var down = this.keyboardState[Keys.Down] == true;
+    var left = this.keyboardState[Keys.Left] == true;
+    var right = this.keyboardState[Keys.Right] == true;
+    
+    /*
+    if ( right )
+      this.move(1);
+      else if ( left )
+        this.move(-1);
+      else
+        this.move(0);
+    */
+    if ( up )
+      this.moveY(-1);
+      else if ( down )
+        this.moveY(1);
+      else
+        this.moveY(0);
+  };
+  
+  this.draw = function(){
+	  // Draw stuff to come when graphics go into game
+  }; 
+}
+</script>
+<script>
+// Instantiates objects
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext("2d");
+var game = new GameEngine(context);
+var keyboard = new Keyboard();
+var player = new Camera(0,0);
+
+game.init = function(ctx){
+  // Init stuff here
+  // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
+  game.addEntity( player );
+  game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(4, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
+  game.addGUI( new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png')));
+  game.camera = { x: 0, y: 150, obj: player };
+  startListeners();
+};
+
+// Loads assets
+var ASSET_MANAGER = new AssetManager();
+ASSET_MANAGER.queueDownload('img/Floor.png');
+ASSET_MANAGER.queueDownload('img/GUI.png');
+ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
+
+// Starts game
+ASSET_MANAGER.downloadAll(function(){
+  game.init(context);
+  game.start();
+});
+</script>
+</html>
