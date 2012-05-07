@@ -25,7 +25,7 @@ function lineDistance(point1, point2){
 
 function HireMenu(sprite, x,y,w,h){
   this.sprite = sprite;
-  this.x = 512 - 384/2;
+  this.x = x;
   this.y = 32;
   this.w = 384;
   this.h = 384;
@@ -80,8 +80,8 @@ function GUI(sprite){
   this.w = 1024;
   this.h = 64;
   this.destroy = false;
-  this.hireMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'));
-  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Build.png'));
+  this.hireMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'), 512);
+  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Build.png'), 64);
   
   this.money = {
     text: "15,000",
@@ -89,7 +89,15 @@ function GUI(sprite){
     y: this.y + 23,
     w: 115,
     h: 28,
-  };
+    };
+    
+  this.stats = {
+    scientists: "2",
+    igors: "1",
+    floors: "5",
+    x: this.x + 250,
+    y: this.y
+    };
   
   this.hireButton = {
     text: "Hire",
@@ -137,14 +145,28 @@ function GUI(sprite){
     // Draw Money
     this.drawMoney(this.money);
     
+    // Draw States
+    this.drawStats(this.stats);
+    
     // Hire Menu
     this.hireMenu.draw();
     this.buildMenu.draw();
   };
   
-  
+  this.drawStats = function(obj){
+    context.fillStyle = "#FFF";
+    context.textAlign = "center";
+    context.font = 'normal bold 24px sans-serif';
+    context.fillText(obj.scientists, obj.x, obj.y+58);
+    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*1, 0, 40, 40, obj.x-18, obj.y, 40, 40 );
+    context.fillText(obj.igors, obj.x + 48, obj.y+58);
+    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*2, 0, 40, 40, obj.x +48-18 , obj.y, 40, 40 );
+    context.fillText(obj.floors, obj.x + 48*2, obj.y+58);
+    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*3, 0, 40, 40, obj.x +48*2-18, obj.y, 40, 40 );
+  }
   
   this.drawMoney = function(obj){
+    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 0, 0, 40, 40, this.x + 30, this.y + 14, 40, 40 );
     context.fillStyle = "#FFF";
     context.textAlign = "center";
     context.font = 'normal bold 24px sans-serif';
@@ -412,6 +434,7 @@ ASSET_MANAGER.queueDownload('img/Floor2.png');
 ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 ASSET_MANAGER.queueDownload('img/GUI_Build.png');
+ASSET_MANAGER.queueDownload('img/Icons.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
