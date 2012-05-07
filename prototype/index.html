@@ -30,7 +30,7 @@ function HireMenu(sprite, x,y,w,h){
   this.w = 384;
   this.h = 384;
   this.destroy = false;
-  this.visible = true;
+  this.visible = false;
   
   this.alreadyDown = false;
   this.offset = { x:0, y:0 };
@@ -81,7 +81,7 @@ function GUI(sprite){
   this.h = 64;
   this.destroy = false;
   this.hireMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'));
-  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'));
+  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Build.png'));
   
   this.money = {
     text: "15,000",
@@ -112,15 +112,17 @@ function GUI(sprite){
     if (isMouseDown){
       // Mouse Clicks Hire Button
       if (isCollide(cursor, this.hireButton))
-        this.hireMenu.visible = true;
+          this.hireMenu.visible = true;
             
       // Mouse Clicks Build Button
       if (isCollide(cursor, this.buildButton)){
+          this.buildMenu.visible = true;
       }
     }
     
     // Hire Menu
     this.hireMenu.update();
+    this.buildMenu.update();
   };
   
   this.draw = function(){
@@ -137,6 +139,7 @@ function GUI(sprite){
     
     // Hire Menu
     this.hireMenu.draw();
+    this.buildMenu.draw();
   };
   
   
@@ -408,6 +411,7 @@ ASSET_MANAGER.queueDownload('img/Floor.png');
 ASSET_MANAGER.queueDownload('img/Floor2.png');
 ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
+ASSET_MANAGER.queueDownload('img/GUI_Build.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
