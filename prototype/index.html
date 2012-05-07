@@ -392,9 +392,9 @@ game.init = function(ctx){
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor.png')) );
-  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor2.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor.png')) );
-  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor2.png')) );
   game.addFloor( new Floor(4, ASSET_MANAGER.getAsset('img/Floor.png')) );
   game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
   // game.addGUI( new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png')));
@@ -405,6 +405,7 @@ game.init = function(ctx){
 // Loads assets
 var ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload('img/Floor.png');
+ASSET_MANAGER.queueDownload('img/Floor2.png');
 ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 
