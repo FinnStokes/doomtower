@@ -108,11 +108,15 @@ function GUI(sprite){
     };
   
   this.update = function(){
+    // isMouseDownPrevious
     var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 };
     if (isMouseDown){
       // Mouse Clicks Hire Button
       if (isCollide(cursor, this.hireButton))
-        this.hireMenu.visible = true;
+        if (this.hireMenu.visible)
+          this.hireMenu.visible = false;
+        else
+          this.hireMenu.visible = true;
             
       // Mouse Clicks Build Button
       if (isCollide(cursor, this.buildButton)){
@@ -204,6 +208,7 @@ function mouseMove(e){
 }
 
 var isMouseDown = false;
+var isMouseDownPrevious = false;
 function mouseDown(e){ // AKA Input Start
   e.preventDefault();
   isMouseDown = true;
