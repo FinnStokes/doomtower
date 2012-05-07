@@ -80,6 +80,8 @@ function GUI(sprite){
   this.w = 1024;
   this.h = 64;
   this.destroy = false;
+  this.hireMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'));
+  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'));
   
   this.money = {
     text: "15,000",
@@ -105,7 +107,21 @@ function GUI(sprite){
     h: 43,
     };
   
-  this.update = function(){};
+  this.update = function(){
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 };
+    if (isMouseDown){
+      // Mouse Clicks Hire Button
+      if (isCollide(cursor, this.hireButton))
+        this.hireMenu.visible = true;
+            
+      // Mouse Clicks Build Button
+      if (isCollide(cursor, this.buildButton)){
+      }
+    }
+    
+    // Hire Menu
+    this.hireMenu.update();
+  };
   
   this.draw = function(){
     context.drawImage(sprite, this.x, this.y);
@@ -118,7 +134,12 @@ function GUI(sprite){
     
     // Draw Money
     this.drawMoney(this.money);
+    
+    // Hire Menu
+    this.hireMenu.draw();
   };
+  
+  
   
   this.drawMoney = function(obj){
     context.fillStyle = "#FFF";
@@ -128,7 +149,7 @@ function GUI(sprite){
   };
   
   this.drawButton = function(obj){
-    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 }
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 };
     if (isCollide(cursor, obj))
       context.fillStyle = "#29ABE2";
       else
@@ -376,7 +397,7 @@ game.init = function(ctx){
   game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor.png')) );
   game.addFloor( new Floor(4, ASSET_MANAGER.getAsset('img/Floor.png')) );
   game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
-  game.addGUI( new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png')));
+  // game.addGUI( new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png')));
   game.camera = { x: 0, y: 150, obj: player };
   startListeners();
 };
