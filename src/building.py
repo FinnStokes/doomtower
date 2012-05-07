@@ -1,6 +1,9 @@
+import event
+
 class Building:
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, event_manager):
+        self.event = event_manager
+        self.event.push_handlers(self)
     
     def update(self, dt):
         pass # update elevator position and room actions
@@ -26,3 +29,9 @@ class Elevator:
     
     def call_to(floor):
         pass # add floor to queue of passenger pickups
+
+event.Event.register_event_type('update_room')
+event.Event.register_event_type('add_elevator')
+event.Event.register_event_type('remove_elevator')
+event.Event.register_event_type('update_elevator')
+

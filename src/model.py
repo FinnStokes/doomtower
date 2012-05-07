@@ -1,18 +1,11 @@
-import pyglet
-
+import event
 import entity
 import building
 
-class Model(pyglet.event.EventDispatcher):
-    def __init__(self, controller):
-        self.controller = controller
-        self.building = building.Building(model)
-        self.controller.push_handlers(building)
+class Model:
+    def __init__(self, event_manager):
+        self.building = building.Building(event_manager)
 
-Model.register_event_type('update_room')
-Model.register_event_type('add_entity')
-Model.register_event_type('remove_entity')
-Model.register_event_type('update_entity')
-Model.register_event_type('add_elevator')
-Model.register_event_type('remove_elevator')
-Model.register_event_type('update_elevator')
+event.Event.register_event_type('add_entity')
+event.Event.register_event_type('remove_entity')
+event.Event.register_event_type('update_entity')
