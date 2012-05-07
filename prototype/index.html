@@ -23,7 +23,7 @@ function lineDistance(point1, point2){
 	return Math.sqrt(dx*dx + dy*dy);
 }
 
-function HireMenu(sprite, x,y,w,h){
+function Menu(sprite, type, x,y,w,h){
   this.sprite = sprite;
   this.x = x;
   this.y = 32;
@@ -31,6 +31,8 @@ function HireMenu(sprite, x,y,w,h){
   this.h = 384;
   this.destroy = false;
   this.visible = false;
+  this.type = type;
+  this.hirees = [];
   
   this.alreadyDown = false;
   this.offset = { x:0, y:0 };
@@ -59,6 +61,7 @@ function HireMenu(sprite, x,y,w,h){
       this.closeButton.y = this.y + 10;
     }
   };
+  
   this.draw = function(){
     if (this.visible){
       context.drawImage(sprite, 0, 0, this.w, this.h, this.x, this.y, this.w, this.h);
@@ -69,8 +72,31 @@ function HireMenu(sprite, x,y,w,h){
         context.drawImage(sprite, this.w + this.closeButton.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
       else
         context.drawImage(sprite, this.w, 0, this.closeButton.w, this.closeButton.h, this.closeButton.x, this.closeButton.y, this.closeButton.w, this.closeButton.h);
+        
+      if (this.type == "Hire"){
+        for (var i=0; i < this.hirees.length; i++){
+          var offset = { x:32 , y:96 };
+          var space = 10;
+          var w = this.hirees[i].w;
+          var h = this.hirees[i].h;
+          var x = this.x + offset.x;
+          var y = this.y + offset.y + ((h+space)*i);
+          if (isCollide(cursor, {x:x,y:y,w:w,h:h}))
+            context.fillStyle = "#3365a6";
+            else
+            context.fillStyle = "#2E3192";
+          context.fillRect(x, y, w, h);
+          context.drawImage(this.hirees[i].sprite, 0, h*i, w, h, x, y, w, h);
+        }
+      }
     }
   };
+}
+
+function Hirees(sprite){
+  this.w = 320;
+  this.h = 128;
+  this.sprite = sprite;
 }
 
 function GUI(sprite){
@@ -80,8 +106,8 @@ function GUI(sprite){
   this.w = 1024;
   this.h = 64;
   this.destroy = false;
-  this.hireMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'), 512);
-  this.buildMenu = new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Build.png'), 64);
+  this.hireMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'), "Hire", 512);
+  this.buildMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Build.png'), "Build", 64);
   
   this.money = {
     text: "15,000",
@@ -422,7 +448,11 @@ game.init = function(ctx){
   game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor2.png')) );
   game.addFloor( new Floor(4, ASSET_MANAGER.getAsset('img/Floor.png')) );
   game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
-  // game.addGUI( new HireMenu(ASSET_MANAGER.getAsset('img/GUI_Hire.png')));
+  
+  // Add all the different people here
+  game.guis[0].hireMenu.hirees.push(new Hirees(ASSET_MANAGER.getAsset('img/Hirees.png')));
+  game.guis[0].hireMenu.hirees.push(new Hirees(ASSET_MANAGER.getAsset('img/Hirees.png')));
+  
   game.camera = { x: 0, y: 150, obj: player };
   startListeners();
 };
@@ -435,6 +465,7 @@ ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 ASSET_MANAGER.queueDownload('img/GUI_Build.png');
 ASSET_MANAGER.queueDownload('img/Icons.png');
+ASSET_MANAGER.queueDownload('img/Hirees.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
