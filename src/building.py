@@ -1,32 +1,35 @@
-import os, sys, pyglet
+import os, sys, event
 class Building:
         
     floor_height = 10
 
-    def __init__(self, model, numfloors = 6):
-        self.model = model
+    def __init__(self, event_manager, numfloors = 6):
+        
+        self.event = event_manager
+        self.event.register("input_build", self.build_room)
+        self.event.register("input_elevator", self.build_elevator)
         self.floors = []
         self.lifts = []
         #fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
             self.model.dispatch_event('floor_init', i)
-
     
     def update(self, dt):      
         pass # update elevator position and room actions
     
     def build_room(self, floor, room_id):
         # construct new room at floor (check that this is next above or below)
-        self.model.dispatch_event('update_room', floor, room_id)
+        self.event.notify('update_room', floor, room_id)
         self.floors[floor] = Room(room_id)
     
     def build_elevator(self, left, floors):
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
         self.lifts[int(not left)] = Elevator(floors, min(floors) * floor_height)
-        self.model.dispatch_event('add_elevator', left, floors)
-            
+        self.event.notify('new_elevator', left, floors)
+           
+    
     def get_elevator(self, floor, left):
         if self.lifts[int(not left)].curr_floor == floor:
             return self.lifts[int(not left)]

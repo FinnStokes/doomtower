@@ -1,0 +1,45 @@
+TODO LIST
+---------
+
+To Add
+-------
+
+* Mouse Click-Drag: Scrolls through level
+* Footer: Build Button: Click to CLOSE "Build Menu"
+* Footer: Hire Button: Click to CLOSE "Hire Menu"
+* Hire Menu: People: click to hire
+* Hire Menu: People: click to fire
+* Hire Menu: People: drag hired to place on floor
+* Build Menu: Floors
+* Build Menu: Buy Floors
+* Build Menu: Drag floors to tower
+* Only apply mouse events to top layer
+
+Currently Implemented (in prototype)
+-------
+* Floors added
+* Mouse scroll wheel: Scrolls through level
+* Keyboard Up/Down: Scrolls through level
+* Footer
+* Footer: Currency
+* Footer: Stats (Scientists, Igors, Floors)
+* Footer: Build Button
+* Footer: Hire Button
+* Footer: Build Button: Mouseover Highlight
+* Footer: Hire Button: Mouseover Highlight
+* Footer: Build Button: Click to open "Build Menu"
+* Footer: Hire Button: Click to open "Hire Menu"
+* Hire Menu
+* Hire Menu: Close Button
+* Hire Menu: Click to drag
+* Hire Menu: People
+* Hire Menu: People: Highlight on mouseover
+* Build Menu
+* Build Menu: Close Button
+* Build Menu: Click to drag
+
+
+Final GUI
+-------
+
+* 
