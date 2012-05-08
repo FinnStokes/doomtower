@@ -31,21 +31,66 @@ function Hirees(sprite){
   this.sprite = sprite;
 }
 
+var State = {
+  standing: 0,
+  walking: 1
+};
 function Scientist(sprite, x, y){
   this.sprite = sprite;
   this.x = x;
   this.y = y;
   this.w = 100;
   this.h = 160;
+  this.vx = 0.75;
+  this.facing = 1;
   this.destroy = false;
   this.visible = false;
-  this.standAnimation = new Animation(this.w, this.h, 0, 2, 60*1.5);
-  this.walkAnimation = new Animation(this.w, this.h, 1, 2, 60*0.5);
+  this.state = State.standing;
+  this.standAnimation = new Animation(this.w, this.h, State.standing, 2, 60*1.5);
+  this.walkAnimation = new Animation(this.w, this.h, State.walking, 2, 60*0.5);
   this.update = function(){
-    this.standAnimation.update(game.elapsedTime);
+    if (this.vx != 0)
+      this.state = State.walking;
+      else
+      this.state = State.standing;
+    
+    if (this.x < 128 || this.x > 128+704-100){
+      this.vx = -this.vx;
+      this.facing = -this.facing;
+    }
+    
+    this.x += this.vx;
+    
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.update(game.elapsedTime);
+        break;
+      case State.walking:
+        this.walkAnimation.update(game.elapsedTime);
+        break;
+    }
+    
+    var rand = Math.random();
+    if (rand > 0.99)
+      this.vx = 0;
+    else if (rand < 0.005)
+      this.vx = 0.75 * this.facing;
+    if (this.vx == 0){
+      var rand = Math.random();
+      if (rand < 0.005)
+        this.facing = -this.facing;
+    }
+
   };
   this.draw = function(){
-    this.standAnimation.draw(sprite, this.x, this.y);
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+      case State.walking:
+        this.walkAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+    }
   };
 }
 
@@ -69,10 +114,14 @@ function Animation(fw, fh, currentAnimation, totalFrames, frameRate){
         this.currentFrame = 0;
     }
   };
-  this.draw = function(sprite,x,y){
+  this.draw = function(sprite,x,y,facing){
+    var offset = 0;
+    if (facing < 0)
+      offset = this.w * this.totalFrames;
+      
     context.drawImage(
       sprite, 
-      this.w * this.currentFrame, 
+      this.w * this.currentFrame + offset, 
       this.h * this.currentAnimation,
       this.w, this.h,
       x, y, this.w, this.h);
@@ -291,7 +340,7 @@ game.init = function(ctx){
   // Init stuff here
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 0, 0) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 130, 80) );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );

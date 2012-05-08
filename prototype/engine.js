@@ -63,14 +63,14 @@ function GameEngine(ctx){
   this.draw = function(){
     this.cameraStart(); // Only works if the camera is added in init()
     
-    // Draw Entities
-    for (var i=0; i<this.entities.length; i++)
-      this.entities[i].draw(this.context);
-      
     // Draw Floors
     for (var i=0; i<this.floors.length; i++)
       this.floors[i].draw(this.context);
       
+    // Draw Entities
+    for (var i=0; i<this.entities.length; i++)
+      this.entities[i].draw(this.context);
+
     this.cameraRestore();
     
     // Draw GUI
