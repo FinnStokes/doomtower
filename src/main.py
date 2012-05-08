@@ -10,11 +10,10 @@ player_view = view.View(event_manager)
 pygame.init()
 
 fpsClock = pygame.time.Clock()
-
-while True:
+running = True
+while running:
+    fpsClock.tick(30)
     event_manager.notify("refresh")
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-    fpsClock.tick(30)
+            running = False

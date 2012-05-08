@@ -13,7 +13,7 @@ class Building:
         #fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
-            self.model.dispatch_event('floor_init', i)
+            self.event.notify('floor_init', i)
     
     def update(self, dt):      
         pass # update elevator position and room actions
