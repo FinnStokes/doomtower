@@ -17,13 +17,16 @@ class Render:
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("refresh", self.on_draw)
         
+        self.testVar = 0
         self.window = window
         self.rooms = []
         for i in range(settings.TOP_FLOOR-settings.BOTTOM_FLOOR+1):
             self.rooms.append(Room(0))
 
     def on_draw(self): # render current game state
-        self.window.fill((255,255,0))
+        self.testVar += 1
+        self.window.fill((0,0,0))
+        self.window.blit(room_image, (47,self.testVar))
         pygame.display.update()
     
     def update_room(self, floor, room_id):

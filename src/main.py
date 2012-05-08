@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from pygame.locals import *
 import event
 import model
@@ -15,6 +15,6 @@ while True:
     event_manager.notify("refresh")
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit();
-            sys.exit;
+            pygame.quit()
+            sys.exit()
     fpsClock.tick(30)
