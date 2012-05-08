@@ -7,6 +7,7 @@ class Building:
         self.event = event_manager
         self.event.register("input_build", self.build_room)
         self.event.register("input_elevator", self.build_elevator)
+        self.event.register("update", self.update)
         self.floors = []
         self.lifts = []
         # fill building with empty floors
@@ -65,9 +66,8 @@ class Elevator:
             pass 
 
     def move(self, dest):
-        if self.curr_floor != dest
-        
-        pass   
+        if self.curr_floor != dest:
+            pass   
 
 
 
