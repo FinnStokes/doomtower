@@ -4,6 +4,8 @@
 <canvas id='canvas' width='1024' height='600' style='background: #DDD'>Your browser does not support canvas.</canvas>
 <script src='assetmanager.js' type='text/javascript'></script>
 <script src='engine.js' type='text/javascript'></script>
+<script src='camera.js' type='text/javascript'></script>
+<script src='input.js' type='text/javascript'></script>
 <script src='keyboard.js' type='text/javascript'></script>
 <script>
 function isCollide(a,b){
@@ -21,6 +23,60 @@ function lineDistance(point1, point2){
 	var dx = point1.x - point2.x;
 	var dy = point1.y - point2.y;
 	return Math.sqrt(dx*dx + dy*dy);
+}
+
+function Hirees(sprite){
+  this.w = 320;
+  this.h = 128;
+  this.sprite = sprite;
+}
+
+function Scientist(sprite, x, y){
+  this.sprite = sprite;
+  this.x = x;
+  this.y = y;
+  this.w = 100;
+  this.h = 160;
+  this.destroy = false;
+  this.visible = false;
+  this.standAnimation = new Animation(this.w, this.h, 0, 2, 60*1.5);
+  this.walkAnimation = new Animation(this.w, this.h, 1, 2, 60*0.5);
+  this.update = function(){
+    this.standAnimation.update(game.elapsedTime);
+  };
+  this.draw = function(){
+    this.standAnimation.draw(sprite, this.x, this.y);
+  };
+}
+
+function Igore(){
+}
+
+function Animation(fw, fh, currentAnimation, totalFrames, frameRate){
+  this.w = fw;
+  this.h = fh;
+  this.frameRate = frameRate;
+  this.totalFrames = totalFrames;
+  this.currentAnimation = currentAnimation;
+  this.lastTime = 0;
+  this.currentFrame = 0;
+  this.update = function(gameElapsedTime){
+    if (gameElapsedTime - this.lastTime > this.frameRate){
+    
+      this.lastTime = gameElapsedTime;
+      
+      if (++this.currentFrame > this.totalFrames-1)
+        this.currentFrame = 0;
+    }
+  };
+  this.draw = function(sprite,x,y){
+    context.drawImage(
+      sprite, 
+      this.w * this.currentFrame, 
+      this.h * this.currentAnimation,
+      this.w, this.h,
+      x, y, this.w, this.h);
+  };
 }
 
 function Menu(sprite, type, x,y,w,h){
@@ -91,12 +147,6 @@ function Menu(sprite, type, x,y,w,h){
       }
     }
   };
-}
-
-function Hirees(sprite){
-  this.w = 320;
-  this.h = 128;
-  this.sprite = sprite;
 }
 
 function GUI(sprite){
@@ -230,207 +280,6 @@ function Floor(floor, sprite){
 }
 </script>
 <script>
-// MOUSE
-var latestCoords = [{x: 0, y: 0}];
-
-function getCoords(e) {
-  if (e.offsetX)
-    return { x: e.offsetX, y: e.offsetY };
-  else if (e.layerX)
-    return { x: e.layerX, y: e.layerY };
-  else
-    return { x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop };
-}
-
-function mouseMove(e){
-  if (e.touches) {
-    // Touch Events
-    for (var i=1; i <= e.touches.length; i++ ){
-      latestCoords[i] = getCoords(e.touches[i - 1]);
-    }
-  } else {
-    // Mouse Events
-    latestCoords[0] = getCoords(e);
-  }
-}
-
-var isMouseDown = false;
-function mouseDown(e){ // AKA Input Start
-  e.preventDefault();
-  isMouseDown = true;
-}
-function mouseUp(e){ // AKA Input End
-  isMouseDown = false;
-}
-
-function scroll(e){
-  e.preventDefault();
-  if ( e.wheelDelta > 0 || e.wheelDeltaY > 0 || e.detail < 0)
-    game.camera.obj.y -= 32;
-  else if ( e.wheelDelta < 0 || e.wheelDeltaY < 0 || e.detail > 0)
-    game.camera.obj.y += 32;
-}
-
-// Input Listeners
-function startListeners(){
-  // touch screen support
-  canvas.ontouchmove = mouseMove;
-  canvas.ontouchstart = mouseDown;
-  canvas.ontouchend = mouseUp;
-
-  // mouse support
-  canvas.onmousemove = mouseMove;
-  canvas.onmousedown = mouseDown;
-  canvas.onmouseup = mouseUp;
-  
-  // mouse scroll
-  window.addEventListener('DOMMouseScroll', scroll, false);
-  window.onmousewheel = document.onmousewheel = scroll;
-}
-</script>
-<script>
-// Camera
-function Camera(x,y){
-  this.x = x;
-  this.y = y;
-  this.w = 1;
-  this.h = 1;
-  this.destroy = false;
-  
-  this.name = 'player';
-  
-  this.velocity = { x: 0, y: 0 };
-  this.maxVelocity = { x: 20, y: 30 }; // this.maxVelocity.y == jump power
-  this.acceleration = { x: 1, y: 1 };
-  this.decceleration = { x: 1 , y: 1 };
-  this.friction = { x: 1, y: 1 };
-  this.gravity = 2;
-  
-  this.canJump = true;
-  this.onGround = true;
-  this.canMove = true;
-  this.spring = false;
-
-  this.state = 'isLanded';
-
-  this.move = function(dir){
-    var v = this.velocity.x * dir;
-    var a = this.acceleration.x;
-    var d = this.decceleration.x;
-    var maxv = this.maxVelocity.x;
-    
-    if (dir != 0){
-      if ( v < 0 ){
-        v += d;
-      } else if ( v < maxv ){
-        v += a;
-        if ( v > maxv ){
-          v = maxv;
-        }
-      }
-      this.velocity.x = v * dir;
-    } else {
-      this.applyGroundFriction(1,0);
-    }
-  };
-  
-  this.moveY = function(dir){
-    var v = this.velocity.y * dir;
-    var a = this.acceleration.y;
-    var d = this.decceleration.y;
-    var maxv = this.maxVelocity.y;
-    
-    if (dir != 0){
-      if ( v < 0 ){
-        v += d;
-      } else if ( v < maxv ){
-        v += a;
-        if ( v > maxv ){
-          v = maxv;
-        }
-      }
-      this.velocity.y = v * dir;
-    } else {
-      this.applyGroundFriction(0,1);
-    }
-  };
-  
-  this.applyGroundFriction = function(x,y){
-    if (x){
-      var dir;
-      var velx = this.velocity.x;
-      
-      if ( velx > 0 ){
-        dir = 1;
-      } else if ( velx < 0 ){
-        dir = -1;
-      } else {
-        dir = 0;
-      }
-      this.velocity.x -= this.friction.x * dir;
-    } else if (y){
-      var dir;
-      var vely = this.velocity.y;
-      
-      if ( vely > 0 ){
-        dir = 1;
-      } else if ( vely < 0 ){
-        dir = -1;
-      } else {
-        dir = 0;
-      }
-      this.velocity.y -= this.friction.y * dir;
-    }
-  };
-  
-  this.update = function(){
-    this.inputLeftRight();
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-  };
-  
-  // Input
-  this.keyboardState = keyboard.GetKeyDown();
-  this.prevKeyboardState = this.keyboardState;
-  
-  this.inputLeftRight = function(){
-    // bools for easy checks
-    var prevup = this.keyboardState[Keys.Up] == true;
-    var prevdown = this.keyboardState[Keys.Down] == true;
-    var prevleft = this.keyboardState[Keys.Left] == true;
-    var prevright = this.keyboardState[Keys.Right] == true;
-
-    // Update
-    this.keyboardState = keyboard.GetKeyDown();
-    
-    // bools for easy checks
-    var up = this.keyboardState[Keys.Up] == true;
-    var down = this.keyboardState[Keys.Down] == true;
-    var left = this.keyboardState[Keys.Left] == true;
-    var right = this.keyboardState[Keys.Right] == true;
-    
-    /*
-    if ( right )
-      this.move(1);
-      else if ( left )
-        this.move(-1);
-      else
-        this.move(0);
-    */
-    if ( up )
-      this.moveY(-1);
-      else if ( down )
-        this.moveY(1);
-      else
-        this.moveY(0);
-  };
-  
-  this.draw = function(){
-	  // Draw stuff to come when graphics go into game
-  }; 
-}
-</script>
-<script>
 // Instantiates objects
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
@@ -442,11 +291,11 @@ game.init = function(ctx){
   // Init stuff here
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
-  game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor.png')) );
-  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor2.png')) );
-  game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor.png')) );
-  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor2.png')) );
-  game.addFloor( new Floor(4, ASSET_MANAGER.getAsset('img/Floor.png')) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 0, 0) );
+  game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
+  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
+  game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );
+  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor_LabBio.png')) );
   game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
   
   // Add all the different people here
@@ -459,13 +308,16 @@ game.init = function(ctx){
 
 // Loads assets
 var ASSET_MANAGER = new AssetManager();
-ASSET_MANAGER.queueDownload('img/Floor.png');
-ASSET_MANAGER.queueDownload('img/Floor2.png');
+ASSET_MANAGER.queueDownload('img/Floor_Reception.png');
+ASSET_MANAGER.queueDownload('img/Floor_Lobby.png');
+ASSET_MANAGER.queueDownload('img/Floor_LabBoom.png');
+ASSET_MANAGER.queueDownload('img/Floor_LabBio.png');
 ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 ASSET_MANAGER.queueDownload('img/GUI_Build.png');
 ASSET_MANAGER.queueDownload('img/Icons.png');
 ASSET_MANAGER.queueDownload('img/Hirees.png');
+ASSET_MANAGER.queueDownload('img/Scientist.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
