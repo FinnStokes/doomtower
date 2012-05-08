@@ -1,30 +1,30 @@
-import pyglet
+import pygame
+from pygame.locals import *
 import settings
 
-pyglet.resource.path = ['../img']
-pyglet.resource.reindex()
-room_image = pyglet.resource.image('rooms.png')
-room = pyglet.sprite.Sprite(room_image, 100,100);
+room_image = pygame.image.load('../img/rooms.png')
+#room = pyglet.sprite.Sprite(room_image, 100,100);
 #room_sprites = pyglet.image.ImageGrid(room_image, 4, 1);
 class Render:
     def __init__(self, window, event_manager):
-        window.push_handlers(self)
-        event_manager.push_handlers(self)
+        self.event = event_manager
+        self.event.register("update_room", self.update_room)
+        self.event.register("add_entity", self.add_entity)
+        self.event.register("remove_entity", self.remove_entity)
+        self.event.register("update_entity", self.update_entity)
+        self.event.register("add_elevator", self.add_elevator)
+        self.event.register("remove_elevator", self.remove_elevator)
+        self.event.register("update_elevator", self.update_elevator)
+        self.event.register("refresh", self.on_draw)
         
         self.window = window
-        self.label = pyglet.text.Label('Hello, world',
-                                  font_name='Times New Roman',
-                                  font_size=36,
-                                  x=window.width//2, y=window.height//2,
-                                  anchor_x='center', anchor_y='center')
         self.rooms = []
         for i in range(settings.TOP_FLOOR-settings.BOTTOM_FLOOR+1):
             self.rooms.append(Room(0))
 
     def on_draw(self): # render current game state
-        self.window.clear()
-        self.label.draw()
-        room.draw()
+        self.window.fill((255,255,0))
+        pygame.display.update()
     
     def update_room(self, floor, room_id):
         self.rooms(floor + settings.BOTTOM_FLOOR).update(room_id)
