@@ -1,4 +1,4 @@
-
+import heapq
 
 class Node:
     def __init__(self, index):
@@ -57,36 +57,35 @@ class Graph:
             return node.pop()
 
     def getPath(self, src, dest):
-        spt = [] # Shortest Path Tree
-        sf = [] # Search Frontier
-        costs = []
-        pq = Queue.PriorityQueue()
-        pq.put(src)
-        while not pq.empty():
-            nextNode = pq.get()
+        spt = [None] * (len(self.nodes) + 1) # Shortest Path Tree
+        sf = [None] * (len(self.edges) + 1) # Search Frontier
+        costs = [0] * (len(self.edges) + 1)
+        pq = [] # Priority Queue
+        heapq.heappush(pq, (0, src))
+        while pq:
+            nextCost, nextNode = heapq.heappop(pq)
             spt[nextNode] = sf[nextNode]
             
-            if nextNode === dest:
+            if nextNode == dest:
                 # return path
-                path = []
+                path = [dest]
                 while True:
                     path.insert(0, spt[path[0]])
-                    if path[0] === src:
+                    if path[0] == src:
                         return path
             
             # relax the edges
             for e in self.edges:
-                if e.src === nextNode:
+                if e.src == nextNode:
                     newCost = costs[nextNode] + e.cost
-                    if e.dest not in sf:
+                    if sf[e.dest] == None:
                         costs[e.dest] = newCost
-                        pq.put(e.dest)
+                        heapq.heappush(pq, (newCost, e.dest))
                         sf[e.dest] = nextNode
-                    elif newCost < costs[e.dest] and e.dest not in spt:
+                    elif newCost < costs[e.dest]:
                         costs[e.dest] = newCost
-                        # pq.ChangePriority(e.dest)
+                        heapq.heappush(pq, (newCost, e.dest))
                         sf[e.dest] = nextNode
-                        
 
     def removeNode(self, index):
         self.nodes.remove(Node(index))
