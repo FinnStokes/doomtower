@@ -22,6 +22,8 @@ class Render:
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("refresh", self.on_draw)
         
+        self.building_height = 0
+        self.building_depth = 0
         self.window = window
         self.rooms = []
         self.y_pan = 0
@@ -45,10 +47,25 @@ class Render:
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
         pygame.display.update()
     
+    def pan_screen(self, floor):
+        screen_width, screen_height = self.window.get_size()
+        floor_height = (self.room_height+self.room_padding)*(floor)
+        if floor_height < self.y_pan:
+            pass #scroll down
+        elif floor_height + self.room_height > self.y_pan + screen_height:
+            pass #scroll up
+        else:
+            pass #stop scrolling
     def add_room(self):
         self.rooms.append(Room())
 
     def update_room(self, floor, room_id):
+        if room_id !=0:
+            height = floor - settings.BOTTOM_FLOOR
+            if height > self.building_height:
+                self.building_height = height
+            elif height < self.building_depth:
+                self.building_depth = height
         self.rooms[floor].update(room_id)
     
     def add_entity(self, id, x, y, sprite):

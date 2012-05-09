@@ -37,7 +37,7 @@ class Building:
         floor_index = floor-settings.BOTTOM_FLOOR
         self.event.notify('update_room', floor_index, room_id)
         self.floors[floor_index] = Room(room_id)
-    
+
     def build_elevator(self, left, floors):
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
