@@ -422,7 +422,7 @@ function GUI(sprite){
 function Floor(floor, sprite){
   this.floor = floor;
   this.sprite = sprite;
-  this.x = 228;
+  this.x = 215;
   this.y = (256 + 10) * -floor; // Negative so it starts from the bottom
   this.w = 704;
   this.h = 256;
@@ -431,8 +431,74 @@ function Floor(floor, sprite){
     document.getElementById("output").innerHTML = latestCoords[0].x + "," + latestCoords[0].y;
   };
   this.draw = function(){
+    context.fillStyle = "#3C2F2B";
+    context.fillRect(this.x - 28, this.y - 10, this.w + 28*2, this.h + 20);
     context.drawImage(sprite, this.x, this.y);
   }; 
+}
+
+function Lift(floorStart, floorEnd, side){
+  this.sprite = ASSET_MANAGER.getAsset('img/Lift.png');
+  this.spritePulley = ASSET_MANAGER.getAsset('img/LiftPulley.png');
+  this.spriteRope = ASSET_MANAGER.getAsset('img/LiftRope.png');
+  this.x;
+  if (side == "left")
+    this.x = 120;
+  else
+    this.x = 920;
+  this.y = (256 + 10) * floorStart;
+  this.w = 96;
+  this.h = 197;
+  this.vy = 1;
+  this.floorStart = floorStart;
+  this.floorEnd = floorEnd;
+  this.fsy = (256 + 10) * floorStart;
+  this.fey = (256 + 10) * floorEnd + 197/3;
+  this.pulley = {
+    sx: 0, sy: 0, sw: 42, sh: 40,
+    x: this.x + 26, y: this.fsy, w: 42, h: 40
+    };
+  this.rope = {
+    sx: 0, sy: 0, sw: 10, sh: 1000,
+    x: this.x + 26, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10
+    };
+  this.rope2 = {
+    sx: 0, sy: 0, sw: 10, sh: 1000,
+    x: this.x + 58, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10
+    };
+  this.lastAnimationUpdate = 0;
+  this.frameRate = 5;
+  this.frame = 0;
+  this.destroy = false;
+  this.update = function(){
+    if (this.y < this.fsy || this.y > this.fey){
+      this.vy = -this.vy;
+    }
+    this.y += this.vy;
+    
+    // Trims Rope
+    this.rope.h = this.y - this.fsy;
+    this.rope2.h = this.y - this.fsy;
+    this.rope.sh = this.y - this.fsy;
+    this.rope2.sh = this.y - this.fsy;
+    
+    // Animation
+    if (game.elapsedTime - this.lastAnimationUpdate > this.frameRate){
+      this.lastAnimationUpdate = game.elapsedTime;
+      if (++this.frame > 1)
+        this.frame = 0;
+    }
+    
+    this.rope.sx = this.rope.w * this.frame;
+    this.rope2.sx = this.rope2.w * this.frame;
+    this.pulley.sx = this.pulley.w * this.frame;
+  };
+  this.draw = function(){
+    context.drawImage(this.spriteRope, this.rope.sx, this.rope.sy, this.rope.sw, this.rope.sh, this.rope.x, this.rope.y, this.rope.w, this.rope.h);
+    context.drawImage(this.spriteRope, this.rope2.sx, this.rope2.sy, this.rope2.sw, this.rope2.sh, this.rope2.x, this.rope2.y, this.rope2.w, this.rope2.h);
+    context.drawImage(this.spritePulley, this.pulley.sx, this.pulley.sy, this.pulley.sw, this.pulley.sh, this.pulley.x, this.pulley.y, this.pulley.w, this.pulley.h);
+    context.drawImage(this.sprite, this.x, this.y, this.w, this.h);
+  };
 }
 </script>
 <script>
@@ -451,6 +517,8 @@ game.init = function(ctx){
   game.addEntity( new Igor(ASSET_MANAGER.getAsset('img/Igor.png'), 330, -1) );
   game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 370, -2) );
   game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 300, -3) );
+  game.addEntity( new Lift(-1, 0, "left") );
+  game.addEntity( new Lift(-2, 0, "right") );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );
@@ -480,6 +548,9 @@ ASSET_MANAGER.queueDownload('img/Scientist.png');
 ASSET_MANAGER.queueDownload('img/Building.png');
 ASSET_MANAGER.queueDownload('img/MiniMap.png');
 ASSET_MANAGER.queueDownload('img/Igor.png');
+ASSET_MANAGER.queueDownload('img/Lift.png');
+ASSET_MANAGER.queueDownload('img/LiftPulley.png');
+ASSET_MANAGER.queueDownload('img/LiftRope.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
