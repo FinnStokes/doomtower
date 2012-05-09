@@ -1,8 +1,59 @@
-class Entity:
+import settings
+
+class Manager:
     def __init__(self, event):
-        id = 0 # give them unique ids or pass into constructor
-        event.register("input_move", moveTo)
+        self.event = event
+        self.nextId = 0
+        event.register("create_client", self.create_client)
+        event.register("create_scientist", self.create_scientist)
+        event.register("create_igor", self.create_igor)
     
-    def moveTo(self, entity, floor):
+    def create_client(self):
+        e = Client(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        self.nextId = self.nextId + 1
+    
+    def create_scientist(self):
+        e = Scientist(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        self.nextId = self.nextId + 1
+    
+    def create_igor(self):
+        e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        self.nextId = self.nextId + 1
+    
+class Entity:
+    def __init__(self, event, id, x, floor):
+        self.id = id
+        self.x = x
+        self.y = floor
+        self.target = self.x
+        self.speed = settings.ENTITY_SPEED
+        self.event = event
+        event.register("input_move", self.move_to)
+        event.register("update", self.update)
+        event.notify("new_entity", self.id, self.x, self.y)
+    
+    def move_to(self, entity, floor):
         if entity == self.id:
-            pass # move
+            if floor != self.y:
+                self.target = 0
+                self.y = floor
+    
+    def update(self, dt):
+        if self.x != self.target:
+            if abs(self.x - self.target) < self.speed*dt:
+                self.x = self.target
+            else:
+                if self.x < self.target:
+                    self.x = self.x + self.speed*dt
+                else:
+                    self.x = self.x - self.speed*dt
+            self.event.notify("update_entity", self.id, self.x, self.y)
+
+class Client(Entity):
+    pass
+
+class Scientist(Entity):
+    pass
+
+class Igor(Entity):
+    pass

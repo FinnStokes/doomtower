@@ -54,9 +54,45 @@ function Scientist(sprite, x, floor){
       else
       this.state = State.standing;
     
-    if (this.x < 228 || this.x > 228+704-100){
-      this.vx = -this.vx;
-      this.facing = -this.facing;
+    var nearestLift = 1000;
+    var lift;
+    for (var i=0; i < game.entities.length; i++){
+      if (game.entities[i].lift){
+        if (lineDistance(game.entities[i], this) < nearestLift){
+          nearestLift = lineDistance(game.entities[i], this);
+          lift = game.entities[i];
+        }
+      }
+    }
+    
+    if (Math.abs(this.x - lift.x) < 10){
+      this.y = lift.y + 30;
+      lift.moving = true;
+    }
+    
+    // If near a lift, walk towards it
+    if ( nearestLift < 150 && !lift.moving){
+      var angle = Math.atan2(lift.y - this.y, lift.x - this.x);
+      this.vx = Math.cos(angle) * 1;
+      
+      // Face the right direction
+      if (this.vx < 0)
+        this.facing = -1;
+        else
+        this.facing = 1;
+        
+      // If in the center of the lift, stop
+      if (Math.abs(this.x+this.w/2 - lift.x+lift.w/2) < 10){
+        this.vx = 0;
+        this.state = State.standing;
+        lift.moving = true;
+      }
+    } else {
+      // Change direction if hit bounds
+      if (this.x < 228 || this.x > 228+704-100){
+        this.vx = -this.vx;
+        this.facing = -this.facing;
+      }
     }
     
     this.x += this.vx;
@@ -438,6 +474,7 @@ function Floor(floor, sprite){
 }
 
 function Lift(floorStart, floorEnd, side){
+  this.lift = true;
   this.sprite = ASSET_MANAGER.getAsset('img/Lift.png');
   this.spritePulley = ASSET_MANAGER.getAsset('img/LiftPulley.png');
   this.spriteRope = ASSET_MANAGER.getAsset('img/LiftRope.png');
@@ -446,7 +483,7 @@ function Lift(floorStart, floorEnd, side){
     this.x = 120;
   else
     this.x = 920;
-  this.y = (256 + 10) * floorStart;
+  this.y = (256 + 10) * floorStart + 30;
   this.w = 96;
   this.h = 197;
   this.vy = 1;
@@ -454,40 +491,41 @@ function Lift(floorStart, floorEnd, side){
   this.floorEnd = floorEnd;
   this.fsy = (256 + 10) * floorStart;
   this.fey = (256 + 10) * floorEnd + 197/3;
-  this.pulley = {
-    sx: 0, sy: 0, sw: 42, sh: 40,
-    x: this.x + 26, y: this.fsy, w: 42, h: 40
-    };
-  this.rope = {
-    sx: 0, sy: 0, sw: 10, sh: 1000,
-    x: this.x + 26, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10
-    };
-  this.rope2 = {
-    sx: 0, sy: 0, sw: 10, sh: 1000,
-    x: this.x + 58, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10
-    };
+  this.liftDoor = { sx: 0, sy: this.h*1, sw: this.w, sh: this.h, x:this.x+this.w-5, y:this.y, w:this.w, h:this.h };
+  this.pulley = { sx: 0, sy: 0, sw: 42, sh: 40, x: this.x + 26, y: this.fsy, w: 42, h: 40 };
+  this.rope = { sx: 0, sy: 0, sw: 10, sh: 1000, x: this.x + 26, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10 };
+  this.rope2 = { sx: 0, sy: 0, sw: 10, sh: 1000, x: this.x + 58, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10 };
   this.lastAnimationUpdate = 0;
   this.frameRate = 5;
   this.frame = 0;
+  this.moving = true;
   this.destroy = false;
   this.update = function(){
-    if (this.y < this.fsy || this.y > this.fey){
+    // Change directions and stop
+    if (this.y < this.fsy + 30|| this.y > this.fey){
+      this.y += -this.vy*3;
       this.vy = -this.vy;
+      this.moving = false;
     }
-    this.y += this.vy;
+    
+    // Move
+    if (this.moving){
+      // Move Lift
+      this.y += this.vy;
+      
+      // Animation
+      if (game.elapsedTime - this.lastAnimationUpdate > this.frameRate){
+        this.lastAnimationUpdate = game.elapsedTime;
+        if (++this.frame > 1)
+          this.frame = 0;
+      }
+    }
     
     // Trims Rope
     this.rope.h = this.y - this.fsy;
     this.rope2.h = this.y - this.fsy;
     this.rope.sh = this.y - this.fsy;
     this.rope2.sh = this.y - this.fsy;
-    
-    // Animation
-    if (game.elapsedTime - this.lastAnimationUpdate > this.frameRate){
-      this.lastAnimationUpdate = game.elapsedTime;
-      if (++this.frame > 1)
-        this.frame = 0;
-    }
     
     this.rope.sx = this.rope.w * this.frame;
     this.rope2.sx = this.rope2.w * this.frame;
@@ -497,7 +535,7 @@ function Lift(floorStart, floorEnd, side){
     context.drawImage(this.spriteRope, this.rope.sx, this.rope.sy, this.rope.sw, this.rope.sh, this.rope.x, this.rope.y, this.rope.w, this.rope.h);
     context.drawImage(this.spriteRope, this.rope2.sx, this.rope2.sy, this.rope2.sw, this.rope2.sh, this.rope2.x, this.rope2.y, this.rope2.w, this.rope2.h);
     context.drawImage(this.spritePulley, this.pulley.sx, this.pulley.sy, this.pulley.sw, this.pulley.sh, this.pulley.x, this.pulley.y, this.pulley.w, this.pulley.h);
-    context.drawImage(this.sprite, this.x, this.y, this.w, this.h);
+    context.drawImage(this.sprite, 0,0,this.w, this.h, this.x, this.y, this.w, this.h);
   };
 }
 </script>
