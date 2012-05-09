@@ -54,9 +54,45 @@ function Scientist(sprite, x, floor){
       else
       this.state = State.standing;
     
-    if (this.x < 128 || this.x > 128+704-100){
-      this.vx = -this.vx;
-      this.facing = -this.facing;
+    var nearestLift = 1000;
+    var lift;
+    for (var i=0; i < game.entities.length; i++){
+      if (game.entities[i].lift){
+        if (lineDistance(game.entities[i], this) < nearestLift){
+          nearestLift = lineDistance(game.entities[i], this);
+          lift = game.entities[i];
+        }
+      }
+    }
+    
+    if (Math.abs(this.x - lift.x) < 10){
+      this.y = lift.y + 30;
+      lift.moving = true;
+    }
+    
+    // If near a lift, walk towards it
+    if ( nearestLift < 150 && !lift.moving){
+      var angle = Math.atan2(lift.y - this.y, lift.x - this.x);
+      this.vx = Math.cos(angle) * 1;
+      
+      // Face the right direction
+      if (this.vx < 0)
+        this.facing = -1;
+        else
+        this.facing = 1;
+        
+      // If in the center of the lift, stop
+      if (Math.abs(this.x+this.w/2 - lift.x+lift.w/2) < 10){
+        this.vx = 0;
+        this.state = State.standing;
+        lift.moving = true;
+      }
+    } else {
+      // Change direction if hit bounds
+      if (this.x < 228 || this.x > 228+704-100){
+        this.vx = -this.vx;
+        this.facing = -this.facing;
+      }
     }
     
     this.x += this.vx;
@@ -94,7 +130,63 @@ function Scientist(sprite, x, floor){
   };
 }
 
-function Igore(){
+function Igor(sprite, x, floor){
+this.sprite = sprite;
+  this.x = x;
+  this.y = (256 + 10) * floor + 80; (256+10) // is the floor position on screen
+  this.w = 100;
+  this.h = 160;
+  this.vx = 0.5;
+  this.facing = 1;
+  this.destroy = false;
+  this.visible = false;
+  this.state = State.standing;
+  this.standAnimation = new Animation(this.w, this.h, State.standing, 2, 60*1.5);
+  this.walkAnimation = new Animation(this.w, this.h, State.walking, 2, 60*0.5);
+  this.update = function(){
+    if (this.vx != 0)
+      this.state = State.walking;
+      else
+      this.state = State.standing;
+    
+    if (this.x < 228 || this.x > 228+704-100){
+      this.vx = -this.vx;
+      this.facing = -this.facing;
+    }
+    
+    this.x += this.vx;
+    
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.update(game.elapsedTime);
+        break;
+      case State.walking:
+        this.walkAnimation.update(game.elapsedTime);
+        break;
+    }
+    
+    var rand = Math.random();
+    if (rand > 0.99)
+      this.vx = 0;
+    else if (rand < 0.005)
+      this.vx = 0.75 * this.facing;
+    if (this.vx == 0){
+      var rand = Math.random();
+      if (rand < 0.005)
+        this.facing = -this.facing;
+    }
+
+  };
+  this.draw = function(){
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+      case State.walking:
+        this.walkAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+    }
+  };
 }
 
 function Animation(fw, fh, currentAnimation, totalFrames, frameRate){
@@ -198,6 +290,49 @@ function Menu(sprite, type, x,y,w,h){
   };
 }
 
+function MiniMap(sprite){
+  this.x = 0;
+  this.y = 0;
+  this.w = 114;
+  this.h = 600;
+  this.floor = { w: 106, h: 32 };
+  this.offset = { x: 4, y: 4 };
+  this.sprite = sprite;
+  this.colorBackground = "#3C2F2B";
+  this.colorEmpty = "#4F4440";
+  this.colorLobby = "#D9564A";
+  this.colorReception = "#F27C38";
+  this.colorBombLab = "#80AE61";
+  this.colorBioLab = "#D95F80";
+  this.update = function(){};
+  this.draw = function(cursor){
+    // Draw Background
+    context.fillStyle = this.colorBackground;
+    context.fillRect(this.x, this.y, this.w, this.h);
+    
+    var decrement = 10;
+    // Draw Blank Rooms
+    for(var i=0; i < 16; i++){
+      var x = this.offset.x;
+      var y = this.offset.y + (this.floor.h + 1) * i;
+      var w = this.floor.w;
+      var h = this.floor.h;
+      
+      // Highlight Floor
+      if (isCollide(cursor, {x:x,y:y,w:w,h:h}))
+        context.fillStyle = this.colorLobby;
+      else
+        context.fillStyle = this.colorEmpty;
+        
+      // Click event
+      
+      context.fillRect(x,y,w,h);
+    }
+    
+    context.drawImage(this.sprite, this.x, this.y, this.w, this.h);
+  };
+}
+
 function GUI(sprite){
   this.sprite = sprite;
   this.x = 0;
@@ -207,6 +342,7 @@ function GUI(sprite){
   this.destroy = false;
   this.hireMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'), "Hire", 512);
   this.buildMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Build.png'), "Build", 64);
+  this.miniMap = new MiniMap(ASSET_MANAGER.getAsset('img/MiniMap.png'));
   
   this.money = {
     text: "15,000",
@@ -259,6 +395,12 @@ function GUI(sprite){
   };
   
   this.draw = function(){
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 };
+    
+      // MiniMap
+    this.miniMap.draw(cursor);
+
+    // Draw Gui
     context.drawImage(sprite, this.x, this.y);
     
     // Draw Hire Button (Highlight logic is in there)
@@ -314,8 +456,9 @@ function GUI(sprite){
 }
 
 function Floor(floor, sprite){
+  this.floor = floor;
   this.sprite = sprite;
-  this.x = 128;
+  this.x = 215;
   this.y = (256 + 10) * -floor; // Negative so it starts from the bottom
   this.w = 704;
   this.h = 256;
@@ -324,8 +467,76 @@ function Floor(floor, sprite){
     document.getElementById("output").innerHTML = latestCoords[0].x + "," + latestCoords[0].y;
   };
   this.draw = function(){
+    context.fillStyle = "#3C2F2B";
+    context.fillRect(this.x - 28, this.y - 10, this.w + 28*2, this.h + 20);
     context.drawImage(sprite, this.x, this.y);
   }; 
+}
+
+function Lift(floorStart, floorEnd, side){
+  this.lift = true;
+  this.sprite = ASSET_MANAGER.getAsset('img/Lift.png');
+  this.spritePulley = ASSET_MANAGER.getAsset('img/LiftPulley.png');
+  this.spriteRope = ASSET_MANAGER.getAsset('img/LiftRope.png');
+  this.x;
+  if (side == "left")
+    this.x = 120;
+  else
+    this.x = 920;
+  this.y = (256 + 10) * floorStart + 30;
+  this.w = 96;
+  this.h = 197;
+  this.vy = 1;
+  this.floorStart = floorStart;
+  this.floorEnd = floorEnd;
+  this.fsy = (256 + 10) * floorStart;
+  this.fey = (256 + 10) * floorEnd + 197/3;
+  this.liftDoor = { sx: 0, sy: this.h*1, sw: this.w, sh: this.h, x:this.x+this.w-5, y:this.y, w:this.w, h:this.h };
+  this.pulley = { sx: 0, sy: 0, sw: 42, sh: 40, x: this.x + 26, y: this.fsy, w: 42, h: 40 };
+  this.rope = { sx: 0, sy: 0, sw: 10, sh: 1000, x: this.x + 26, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10 };
+  this.rope2 = { sx: 0, sy: 0, sw: 10, sh: 1000, x: this.x + 58, y: this.fsy + 20, w: 10, h: 1000 - this.h + 10 };
+  this.lastAnimationUpdate = 0;
+  this.frameRate = 5;
+  this.frame = 0;
+  this.moving = true;
+  this.destroy = false;
+  this.update = function(){
+    // Change directions and stop
+    if (this.y < this.fsy + 30|| this.y > this.fey){
+      this.y += -this.vy*3;
+      this.vy = -this.vy;
+      this.moving = false;
+    }
+    
+    // Move
+    if (this.moving){
+      // Move Lift
+      this.y += this.vy;
+      
+      // Animation
+      if (game.elapsedTime - this.lastAnimationUpdate > this.frameRate){
+        this.lastAnimationUpdate = game.elapsedTime;
+        if (++this.frame > 1)
+          this.frame = 0;
+      }
+    }
+    
+    // Trims Rope
+    this.rope.h = this.y - this.fsy;
+    this.rope2.h = this.y - this.fsy;
+    this.rope.sh = this.y - this.fsy;
+    this.rope2.sh = this.y - this.fsy;
+    
+    this.rope.sx = this.rope.w * this.frame;
+    this.rope2.sx = this.rope2.w * this.frame;
+    this.pulley.sx = this.pulley.w * this.frame;
+  };
+  this.draw = function(){
+    context.drawImage(this.spriteRope, this.rope.sx, this.rope.sy, this.rope.sw, this.rope.sh, this.rope.x, this.rope.y, this.rope.w, this.rope.h);
+    context.drawImage(this.spriteRope, this.rope2.sx, this.rope2.sy, this.rope2.sw, this.rope2.sh, this.rope2.x, this.rope2.y, this.rope2.w, this.rope2.h);
+    context.drawImage(this.spritePulley, this.pulley.sx, this.pulley.sy, this.pulley.sw, this.pulley.sh, this.pulley.x, this.pulley.y, this.pulley.w, this.pulley.h);
+    context.drawImage(this.sprite, 0,0,this.w, this.h, this.x, this.y, this.w, this.h);
+  };
 }
 </script>
 <script>
@@ -340,10 +551,12 @@ game.init = function(ctx){
   // Init stuff here
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 130, 0) );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 230, -1) );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 170, -2) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 230, 0) );
+  game.addEntity( new Igor(ASSET_MANAGER.getAsset('img/Igor.png'), 330, -1) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 370, -2) );
   game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 300, -3) );
+  game.addEntity( new Lift(-1, 0, "left") );
+  game.addEntity( new Lift(-2, 0, "right") );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );
@@ -370,6 +583,12 @@ ASSET_MANAGER.queueDownload('img/GUI_Build.png');
 ASSET_MANAGER.queueDownload('img/Icons.png');
 ASSET_MANAGER.queueDownload('img/Hirees.png');
 ASSET_MANAGER.queueDownload('img/Scientist.png');
+ASSET_MANAGER.queueDownload('img/Building.png');
+ASSET_MANAGER.queueDownload('img/MiniMap.png');
+ASSET_MANAGER.queueDownload('img/Igor.png');
+ASSET_MANAGER.queueDownload('img/Lift.png');
+ASSET_MANAGER.queueDownload('img/LiftPulley.png');
+ASSET_MANAGER.queueDownload('img/LiftRope.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){

@@ -14,6 +14,12 @@ To Add
 * Build Menu: Buy Floors
 * Build Menu: Drag floors to tower
 * Only apply mouse events to top layer
+* Drag Scientist/Igor from Floor to MiniMap
+* Click to select Scientist/Igor
+* If Scientist/Igor selected and Click, instruct entity to move to new floor
+* Click on customer
+* 
+
 
 Currently Implemented (in prototype)
 -------
