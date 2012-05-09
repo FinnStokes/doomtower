@@ -7,8 +7,7 @@ room_images.append(pygame.image.load('img/Floor_Lobby.png'))
 room_images.append(pygame.image.load('img/Floor_Reception.png'))
 room_images.append(pygame.image.load('img/Floor_LabBio.png'))
 room_images.append(pygame.image.load('img/Floor_LabBoom.png'))
-#room = pyglet.sprite.Sprite(room_image, 100,100);
-#room_sprites = pyglet.image.ImageGrid(room_image, 4, 1);
+
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -86,13 +85,13 @@ class Render:
     def step_screen(self, up):
         screen_width, screen_height = self.window.get_size()
         if up:
-            top_room = (self.y_pan + screen_height + self.room_padding)//(self.room_height+self.room_padding)
+            top_room = (self.y_pan + screen_height + self.room_padding + self.room_height/2)//(self.room_height+self.room_padding)
             if self.pan_speed > 0:
                 self.pan_screen(top_room + 1)
             else:
                 self.pan_screen(top_room)
         else:
-            bottom_room = (self.y_pan - self.room_padding)//(self.room_height+self.room_padding)
+            bottom_room = (self.y_pan - self.room_padding - self.room_height/2)//(self.room_height+self.room_padding)
             if self.pan_speed < 0:
                 self.pan_screen(bottom_room - 1)
             else:
