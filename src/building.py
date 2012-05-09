@@ -19,7 +19,15 @@ class Building:
             self.event.notify("add_room")
         # add lobby at ground floor
         self.build_room(0,1)
-    
+
+        # add test floors
+        self.build_room(1,2)
+        self.build_room(-1,3)
+        self.build_room(2,4)
+        self.build_room(3,3)
+        self.event.notify("set_scroll", -1)
+        self.event.notify("set_scroll", 1)
+        self.event.notify("set_scroll", 2)
     def update(self, dt):      
     #   Elevators
         for i in range(len(self.lifts)):
