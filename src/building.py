@@ -25,7 +25,6 @@ class Building:
         self.build_room(-1,3)
         self.build_room(2,4)
         self.build_room(3,3)
-        self.event.notify("set_scroll", -1)
     def update(self, dt):      
     #   Elevators
         for i in range(len(self.lifts)):
