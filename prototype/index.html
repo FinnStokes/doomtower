@@ -54,7 +54,7 @@ function Scientist(sprite, x, floor){
       else
       this.state = State.standing;
     
-    if (this.x < 128 || this.x > 128+704-100){
+    if (this.x < 228 || this.x > 228+704-100){
       this.vx = -this.vx;
       this.facing = -this.facing;
     }
@@ -94,7 +94,63 @@ function Scientist(sprite, x, floor){
   };
 }
 
-function Igore(){
+function Igor(sprite, x, floor){
+this.sprite = sprite;
+  this.x = x;
+  this.y = (256 + 10) * floor + 80; (256+10) // is the floor position on screen
+  this.w = 100;
+  this.h = 160;
+  this.vx = 0.5;
+  this.facing = 1;
+  this.destroy = false;
+  this.visible = false;
+  this.state = State.standing;
+  this.standAnimation = new Animation(this.w, this.h, State.standing, 2, 60*1.5);
+  this.walkAnimation = new Animation(this.w, this.h, State.walking, 2, 60*0.5);
+  this.update = function(){
+    if (this.vx != 0)
+      this.state = State.walking;
+      else
+      this.state = State.standing;
+    
+    if (this.x < 228 || this.x > 228+704-100){
+      this.vx = -this.vx;
+      this.facing = -this.facing;
+    }
+    
+    this.x += this.vx;
+    
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.update(game.elapsedTime);
+        break;
+      case State.walking:
+        this.walkAnimation.update(game.elapsedTime);
+        break;
+    }
+    
+    var rand = Math.random();
+    if (rand > 0.99)
+      this.vx = 0;
+    else if (rand < 0.005)
+      this.vx = 0.75 * this.facing;
+    if (this.vx == 0){
+      var rand = Math.random();
+      if (rand < 0.005)
+        this.facing = -this.facing;
+    }
+
+  };
+  this.draw = function(){
+    switch(this.state){
+      case State.standing:
+        this.standAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+      case State.walking:
+        this.walkAnimation.draw(sprite, this.x, this.y, this.facing);
+        break;
+    }
+  };
 }
 
 function Animation(fw, fh, currentAnimation, totalFrames, frameRate){
@@ -198,6 +254,49 @@ function Menu(sprite, type, x,y,w,h){
   };
 }
 
+function MiniMap(sprite){
+  this.x = 0;
+  this.y = 0;
+  this.w = 114;
+  this.h = 600;
+  this.floor = { w: 106, h: 32 };
+  this.offset = { x: 4, y: 4 };
+  this.sprite = sprite;
+  this.colorBackground = "#3C2F2B";
+  this.colorEmpty = "#4F4440";
+  this.colorLobby = "#D9564A";
+  this.colorReception = "#F27C38";
+  this.colorBombLab = "#80AE61";
+  this.colorBioLab = "#D95F80";
+  this.update = function(){};
+  this.draw = function(cursor){
+    // Draw Background
+    context.fillStyle = this.colorBackground;
+    context.fillRect(this.x, this.y, this.w, this.h);
+    
+    var decrement = 10;
+    // Draw Blank Rooms
+    for(var i=0; i < 16; i++){
+      var x = this.offset.x;
+      var y = this.offset.y + (this.floor.h + 1) * i;
+      var w = this.floor.w;
+      var h = this.floor.h;
+      
+      // Highlight Floor
+      if (isCollide(cursor, {x:x,y:y,w:w,h:h}))
+        context.fillStyle = this.colorLobby;
+      else
+        context.fillStyle = this.colorEmpty;
+        
+      // Click event
+      
+      context.fillRect(x,y,w,h);
+    }
+    
+    context.drawImage(this.sprite, this.x, this.y, this.w, this.h);
+  };
+}
+
 function GUI(sprite){
   this.sprite = sprite;
   this.x = 0;
@@ -207,6 +306,7 @@ function GUI(sprite){
   this.destroy = false;
   this.hireMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Hire.png'), "Hire", 512);
   this.buildMenu = new Menu(ASSET_MANAGER.getAsset('img/GUI_Build.png'), "Build", 64);
+  this.miniMap = new MiniMap(ASSET_MANAGER.getAsset('img/MiniMap.png'));
   
   this.money = {
     text: "15,000",
@@ -259,6 +359,12 @@ function GUI(sprite){
   };
   
   this.draw = function(){
+    var cursor = { x: latestCoords[0].x, y: latestCoords[0].y, w: 1, h: 1 };
+    
+      // MiniMap
+    this.miniMap.draw(cursor);
+
+    // Draw Gui
     context.drawImage(sprite, this.x, this.y);
     
     // Draw Hire Button (Highlight logic is in there)
@@ -314,8 +420,9 @@ function GUI(sprite){
 }
 
 function Floor(floor, sprite){
+  this.floor = floor;
   this.sprite = sprite;
-  this.x = 128;
+  this.x = 228;
   this.y = (256 + 10) * -floor; // Negative so it starts from the bottom
   this.w = 704;
   this.h = 256;
@@ -340,9 +447,9 @@ game.init = function(ctx){
   // Init stuff here
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 130, 0) );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 230, -1) );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 170, -2) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 230, 0) );
+  game.addEntity( new Igor(ASSET_MANAGER.getAsset('img/Igor.png'), 330, -1) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 370, -2) );
   game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 300, -3) );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
@@ -370,6 +477,9 @@ ASSET_MANAGER.queueDownload('img/GUI_Build.png');
 ASSET_MANAGER.queueDownload('img/Icons.png');
 ASSET_MANAGER.queueDownload('img/Hirees.png');
 ASSET_MANAGER.queueDownload('img/Scientist.png');
+ASSET_MANAGER.queueDownload('img/Building.png');
+ASSET_MANAGER.queueDownload('img/MiniMap.png');
+ASSET_MANAGER.queueDownload('img/Igor.png');
 
 // Starts game
 ASSET_MANAGER.downloadAll(function(){
