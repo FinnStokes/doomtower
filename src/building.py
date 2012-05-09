@@ -13,6 +13,7 @@ class Building:
         self.player_funds = settings.STARTING_FUNDS
         self.floors = []
         self.lifts = []
+
         # fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
@@ -29,12 +30,10 @@ class Building:
     #   Elevators
         for i in range(len(self.lifts)):
             self.lifts[i].move()
-
     #   Rooms
         for i in range(len(self.floors)):
             self.floors[i].operate()
-                
-    
+
         pass # update elevator position and room actions
     
     def build_room(self, floor, room_id):
@@ -46,15 +45,17 @@ class Building:
     def build_elevator(self, left, floors):
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
-      
-        self.lifts[int(not left)] = Elevator(floors, min(floors) * floor_height)
+        self.lifts[int(not left)].append( Elevator(floors, min(floors) * floor_height))
         self.event.notify('new_elevator', left, floors)
-           
-    def get_elevator(self, floor, left):
-        if self.lifts[int(not left)].curr_floor == floor:
-            return self.lifts[int(not left)]
-        else: 
-            return None  # get the elevator at floor (on left if left is true, on right if false)
+     
+    #gets elevator at given floor on given side of building       
+    def get_elevator(self, floor, left): 
+        
+        for i in range(len(self.lifts[int(not left)])):               
+            if floor == self.lifts[int(not left)][i].curr_floor:
+                return self.lifts[int(not left)]
+  
+        return None  # get the elevator at floor (on left if left is true, on right if false)
 
     def service(self):
         pass
@@ -74,7 +75,7 @@ class Elevator:
         self.capacity = 1
         self.occupants = 0
         self.pickups = []
-        self.ascending = True
+     #   self.ascending = True
         self.moving = False
 
     # calculate distance from given floor
@@ -83,21 +84,35 @@ class Elevator:
     
     # add floor to queue of passenger pickups
     def call_to(self, floor):
+        if not self.moving:
+            self.moving = True
+
         if floor in self.floors:
             self.pickups.append(floor)
         else:  
             pass 
 
-    # move to nearest floor in current direction
+    # move to next floor in pickup queue  
     def move(self, dt):
-    # cull destinations that won't be encountered in current direction
+        if not self.moving:
+            return None
+ 
+        dest = self.pickups[0]
 
         if self.curr_floor != dest:
+            distance = distance_from(self, dest)
+            self.y = self.y + Elevator.lift_speed * dt * (distance / abs(distance))
+            self.curr_floor = int( float(self.y) / float(Building.floor_height))
             pass
         else:
-            pass      
+            self.pickups.pop(0)
+            open_doors(self)
 
-
+    # when elevator reaches a requested floor it must stop and allow ingress/egress
+    def open_doors(self):
+        self.moving = False
+        self.event.notify("elevator_open", self.curr_floor)
+    
 
 class Room:
     #product types
