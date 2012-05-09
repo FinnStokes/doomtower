@@ -4,6 +4,9 @@ import settings
 
 room_images = []
 room_images.append(pygame.image.load('img/Floor_Lobby.png'))
+room_images.append(pygame.image.load('img/Floor_Reception.png'))
+room_images.append(pygame.image.load('img/Floor_LabBio.png'))
+room_images.append(pygame.image.load('img/Floor_LabBoom.png'))
 #room = pyglet.sprite.Sprite(room_image, 100,100);
 #room_sprites = pyglet.image.ImageGrid(room_image, 4, 1);
 class Render:
@@ -38,7 +41,7 @@ class Render:
         
         for i in range(bottom_room, top_room):
             y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
-            self.window.blit(room_images[0], (x_offset,y_offset))
+            self.window.blit(room_images[i%4], (x_offset,y_offset))
         pygame.display.update()
     
     def add_room(self):
