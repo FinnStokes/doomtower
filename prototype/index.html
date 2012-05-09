@@ -35,10 +35,10 @@ var State = {
   standing: 0,
   walking: 1
 };
-function Scientist(sprite, x, y){
+function Scientist(sprite, x, floor){
   this.sprite = sprite;
   this.x = x;
-  this.y = y;
+  this.y = (256 + 10) * floor + 80; (256+10) // is the floor position on screen
   this.w = 100;
   this.h = 160;
   this.vx = 0.75;
@@ -340,7 +340,10 @@ game.init = function(ctx){
   // Init stuff here
   // var level = new Level(ASSET_MANAGER.getAsset('img/blank.png'), ASSET_MANAGER.getAsset('img/GroundTile.png'));
   game.addEntity( player );
-  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 130, 80) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 130, 0) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 230, -1) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 170, -2) );
+  game.addEntity( new Scientist(ASSET_MANAGER.getAsset('img/Scientist.png'), 300, -3) );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );
