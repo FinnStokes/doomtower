@@ -32,7 +32,6 @@ class Render:
         
     def on_draw(self): # render current game state
         self.window.fill((0,0,0))
-        self.y_pan += 1
         screen_width, screen_height = self.window.get_size()
         x_offset = (screen_width-704)/2
 
@@ -40,15 +39,17 @@ class Render:
         top_room = (self.y_pan + screen_height)//(self.room_height+self.room_padding) + 1
         
         for i in range(bottom_room, top_room):
-            y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
-            self.window.blit(room_images[i%4], (x_offset,y_offset))
+            room_id = self.rooms[i-settings.BOTTOM_FLOOR].id - 1
+            if room_id in range (0,4):
+                y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
+                self.window.blit(room_images[room_id], (x_offset,y_offset))
         pygame.display.update()
     
     def add_room(self):
         self.rooms.append(Room())
 
     def update_room(self, floor, room_id):
-        self.rooms(floor + settings.BOTTOM_FLOOR).update(room_id)
+        self.rooms[floor].update(room_id)
     
     def add_entity(self, id, x, y, sprite):
         pass # create entity with given sprite at given position

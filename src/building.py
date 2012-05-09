@@ -15,14 +15,17 @@ class Building:
         for i in range(numfloors):
             self.floors.append(Room()) 
             self.event.notify("add_room")
+        # add lobby at ground floor
+        self.build_room(0,1)
     
     def update(self, dt):      
         pass # update elevator position and room actions
     
     def build_room(self, floor, room_id):
         # construct new room at floor (check that this is next above or below)
-        self.event.notify('update_room', floor, room_id)
-        self.floors[floor] = Room(room_id)
+        floor_index = floor-settings.BOTTOM_FLOOR
+        self.event.notify('update_room', floor_index, room_id)
+        self.floors[floor_index] = Room(room_id)
     
     def build_elevator(self, left, floors):
         # construct new elevator servicing given floors (on left if left is true, on right if false)
