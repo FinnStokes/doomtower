@@ -70,6 +70,7 @@ class Elevator:
         self.occupants = 0
         self.pickups = []
         self.ascending = True
+        self.moving = False
 
     # calculate distance from given floor
     def distance_from(self, floor):
@@ -84,6 +85,8 @@ class Elevator:
 
     # move to nearest floor in current direction
     def move(self, dt):
+    # cull destinations that won't be encountered in current direction
+
         if self.curr_floor != dest:
             pass
         else:
