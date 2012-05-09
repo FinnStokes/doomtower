@@ -23,6 +23,26 @@ class Event():
             for handler in self.handlers[event]:
                 handler(*args, **kargs)
 
+
+# update(dt)
+# This event should be produced periodically with dt set to the time in seconds since it was last produced.
+
+# create_client()
+# This event should be produced when a new client should enter the building at the spawn location.
+# Entity should respond by creating a new Client
+
+# create_scientist()
+# This event should be produced when a new scientist should enter the building at the spawn location (i.e. is hired).
+# Entity should respond by creating a new Scientist
+
+# create_igor()
+# This event should be produced when a new igor should enter the building at the spawn location (i.e. is hired).
+# Entity should respond by creating a new Igor
+
+# input_move(entity, floor)
+# This event should be produced when the player commands an entity to go to a new floor.
+# Entity should respond by starting the referenced entity moving towards the given floor
+
 # update_room(floor, room_id)
 # This event should be produced when a new room gets built, a room is destrpyed (setting id to 0)
 # or a room is remodelled.

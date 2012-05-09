@@ -9,11 +9,15 @@ player_view = view.View(event_manager)
 game_model = model.Model(event_manager)
 pygame.init()
 
+event_manager.notify("create_client")
+event_manager.notify("input_move",0,2)
+
 fpsClock = pygame.time.Clock()
 running = True
 while running:
     fpsClock.tick(30)
     event_manager.notify("refresh")
+    event_manager.notify("update", fpsClock.get_time()/1000.0)
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False

@@ -6,3 +6,10 @@ ROOM_HEIGHT = 256
 STARTING_FUNDS = 10000
 
 SCROLL_TIME = 20
+
+# The x position and floor new entities should spawn at
+SPAWN_POSITION = 0.5
+SPAWN_FLOOR = 0
+
+# The horizontal speed the entities should move at in rooms per second
+ENTITY_SPEED = 1
