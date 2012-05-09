@@ -5,10 +5,12 @@ class Building:
 
     def __init__(self, event_manager):
         numfloors = settings.TOP_FLOOR - settings.BOTTOM_FLOOR +1
+  
         self.event = event_manager
         self.event.register("input_build", self.build_room)
         self.event.register("input_elevator", self.build_elevator)
         self.event.register("update", self.update)
+        self.player_funds = settings.STARTING_FUNDS
         self.floors = []
         self.lifts = []
         # fill building with empty floors
@@ -19,6 +21,15 @@ class Building:
         self.build_room(0,1)
     
     def update(self, dt):      
+    #   Elevators
+        for i in range(len(self.lifts)):
+            self.lifts[i].move()
+
+    #   Rooms
+        for i in range(len(self.floors)):
+            self.floors[i].operate()
+                
+    
         pass # update elevator position and room actions
     
     def build_room(self, floor, room_id):
@@ -30,6 +41,7 @@ class Building:
     def build_elevator(self, left, floors):
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
+      
         self.lifts[int(not left)] = Elevator(floors, min(floors) * floor_height)
         self.event.notify('new_elevator', left, floors)
            
@@ -57,7 +69,8 @@ class Elevator:
         self.capacity = 1
         self.occupants = 0
         self.pickups = []
-       
+        self.ascending = True
+
     # calculate distance from given floor
     def distance_from(self, floor):
         return self.curr_floor - floor
@@ -69,9 +82,12 @@ class Elevator:
         else:  
             pass 
 
-    def move(self, dest):
+    # move to nearest floor in current direction
+    def move(self, dt):
         if self.curr_floor != dest:
-            pass   
+            pass
+        else:
+            pass      
 
 
 
@@ -106,6 +122,9 @@ class Room:
         self.room_id = room_id
         self.size = size
         self.jobs = []
+
+    def operate(self):
+        pass
 
     def produce(self, products):
         pass
