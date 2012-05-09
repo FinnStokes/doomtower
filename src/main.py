@@ -17,3 +17,5 @@ while running:
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
+        elif event.type == VIDEORESIZE:
+            pygame.display.set_mode((event.size),pygame.RESIZABLE) 

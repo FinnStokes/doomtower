@@ -1,9 +1,10 @@
-import os, sys, event
+import os, sys, event, settings
 #encapsulates all building data in the current game
 class Building:
     floor_height = 10
 
-    def __init__(self, event_manager, numfloors = 6):
+    def __init__(self, event_manager):
+        numfloors = settings.TOP_FLOOR - settings.BOTTOM_FLOOR +1
         self.event = event_manager
         self.event.register("input_build", self.build_room)
         self.event.register("input_elevator", self.build_elevator)
@@ -13,7 +14,7 @@ class Building:
         # fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
-            self.event.notify('floor_init', i)
+            self.event.notify("add_room")
     
     def update(self, dt):      
         pass # update elevator position and room actions

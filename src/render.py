@@ -2,12 +2,14 @@ import pygame
 from pygame.locals import *
 import settings
 
-room_image = pygame.image.load('../img/rooms.png')
+room_images = []
+room_images.append(pygame.image.load('img/Floor_Lobby.png'))
 #room = pyglet.sprite.Sprite(room_image, 100,100);
 #room_sprites = pyglet.image.ImageGrid(room_image, 4, 1);
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
+        self.event.register("add_room", self.add_room)
         self.event.register("update_room", self.update_room)
         self.event.register("add_entity", self.add_entity)
         self.event.register("remove_entity", self.remove_entity)
@@ -17,18 +19,31 @@ class Render:
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("refresh", self.on_draw)
         
-        self.testVar = 0
         self.window = window
         self.rooms = []
-        for i in range(settings.TOP_FLOOR-settings.BOTTOM_FLOOR+1):
-            self.rooms.append(Room(0))
+        self.y_pan = 0
 
+        self.room_width = 704
+        self.room_height = 256
+        self.room_padding = 10
+        
     def on_draw(self): # render current game state
-        self.testVar += 1
         self.window.fill((0,0,0))
-        self.window.blit(room_image, (47,self.testVar))
+        self.y_pan += 1
+        screen_width, screen_height = self.window.get_size()
+        x_offset = (screen_width-704)/2
+
+        bottom_room = self.y_pan//(self.room_height+self.room_padding)
+        top_room = (self.y_pan + screen_height)//(self.room_height+self.room_padding) + 1
+        
+        for i in range(bottom_room, top_room):
+            y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
+            self.window.blit(room_images[0], (x_offset,y_offset))
         pygame.display.update()
     
+    def add_room(self):
+        self.rooms.append(Room())
+
     def update_room(self, floor, room_id):
         self.rooms(floor + settings.BOTTOM_FLOOR).update(room_id)
     
@@ -52,8 +67,8 @@ class Render:
     
 
 class Room:
-    def __init__(self, room_id):
-        self.id = room_id
+    def __init__(self):
+        self.id = 0
         
     def update(self, room_id):
         self.id = room_id
