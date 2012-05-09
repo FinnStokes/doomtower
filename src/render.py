@@ -12,6 +12,7 @@ room_images.append(pygame.image.load('img/Floor_LabBoom.png'))
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
+        self.event.register("set_scroll", self.pan_screen)
         self.event.register("add_room", self.add_room)
         self.event.register("update_room", self.update_room)
         self.event.register("add_entity", self.add_entity)
@@ -22,10 +23,12 @@ class Render:
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("refresh", self.on_draw)
         
+        self.building_height = 0
+        self.building_depth = 0
         self.window = window
         self.rooms = []
         self.y_pan = 0
-
+        self.y_target = 0
         self.room_width = 704
         self.room_height = 256
         self.room_padding = 10
@@ -33,6 +36,10 @@ class Render:
     def on_draw(self): # render current game state
         self.window.fill((0,0,0))
         screen_width, screen_height = self.window.get_size()
+        if self.y_pan < self.y_target:
+            self.y_pan += 1
+        elif self.y_pan > self.y_target:
+            self.y_pan -= 1
         x_offset = (screen_width-704)/2
 
         bottom_room = self.y_pan//(self.room_height+self.room_padding)
@@ -45,10 +52,28 @@ class Render:
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
         pygame.display.update()
     
+    def pan_screen(self, floor):
+        screen_width, screen_height = self.window.get_size()
+        floor_height = (self.room_height+self.room_padding)*(floor)
+        if floor_height < self.y_pan:
+            #scroll down
+            self.y_target = floor_height
+        elif floor_height + self.room_height > self.y_pan + screen_height:
+            #scroll up
+            self.y_target = floor_height + self.room_height - screen_height
+        else:
+            #stop scrolling
+            self.y_target = self.y_pan
     def add_room(self):
         self.rooms.append(Room())
 
     def update_room(self, floor, room_id):
+        if room_id !=0:
+            height = floor - settings.BOTTOM_FLOOR
+            if height > self.building_height:
+                self.building_height = height
+            elif height < self.building_depth:
+                self.building_depth = height
         self.rooms[floor].update(room_id)
     
     def add_entity(self, id, x, y, sprite):
