@@ -19,3 +19,8 @@ while running:
             running = False
         elif event.type == VIDEORESIZE:
             pygame.display.set_mode((event.size),pygame.RESIZABLE) 
+        elif event.type == KEYDOWN:
+            if event.key == K_UP:
+                event_manager.notify("step_scroll", True)
+            elif event.key == K_DOWN:
+                event_manager.notify("step_scroll", False)
