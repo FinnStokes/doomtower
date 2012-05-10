@@ -33,6 +33,7 @@ class Render:
         self.room_width = 704
         self.room_height = 256
         self.room_padding = 10
+        self.entities = dict()
         
     def on_draw(self, dt): # render current game state
         self.window.fill((0,0,0))
@@ -56,10 +57,16 @@ class Render:
         top_room = (self.y_pan + screen_height)//(self.room_height+self.room_padding) + 1
         
         for i in range(bottom_room, top_room):
-            room_id = self.rooms[i-settings.BOTTOM_FLOOR].id - 1
+            room = self.rooms[i-settings.BOTTOM_FLOOR]
+            room_id = room.id - 1
+            y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
             if room_id in range (0,len(room_images)):
-                y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
+            for entity in room.entities:
+                if entity.sprite:
+                    self.window.blit(entity.sprite,
+                                     (x_offset + entity.x*704,
+                                      y_offset + entity.y*(self.room_height+self.room_padding)))
         pygame.display.update()
     
     def pan_screen(self, floor):
@@ -113,13 +120,32 @@ class Render:
         self.rooms[floor].update(room_id)
     
     def add_entity(self, id, x, y, sprite):
-        pass # create entity with given sprite at given position
+        print "new entity ("+str(id)+")"
+        self.entities[id] = Entity(sprite, x, y)
+        if y in range(len(self.rooms)):
+            self.rooms[y].entities.add(self.entities[id])
     
-    def remove_entity(self, id):
-        pass
+    def remove_entity(self, id): # create entity with given sprite at given position
+        if id in self.entities:
+            y = self.entities[id].y
+            if y in range(len(self.rooms)):
+                self.rooms[y].entities.remove(self.entities[id])
+            del self.entities[id]
+        else:
+            raise ValueError("Invalid entity id.")
     
-    def update_entity(self, id, x, y):
-        pass # change entity position
+    def update_entity(self, id, x, y): # change entity position
+        print "update entity "+str(id)
+        if id in self.entities:
+            oldy = self.entities[id].y
+            if oldy in range(len(self.rooms)):
+                self.rooms[oldy].entities.discard(self.entities[id])
+            if y in range(len(self.rooms)):
+                self.rooms[y].entities.add(self.entities[id])
+            self.entities[id].x = x
+            self.entities[id].y = y
+        else:
+            raise ValueError("Invalid entity id.")
     
     def add_elevator(self, id, left, floors, y):
         pass # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
@@ -134,6 +160,7 @@ class Render:
 class Room:
     def __init__(self):
         self.id = 0
+        self.entities = set()
         
     def update(self, room_id):
         self.id = room_id
