@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from pygame.locals import *
 import render
 import input
@@ -16,7 +16,8 @@ class View:
         
         for e in pygame.event.get():
             if e.type == QUIT:
-                running = False
+                #self.event.notify("quit")
+                sys.exit()
             elif e.type == VIDEORESIZE:
                 pygame.display.set_mode((e.size),pygame.RESIZABLE) 
             elif e.type == KEYDOWN:

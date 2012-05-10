@@ -27,6 +27,9 @@ class Event():
 # update(dt)
 # This event should be produced periodically with dt set to the time in seconds since it was last produced.
 
+# key_down(key)
+# This event should be produced whenever a key is pressed, where key is the key id (use pygame.locals to interpret)
+
 # create_client()
 # This event should be produced when a new client should enter the building at the spawn location.
 # Entity should respond by creating a new Client
