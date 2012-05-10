@@ -558,9 +558,9 @@ game.init = function(ctx){
   game.addEntity( new Lift(-1, 0, "left") );
   game.addEntity( new Lift(-2, 0, "right") );
   game.addFloor( new Floor(0, ASSET_MANAGER.getAsset('img/Floor_Lobby.png')) );
-  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Reception.png')) );
-  game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_LabBoom.png')) );
-  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor_LabBio.png')) );
+  game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Waiting.png')) );
+  game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_Boom.png')) );
+  game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor_Bio.png')) );
   game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
   
   // Add all the different people here
@@ -573,10 +573,10 @@ game.init = function(ctx){
 
 // Loads assets
 var ASSET_MANAGER = new AssetManager();
-ASSET_MANAGER.queueDownload('img/Floor_Reception.png');
+ASSET_MANAGER.queueDownload('img/Floor_Waiting.png');
 ASSET_MANAGER.queueDownload('img/Floor_Lobby.png');
-ASSET_MANAGER.queueDownload('img/Floor_LabBoom.png');
-ASSET_MANAGER.queueDownload('img/Floor_LabBio.png');
+ASSET_MANAGER.queueDownload('img/Floor_Boom.png');
+ASSET_MANAGER.queueDownload('img/Floor_Bio.png');
 ASSET_MANAGER.queueDownload('img/GUI.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 ASSET_MANAGER.queueDownload('img/GUI_Build.png');

@@ -24,3 +24,9 @@ class View:
                 self.event.notify("key_down", e.key)
             elif e.type == KEYUP:
                 self.event.notify("key_up", e.key)
+            elif e.type == MOUSEMOTION:
+                self.event.notify("mouse_move", e.pos, e.rel, e.buttons)
+            elif e.type == MOUSEBUTTONDOWN:
+                self.event.notify("mouse_down", e.pos, e.button )
+            elif e.type == MOUSEBUTTONUP:
+                self.event.notify("mouse_up")
