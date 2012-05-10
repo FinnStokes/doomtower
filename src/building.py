@@ -15,7 +15,7 @@ class Building:
         self.lifts = []
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, top-bottom
-        self.building_graph = Graph()
+        self.building_graph = path.Graph()
         for i in range(numfloors * 2):
             self.building_graph.addNode(i)
 
