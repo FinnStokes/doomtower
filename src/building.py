@@ -177,5 +177,6 @@ class Room:
     def operate(self):
         pass
 
-    def produce(self, products):
-        pass
+    def produce(self, product):
+        if products[product] == self.room_id
+            self.jobs.append(product)
