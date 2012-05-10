@@ -32,7 +32,7 @@ class Input:
                     w.over(buttons)
                     if self.over:
                         self.over.out(buttons)
-                        self.over = None
+                    self.over = w
                     break
             if self.over and not self.over.contains(pos):
                 self.over.out(buttons)
@@ -81,7 +81,7 @@ class Button(Widget):
         Widget.__init__(self, rect, enabled)
        
     def over(self, buttons):
-        pass#print "over"
+        print "over"
        
     def out(self, buttons):
         print "out"
