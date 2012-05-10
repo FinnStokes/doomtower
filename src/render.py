@@ -21,7 +21,7 @@ class Render:
         self.event.register("add_elevator", self.add_elevator)
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
-        self.event.register("refresh", self.on_draw)
+        self.event.register("update", self.on_draw)
         
         self.building_height = 0
         self.building_depth = 0
@@ -34,7 +34,7 @@ class Render:
         self.room_height = 256
         self.room_padding = 10
         
-    def on_draw(self): # render current game state
+    def on_draw(self, dt): # render current game state
         self.window.fill((0,0,0))
         screen_width, screen_height = self.window.get_size()
         if self.pan_speed > 0:
@@ -42,13 +42,13 @@ class Render:
                 self.y_pan = self.y_target
                 self.pan_speed = 0
             else:
-                self.y_pan += self.pan_speed
+                self.y_pan += self.pan_speed #*dt
         elif self.pan_speed < 0:
             if self.y_target - self.y_pan> self.pan_speed:
                 self.y_pan = self.y_target
                 self.pan_speed = 0
             else:
-                self.y_pan += self.pan_speed
+                self.y_pan += self.pan_speed #*dt
         
         x_offset = (screen_width-704)/2
 
