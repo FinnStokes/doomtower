@@ -14,8 +14,9 @@ class Building:
         self.floors = []
         self.lifts = []
         #Graph with elevator doors as nodes and paths between as edges
-        #indexed left-right, top-bottom
+        #indexed left-right, bottom-top
         self.building_graph = path.Graph()
+ 
         for i in range(numfloors * 2):
             self.building_graph.addNode(i)
 
@@ -27,9 +28,6 @@ class Building:
         for i in range(numfloors):
             self.floors.append(Room()) 
             self.event.notify("add_room")
-
-
-
 
 
         # add lobby at ground floor
@@ -57,12 +55,26 @@ class Building:
         self.floors[floor_index] = Room(room_id)
 
     def build_elevator(self, left, floors):
+        side = int(not left)
+        doors = []
+        floors_off = []
+
+        #get elevator doors serviced
+        for i in range(len(floors)):
+            doors.append((floors[i] - settings.BOTTOM_FLOOR) * 2 + side )           
+            floors_off.append(floors[i] - settings.BOTTOM_FLOOR)
+
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
-        self.lifts[int(not left)].append( Elevator(floors, min(floors) * floor_height))
+        self.lifts[side].append( Elevator(floors, min(floors) * floor_height))
         self.event.notify('new_elevator', left, floors)
+        
         #add edges provided by elevator to building_graph
-
+        for i in range(len(doors)):
+            for j in range(len(doors)):
+                if not (doors[j] == doors[i]):
+                    self.building_graph.addEdge(doors[i], doors[j], abs(floors_off[i] - floors_off[j]))   
+                 
 
     #gets elevator at given floor on given side of building       
     def get_elevator(self, floor, left): 
