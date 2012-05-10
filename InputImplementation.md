@@ -9,7 +9,6 @@ Mouse
 * Mouse: (Hiree Selected) Click on floor, either minimap or actual, to instruct Hiree to move to floor
 * Mouse: (Hiree Selected) Click on current floor to instruct Hiree to move to mouse position
 * Mouse: Click on Mad Scientist, Show speech bubble (shows what they want)
-* Mouse: Click on floor on miniMap to scroll to that floor
 
 Keyboard
 --------
@@ -22,6 +21,11 @@ Keyboard
 
 GUI
 ---
+
+### Mini Map
+* Mouse: MouseOver highlights selection
+* Mouse: Click on floor on miniMap to scroll to that floor
+
 
 ### Build Button (Bottom UI)
 * Mouse: MouseOver highlights selection
