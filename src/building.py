@@ -41,10 +41,10 @@ class Building:
     def update(self, dt):      
     #   Elevators
         for i in range(len(self.lifts)):
-            self.lifts[i].move()
+            self.lifts[i].move(dt)
     #   Rooms
         for i in range(len(self.floors)):
-            self.floors[i].operate()
+            self.floors[i].operate(dt)
 
         pass # update elevator position and room actions
     
@@ -174,7 +174,7 @@ class Room:
         self.size = size
         self.jobs = []
 
-    def operate(self):
+    def operate(self, dt):
         pass
 
     def produce(self, product):

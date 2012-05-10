@@ -1,60 +1,52 @@
 # audio.py - manipulates pyglet.media.Player according to game events
+
 import os, sys, pygame, event
 
 class DoomMixer:
 # manages playback of streaming audio files (music) and static audio files (sound effects)
 
 # audio source files
-    sfxsources = []
-    voicesources = []
-    bgmsources = []
+#should be separated by event type
+#    entitysources = [['../snd/clientgreeting1.ogg', '../snd/clientfarewell1.ogg'],
+#                     ['../snd/clientgreeting2.ogg', '../snd/clientfarewell2.ogg']  ]
+    roomsource = ['../snd/bio.ogg', '../snd/boom.ogg', '../snd/cosmic.ogg', '../snd/informatics', '../snd/meeting.ogg', '../snd/psycho.ogg', '../snd/reception.ogg']
+    bgmsources = ['../snd/sciencegroove.ogg']
+#    inputsources = []
 
+
+#    sfxsources = []
+#    voicesources = []
+#  
     def __init__(self, event_manager):
         self.event = event_manager
-        self.sfx = {}
+        #unique room sound should play when a room is built
+        self.event.register("input_build", self.play_room) 
+        self.entitysnd = []
         self.voice = {}
-        self.bgm = {}
+        self.room_snd = []
+        self.bgm = []
         
-        for name in sfxsources:
-            pass
-
-        for name in voicesources:
-            pass
+ #       for path in entitysources:
+ #           pass
+        
+        for i in range(len(roomsources)):
+            self.room_snd.append(pygame.mixer.Sound(roomsources[i]))
+ #       for name in voicesources:
+  #          pass
             
-        for name in bgmsources:
-            pass
-
- #       self.event.register()        
- #       self.event.register()        
- #       self.event.register()        
+   #     for name in bgmsources:
+    #        pass
 
         pygame.mixer.init()
     
-    # creates associative array entry for static audio object   
-    def loadsfx(self, sfxname):
-        self.sfx[sfxname] = pygame.mixer.Sound(sfxname)
   
-    # creates associative array entry for static audio object   
-    def loadvoice(self, voicename):
-        self.voice[voicename] = pygame.mixer.Sound(voicename)
-
-    # creates associative array entry for streaming audio object   
-    def loadbgm(self, bgmname):
-        self.sfx[bgmname] = pygame.mixer.Sound(bgmname)
-
-
+    def play_room(self, room_id):
+        self.room_snd[room_id].play()
+    
     # generic audio call
-    def make_noise(self, ):
+    def make_noise(self):
         pass
 
-    # play sound effect track
-    def playsfx(self, title): 
-        self.sfx[title].play()   
-    
-    # play voice track
-    def playvoice(self, title):
-        self.voice[title].play()
-            
 
     # play new background music, current track faded out or cut
     def playbgm(self, title, sharp = True):
@@ -67,4 +59,3 @@ class DoomMixer:
             pygame.mixer.music.queue(bgm)
             pygame.mixer.music.fadeout()  
 
-# need some code initialising listening for events, handling events by playing appropriate audio
