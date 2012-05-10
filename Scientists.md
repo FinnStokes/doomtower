@@ -19,3 +19,14 @@ Igor
 
 Mad Scientists
 --------------
+
+* Professor Farnsworth
+* Dexter
+* Emmett Brown
+* Dr Evil
+* Jonas Venture
+* Rusty Venture
+* Danny Elfman
+* Dr Frankenstein
+* Dr Frank N Furter
+* Dr No
