@@ -16,15 +16,6 @@ fpsClock = pygame.time.Clock()
 running = True
 while running:
     fpsClock.tick(30)
+    #phasing out usage of refresh in favour of update
     event_manager.notify("refresh")
     event_manager.notify("update", fpsClock.get_time()/1000.0)
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            running = False
-        elif event.type == VIDEORESIZE:
-            pygame.display.set_mode((event.size),pygame.RESIZABLE) 
-        elif event.type == KEYDOWN:
-            if event.key == K_UP:
-                event_manager.notify("step_scroll", True)
-            elif event.key == K_DOWN:
-                event_manager.notify("step_scroll", False)

@@ -7,7 +7,7 @@ room_images.append(pygame.image.load('img/Floor_Lobby.png'))
 room_images.append(pygame.image.load('img/Floor_Reception.png'))
 room_images.append(pygame.image.load('img/Floor_LabBio.png'))
 room_images.append(pygame.image.load('img/Floor_LabBoom.png'))
-
+entity_images = []
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -57,7 +57,7 @@ class Render:
         
         for i in range(bottom_room, top_room):
             room_id = self.rooms[i-settings.BOTTOM_FLOOR].id - 1
-            if room_id in range (0,4):
+            if room_id in range (0,len(room_images)):
                 y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
         pygame.display.update()
@@ -75,10 +75,14 @@ class Render:
             #scroll down
             self.y_target = floor_height
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
+            if self.pan_speed > -(self.room_height/settings.SCROLL_TIME):
+                self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
         elif floor_height + self.room_height > self.y_pan + screen_height:
             #scroll up
             self.y_target = floor_height + self.room_height - screen_height
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
+            if self.pan_speed < (self.room_height/settings.SCROLL_TIME):
+                self.pan_speed = (self.room_height/settings.SCROLL_TIME)
         else:
             #stop scrolling
             self.y_target = self.y_pan
@@ -133,3 +137,10 @@ class Room:
         
     def update(self, room_id):
         self.id = room_id
+
+class Entity:
+    def __init__(self, sprite_id, x_coord, y_coord):
+        if sprite_id in range(0, entity_images.length()):
+            self.sprite = entity_images[sprite_id]
+        self.x = x_coord
+        self.y = y_coord
