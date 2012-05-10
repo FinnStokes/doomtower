@@ -12,6 +12,8 @@ Bottom Panel
 Position: 0, 536
 Dimensions: 1024, 64
 
+(Relative to Bottom Panel position)
+
 Build Button Position: 446, 10
 Build Button Dimensions: 128, 43
 
