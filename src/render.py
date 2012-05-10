@@ -89,7 +89,7 @@ class Render:
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
         elif floor_height + self.room_height > self.y_pan + screen_height:
             #scroll up
-            self.y_target = floor_height + self.room_height - screen_height
+            self.y_target = floor_height + self.room_height + 2*self.room_padding - screen_height
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed < (self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = (self.room_height/settings.SCROLL_TIME)
