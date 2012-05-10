@@ -1,4 +1,4 @@
-import os, sys, event, settings
+import os, sys, event, path, settings
 #encapsulates all building data in the current game
 class Building:
     floor_height = 10
@@ -13,11 +13,25 @@ class Building:
         self.player_funds = settings.STARTING_FUNDS
         self.floors = []
         self.lifts = []
+        #Graph with elevator doors as nodes and paths between as edges
+        #indexed left-right, top-bottom
+        self.building_graph = Graph()
+        for i in range(numfloors * 2):
+            self.building_graph.addNode(i)
+
+        #add initial edges
+        for i in range(0, numfloors * 2, 2):
+            self.building_graph.addEdge(i, i+1, 1)
 
         # fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
             self.event.notify("add_room")
+
+
+
+
+
         # add lobby at ground floor
         self.build_room(0,1)
 
@@ -47,7 +61,9 @@ class Building:
         # determine initial position (initialised to minimum floor)          
         self.lifts[int(not left)].append( Elevator(floors, min(floors) * floor_height))
         self.event.notify('new_elevator', left, floors)
-     
+        #add edges provided by elevator to building_graph
+
+
     #gets elevator at given floor on given side of building       
     def get_elevator(self, floor, left): 
         
