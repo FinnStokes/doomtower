@@ -21,7 +21,7 @@ class Manager:
         self.nextId = self.nextId + 1
     
 class Entity:
-    def __init__(self, event, id, x, floor):
+    def __init__(self, event, id, x, floor, sprite):
         self.id = id
         self.x = x
         self.y = floor
@@ -30,7 +30,7 @@ class Entity:
         self.event = event
         event.register("input_move", self.move_to)
         event.register("update", self.update)
-        event.notify("new_entity", self.id, self.x, self.y, 0)
+        event.notify("new_entity", self.id, self.x, self.y, sprite)
     
     def move_to(self, entity, floor):
         if entity == self.id:
@@ -50,10 +50,13 @@ class Entity:
             self.event.notify("update_entity", self.id, self.x, self.y)
 
 class Client(Entity):
-    pass
+    def __init__(self, event, id, x, floor):
+        Entity.__init__(self, event, id, x, floor, 2)
 
 class Scientist(Entity):
-    pass
+    def __init__(self, event, id, x, floor):
+        Entity.__init__(self, event, id, x, floor, 0)
 
 class Igor(Entity):
-    pass
+    def __init__(self, event, id, x, floor):
+        Entity.__init__(self, event, id, x, floor, 1)
