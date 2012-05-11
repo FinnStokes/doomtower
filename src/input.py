@@ -3,16 +3,17 @@ from pygame.locals import *
 
 import settings
 
-interface_btn = pygame.image.load('img/InterfaceButtons.png')
+interface_btn = pygame.image.load('img/Buttons.png')
 build = pygame.image.load('img/GUI_Build.png')
 hire = pygame.image.load('img/GUI_Hire.png')
 buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
 footer = pygame.image.load('img/GUI_Footer.png')
 
 class Input:
-    def __init__(self, window, event_manager):
+    def __init__(self, window, event_manager, render):
         self.event = event_manager
         self.window = window
+        self.render = render
         
         self.widgets = list()
         self.pressed = dict()
@@ -106,7 +107,8 @@ class Input:
                 self.window.blit(sprite, widget.rect.topleft)
     
     def new_entity(self, id, x, y, sprite, character):
-        pass
+        entity = Entity(pygame.Rect(0,0,100,128), id, x, y, self.event, self.render)
+        self.widgets.append(entity)
     
     def remove_entity(self, id):
         pass
@@ -301,7 +303,7 @@ class Entity(Widget):
         self.entity_x = entity_x
         self.entity_y = entity_y
         self.render = render
-        event_manager.register("update_entity", update_entity)
+        event_manager.register("update_entity", self.update_entity)
     
     def update_entity(self, id, x, y):
         if self.entity_id == id:
