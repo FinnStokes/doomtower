@@ -82,6 +82,9 @@ class Render:
                                      (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
                                      pygame.Rect(0,entity.character*entity.subheight,entity.subwidth, entity.subheight))
     
+    def get_screen_pos(self, pos):
+        return ((screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1])
+    
     def pan_screen(self, floor):
         if floor > self.building_height:
             target_floor = self.building_height

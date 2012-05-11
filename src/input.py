@@ -3,12 +3,11 @@ from pygame.locals import *
 
 import settings
 
-close = pygame.image.load('img/GUI_Close.png')
+interface_btn = pygame.image.load('img/InterfaceButtons.png')
 build = pygame.image.load('img/GUI_Build.png')
 hire = pygame.image.load('img/GUI_Hire.png')
-build_btn = pygame.image.load('img/GUI_Button_Build.png')
-hire_btn = pygame.image.load('img/GUI_Button_Hire.png')
-footer = pygame.image.load('img/GUI.png')
+buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
+footer = pygame.image.load('img/GUI_Footer.png')
 
 class Input:
     def __init__(self, window, event_manager):
@@ -25,28 +24,29 @@ class Input:
         self.event.register("mouse_down", self.mouse_down)
         self.event.register("mouse_up", self.mouse_up)
         self.event.register("window_resize", self.window_resize)
+        event_manager.register("new_entity", self.new_entity)
+        event_manager.register("remove_entity", self.remove_entity)
 
         self.hire_btn = Toggle(pygame.Rect(20, 0, 128, 43),
-                               out=hire_btn.subsurface(pygame.Rect(0,0,128,43)),
-                               over=hire_btn.subsurface(pygame.Rect(128,0,128,43)),
-                               on=hire_btn.subsurface(pygame.Rect(128,0,128,43)),
+                               out=buildhire_btn.subsurface(pygame.Rect(0,43,128,43)),
+                               over=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
+                               on=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                event_manager=event_manager, event="open_hire")
         self.build_btn = Toggle(pygame.Rect(168, 0, 128, 43),
-                                out=build_btn.subsurface(pygame.Rect(0,0,128,43)),
-                                over=build_btn.subsurface(pygame.Rect(128,0,128,43)),
-                                on=build_btn.subsurface(pygame.Rect(128,0,128,43)),
+                                out=buildhire_btn.subsurface(pygame.Rect(0,0,128,43)),
+                                over=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
+                                on=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
                                 event_manager=event_manager, event="open_build")
         self.widgets.append(self.hire_btn)
         self.widgets.append(self.build_btn)
-        #(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, pressed = None, on_press = None)
         
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
         
-        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, close, event_manager, open_event="open_build", open = False)
+        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, close, event_manager, open_event="open_hire", open = False)
+        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
         
         self.window_resize(self.window.get_size())
@@ -104,6 +104,12 @@ class Input:
             sprite = widget.sprite()
             if sprite:
                 self.window.blit(sprite, widget.rect.topleft)
+    
+    def new_entity(self, id, x, y, sprite, character):
+        pass
+    
+    def remove_entity(self, id):
+        pass
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
@@ -259,8 +265,8 @@ class PopupWindow:
     def __init__(self, rect, window_sprite, close_sprite, event_manager, open_event = None, open = False):
         self.widgets = list()
         self.widgets.append(Button(pygame.Rect(rect.right-49,rect.top+10,39,28),
-                                   out=close.subsurface(pygame.Rect(0,0,39,28)),
-                                   over=close.subsurface(pygame.Rect(39,0,39,28)),
+                                   out=close_sprite.subsurface(pygame.Rect(0,0,39,28)),
+                                   over=close_sprite.subsurface(pygame.Rect(39,0,39,28)),
                                    on_press=self.close))
         self.widgets.append(DragBar(pygame.Rect(rect.left, rect.top, rect.width, settings.DRAGBAR_HEIGHT), self))
         self.widgets.append(Static(rect, window_sprite))
@@ -287,3 +293,22 @@ class PopupWindow:
     def move(self, rel):
         for w in self.widgets:
             w.move(rel)
+
+class Entity(Widget):
+    def __init__(self, rect, entity_id, entity_x, entity_y, event_manager, render):
+        Widget.__init__(self, rect)
+        self.entity_id = entity_id
+        self.entity_x = entity_x
+        self.entity_y = entity_y
+        self.render = render
+        event_manager.register("update_entity", update_entity)
+    
+    def update_entity(self, id, x, y):
+        if self.entity_id == id:
+            self.entity_x = x
+            self.entity_y = y
+    
+    def update(self, dt):
+            self.rect.bottomleft = render.get_screen_pos((self.entity_x, self.entity_y))
+        
+        
