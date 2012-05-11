@@ -10,11 +10,11 @@ class Manager:
         event.register("create_igor", self.create_igor)
     
     def create_client(self):
-        e = Client(self.event, self.nextId, random.randint(0,10), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        e = Client(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
         self.nextId = self.nextId + 1
     
     def create_scientist(self):
-        e = Scientist(self.event, self.nextId, random.randint(0,10), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        e = Scientist(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
         self.nextId = self.nextId + 1
     
     def create_igor(self):
@@ -22,17 +22,16 @@ class Manager:
         self.nextId = self.nextId + 1
     
 class Entity:
-    def __init__(self, event, id, character, x, floor, sprite):
+    def __init__(self, event, id, x, floor, sprite, character):
         self.id = id
         self.x = x
         self.y = floor
         self.target = self.x
         self.speed = settings.ENTITY_SPEED
         self.event = event
-        self.character = character
         event.register("input_move", self.move_to)
         event.register("update", self.update)
-        event.notify("new_entity", self.id, self.character, self.x, self.y, sprite)
+        event.notify("new_entity", self.id, self.x, self.y, sprite, character)
     
     def move_to(self, entity, floor):
         if entity == self.id:
@@ -53,12 +52,12 @@ class Entity:
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor):
-        Entity.__init__(self, event, id, character, x, floor, 2)
+        Entity.__init__(self, event, id, x, floor, 2, character)
 
 class Scientist(Entity):
     def __init__(self, event, id, character, x, floor):
-        Entity.__init__(self, event, id, character, x, floor, 0)
+        Entity.__init__(self, event, id, x, floor, 0, character)
 
 class Igor(Entity):
     def __init__(self, event, id, x, floor):
-        Entity.__init__(self, event, id, 0, x, floor, 1)
+        Entity.__init__(self, event, id, x, floor, 1, -1)
