@@ -8,7 +8,7 @@ class View:
         self.event = event_manager
         self.event.register("update", self.update)
         window = pygame.display.set_mode((800,600),pygame.RESIZABLE)
-        pygame.display.set_caption('Doom Tower')       
+        pygame.display.set_caption('Doom Tower')
         self.render = render.Render(window, event_manager)
         self.input = input.Input(window, event_manager, render)
     
