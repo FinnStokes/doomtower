@@ -75,19 +75,106 @@ class Widget:
     
     def drag(self, rel):
         pass
+    
+    def sprite():
+        return None
+    
+    def move(rel):
+        pass
+
 
 class Button(Widget):
-    def __init__(self, rect, enabled = True):
-        Widget.__init__(self, rect, enabled)
+    def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, pressed = None):
+        Widget.__init__(self, rect, enabled=enabled)
+        self.over = False
+        self.pressed = False
+        self.out_sprite = out
+        self.over_sprite = over
+        self.pressed_sprite = pressed
+        self.event_manager = event_manager
+        self.event = None
+        if event:
+            if self.event_manager:
+                self.event = event
+            else:
+                raise ValueError("event_manager missing from Button constructor.")
        
     def over(self, buttons):
-        print "over"
+        self.over = True
        
     def out(self, buttons):
-        print "out"
+        self.out = True
        
     def press(self, button):
-        print "press "+repr(button)
-       
+        if button == LEFT:
+            if self.event:
+                self.event_manager.notify(self.event)
+            self.pressed = True
+
     def release(self, button):
-        print "release "+repr(button)
+        if button == LEFT:
+            self.pressed = False
+
+    def sprite():
+        if self.pressed and self.pressed_sprite:
+            return self.pressed_sprite
+        elif self.over and self.over_sprite:
+            return self.over_sprite
+        elif self.out_sprite:
+            return self.out_sprite
+        else:
+            return None
+
+    
+class Toggle(Widget):
+    def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, on = None, onover = None):
+        Widget.__init__(self, rect, enabled=enabled)
+        self.over = False
+        self.on = False
+        self.out_sprite = out
+        self.over_sprite = over
+        self.on_sprite = on
+        self.onover_sprite = onover
+        self.event_manager = event_manager
+        self.event = None
+        if event:
+            if self.event_manager:
+                self.event = event
+            else:
+                raise ValueError("event_manager missing from Toggle constructor.")
+       
+    def over(self, buttons):
+        self.over = True
+       
+    def out(self, buttons):
+        self.over = False
+       
+    def press(self, button):
+        if button == LEFT:
+            self.on = !self.on
+            if self.event:
+                self.event_manager.notify(self.event, self.on)
+    
+    def sprite():
+        if self.on:
+            if self.over and self.onover_sprite:
+                return self.onover_sprite
+            elif self.on_sprite:
+                return self.on_sprite
+        elif self.over and self.over_sprite:
+            return self.over_sprite
+        elif self.out_sprite:
+            return self.out_sprite
+        else:
+            return None
+            
+class DragBar(Widget):
+    def __init__(self, rect, parent, enabled = True):
+        Widget.__init__(self, rect, enabled=enabled, draggable=True)
+        self.parent = parent
+    
+    def drag(rel):
+        self.parent.move(rel)
+
+class PopupWindow:
+    pass
