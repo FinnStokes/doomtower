@@ -3,14 +3,14 @@ Scientists
 
 * Unnamed 1: Up to you
 * Unnamed 2: Up to you (Balding Guy)
-* Thomas Edison: American
-* Max Planck: German
-* Albert Einstein: German
 * Ernest Rutherford: New Zealand
-* Marie Curie: Polish
+* Thomas Edison: American
 * JJ Thomson: British
-* Isaac Newton: English 1700s
+* Max Planck: German
+* Marie Curie: Polish
 * Nikola Telsa: Serbian
+* Albert Einstein: German
+* Isaac Newton: English 1700s
 
 Igor
 ----
