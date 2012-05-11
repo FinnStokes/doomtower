@@ -5,6 +5,10 @@ ROOM_WIDTH = 706
 ROOM_HEIGHT = 256
 STARTING_FUNDS = 10000
 
+# The number of seconds spent on each frame of the animation
+ANIMATION_TIME = 0.2
+
+# The number of frames taken to scroll to a given floor
 SCROLL_TIME = 20
 
 # The x position and floor new entities should spawn at

@@ -3,7 +3,7 @@ from pygame.locals import *
 
 import settings
 
-interface_btn = pygame.image.load('img/InterfaceButtons.png')
+interface_btn = pygame.image.load('img/Buttons.png')
 build = pygame.image.load('img/GUI_Build.png')
 hire = pygame.image.load('img/GUI_Hire.png')
 buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
