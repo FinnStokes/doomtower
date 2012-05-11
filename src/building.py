@@ -27,7 +27,7 @@ class Building:
         # fill building with empty floors
         for i in range(numfloors):
             self.floors.append(Room()) 
-            self.event.notify("add_room")
+            self.event.notify("new_room")
 
 
         # add lobby at ground floor

@@ -30,7 +30,7 @@ class Entity:
         self.event = event
         event.register("input_move", self.move_to)
         event.register("update", self.update)
-        event.notify("new_entity", self.id, self.x, self.y)
+        event.notify("new_entity", self.id, self.x, self.y, 0)
     
     def move_to(self, entity, floor):
         if entity == self.id:
