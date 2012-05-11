@@ -127,7 +127,7 @@ class Render:
     def get_room(self, floor_number):
         return self.rooms[floor_number - settings.BOTTOM_FLOOR]
     
-    def new_entity(self, id, x, y, sprite):
+    def new_entity(self, id, character, x, y, sprite):
         self.entities[id] = Entity(sprite, x, y)
         if y in range(len(self.rooms)):
             self.get_room(y).entities.add(self.entities[id])
