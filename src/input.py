@@ -151,7 +151,7 @@ class Toggle(Widget):
        
     def press(self, button):
         if button == LEFT:
-            self.on = !self.on
+            self.on = not self.on
             if self.event:
                 self.event_manager.notify(self.event, self.on)
     

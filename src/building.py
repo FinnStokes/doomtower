@@ -178,5 +178,5 @@ class Room:
         pass
 
     def produce(self, product):
-        if products[product] == self.room_id
+        if products[product] == self.room_id:
             self.jobs.append(product)

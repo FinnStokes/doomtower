@@ -4,10 +4,13 @@ import settings
 
 room_images = []
 room_images.append(pygame.image.load('img/Floor_Lobby.png'))
-room_images.append(pygame.image.load('img/Floor_Reception.png'))
-room_images.append(pygame.image.load('img/Floor_LabBio.png'))
-room_images.append(pygame.image.load('img/Floor_LabBoom.png'))
+room_images.append(pygame.image.load('img/Floor_Waiting.png'))
+room_images.append(pygame.image.load('img/Floor_Bio.png'))
+room_images.append(pygame.image.load('img/Floor_Boom.png'))
 room_images.append(pygame.image.load('img/Floor_Cosmo.png'))
+room_images.append(pygame.image.load('img/Floor_Psych.png'))
+room_images.append(pygame.image.load('img/Floor_Info.png'))
+room_images.append(pygame.image.load('img/Floor_Meeting.png'))
 entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
 entity_images.append(pygame.image.load('img/Igor.png'))
