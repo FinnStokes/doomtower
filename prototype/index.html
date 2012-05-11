@@ -425,15 +425,15 @@ function GUI(sprite){
     context.textAlign = "center";
     context.font = 'normal bold 24px sans-serif';
     context.fillText(obj.scientists, obj.x, obj.y+58);
-    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*1, 0, 40, 40, obj.x-18, obj.y, 40, 40 );
+    // context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*1, 0, 40, 40, obj.x-18, obj.y, 40, 40 );
     context.fillText(obj.igors, obj.x + 48, obj.y+58);
-    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*2, 0, 40, 40, obj.x +48-18 , obj.y, 40, 40 );
+    // context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*2, 0, 40, 40, obj.x +48-18 , obj.y, 40, 40 );
     context.fillText(obj.floors, obj.x + 48*2, obj.y+58);
-    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*3, 0, 40, 40, obj.x +48*2-18, obj.y, 40, 40 );
+    // context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 40*3, 0, 40, 40, obj.x +48*2-18, obj.y, 40, 40 );
   }
   
   this.drawMoney = function(obj){
-    context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 0, 0, 40, 40, this.x + 30, this.y + 14, 40, 40 );
+    // context.drawImage(ASSET_MANAGER.getAsset('img/Icons.png'), 0, 0, 40, 40, this.x + 30, this.y + 14, 40, 40 );
     context.fillStyle = "#FFF";
     context.textAlign = "center";
     context.font = 'normal bold 24px sans-serif';
@@ -561,7 +561,7 @@ game.init = function(ctx){
   game.addFloor( new Floor(1, ASSET_MANAGER.getAsset('img/Floor_Waiting.png')) );
   game.addFloor( new Floor(2, ASSET_MANAGER.getAsset('img/Floor_Boom.png')) );
   game.addFloor( new Floor(3, ASSET_MANAGER.getAsset('img/Floor_Bio.png')) );
-  game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI.png')));
+  game.addGUI( new GUI(ASSET_MANAGER.getAsset('img/GUI_Footer.png')));
   
   // Add all the different people here
   game.guis[0].hireMenu.hirees.push(new Hirees(ASSET_MANAGER.getAsset('img/Hirees.png')));
@@ -577,10 +577,9 @@ ASSET_MANAGER.queueDownload('img/Floor_Waiting.png');
 ASSET_MANAGER.queueDownload('img/Floor_Lobby.png');
 ASSET_MANAGER.queueDownload('img/Floor_Boom.png');
 ASSET_MANAGER.queueDownload('img/Floor_Bio.png');
-ASSET_MANAGER.queueDownload('img/GUI.png');
+ASSET_MANAGER.queueDownload('img/GUI_Footer.png');
 ASSET_MANAGER.queueDownload('img/GUI_Hire.png');
 ASSET_MANAGER.queueDownload('img/GUI_Build.png');
-ASSET_MANAGER.queueDownload('img/Icons.png');
 ASSET_MANAGER.queueDownload('img/Hirees.png');
 ASSET_MANAGER.queueDownload('img/Scientist.png');
 ASSET_MANAGER.queueDownload('img/Building.png');

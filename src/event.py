@@ -67,7 +67,7 @@ class Event():
 # This event should be produced when an elevator changes position.
 # Render should react by changing the elevator graphic to reflect this.
 
-# new_entity(id, x, y)
+# new_entity(id, x, y, sprite, character)
 # This event should be produced when a new entity enters the building.
 #  The integer id should be a unique identifier amongst entities.
 #  The float x should indicate how far across the building the entity is (0 = left wall, 1 = right wall).
