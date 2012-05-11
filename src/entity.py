@@ -36,8 +36,12 @@ class Entity:
     def move_to(self, entity, floor):
         if entity == self.id:
             if floor != self.y:
-                self.target = 0
+                if self.x <= 0.1:
+                    self.target = 0.8
+                else:
+                    self.target = 0.05
                 self.y = floor
+                self.event.notify("update_entity", self.id, self.x, self.y)
     
     def update(self, dt):
         if self.x != self.target:

@@ -16,7 +16,7 @@ SPAWN_POSITION = 0.5
 SPAWN_FLOOR = 0
 
 # The horizontal speed the entities should move at in rooms per second
-ENTITY_SPEED = 5
+ENTITY_SPEED = 0.2
 
 # The height of the drag bar for pop-up windows in pixels
 DRAGBAR_HEIGHT = 75
