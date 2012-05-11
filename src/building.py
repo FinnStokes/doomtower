@@ -73,8 +73,12 @@ class Building:
         for i in range(len(doors)):
             for j in range(len(doors)):
                 if not (doors[j] == doors[i]):
-                    self.building_graph.addEdge(doors[i], doors[j], abs(floors_off[i] - floors_off[j]))   
+                    self.building_graph.addEdge(doors[i], doors[j], abs(floors_off[i] - floors_off[j])+0.1)   
                  
+
+    def remove_elevator(self, left, index):
+        pass
+
 
     #gets elevator at given floor on given side of building       
     def get_elevator(self, floor, left): 
