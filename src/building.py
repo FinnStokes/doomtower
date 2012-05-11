@@ -158,15 +158,15 @@ class Room:
     #define some lab attributes as defined in design doc
     #each entry includes: key(room_id) = buy_cost, upkeep, decomm_cost, income
     labtypes = {'boom': [5000, 500, 1000, 1000], 
-                'bio': [10000, 1000, 2000, 200 ], 
+                'bio': [10000, 1000, 3000, 200 ], 
                 'psycho': [5000, 500, 1000, 2500], 
-                'info': [1000, 100, 500, 500], 
-                'cosmic': [10000, 2000, 2500, 8000]
+                'info': [1000, 100, 300, 500], 
+                'cosmic': [10000, 2000, 3000, 8000]
     }
     #define some lab attributes as defined in design doc
     #each entry includes: key(room_id) = buy_cost, upkeep, decomm_cost
-    miscroomtypes = {'reception': [10000, 1000, 2000],
-                     'meeting': [10000, 1000, 2000]
+    miscroomtypes = {'reception': [1000, 100, 300],
+                     'meeting': [1000, 100, 300]
     }       
 
     def __init__(self, room_id = 'empty', size = 1):
