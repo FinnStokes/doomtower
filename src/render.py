@@ -22,6 +22,7 @@ entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
+        self.event.register("update", self.update)
         self.event.register("set_scroll", self.pan_screen)
         self.event.register("step_scroll", self.step_screen)
         self.event.register("new_room", self.new_room)
@@ -44,7 +45,24 @@ class Render:
         self.room_height = 256
         self.room_padding = 10
         self.entities = dict()
+        self.anim_timer = 0
+        self.anim_state = False
         
+    def update(self, dt):
+        self.anim_timer += dt
+        if(self.anim_timer > settings.ANIMATION_TIME):
+            dx = 0
+            if(self.anim_state):
+                dx = -1
+                self.anim_state = False
+            else:
+                dx = 1
+                self.anim_state = True
+            for room in self.rooms:
+                for entity in room.entities:
+                    entity.main_rect.move_ip(dx*entity.width,0)
+            self.anim_timer -= settings.ANIMATION_TIME
+
     def draw(self): # render current game state
         self.window.fill((0,0,0))
         screen_width, screen_height = self.window.get_size()
@@ -76,11 +94,11 @@ class Render:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
                                      (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
-                                     pygame.Rect(0,0,entity.width,entity.height))
+                                     entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
                                      (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
-                                     pygame.Rect(0,entity.character*entity.subheight,entity.subwidth, entity.subheight))
+                                     entity.sub_rect)
     
     def get_screen_pos(self, pos):
         return ((screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1])
@@ -187,11 +205,14 @@ class Entity:
         self.sprite = None
         self.width = 100
         self.height = 160
-        self.subwidth = 92
-        self.subheight = 86
+        self.main_rect = pygame.Rect(0,self.height,self.width, self.height)
+        if character_id >= 0:
+            self.subwidth = 92
+            self.subheight = 86
+            self.sub_rect = pygame.Rect(0,self.subheight*character_id,self.subwidth, self.subheight)
+            self.character = character_id
         if sprite_id in range(len(entity_images)):
             self.sprite = entity_images[sprite_id]
             self.subsprite = entity_subimages[sprite_id]
-            self.character = character_id
         self.x = x_coord
         self.y = y_coord
