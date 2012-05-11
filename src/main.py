@@ -15,6 +15,11 @@ running = True
 event_manager.notify("create_client")
 event_manager.notify("input_move",0,2)
 
+def close():
+    global running
+    running = False
+
+event_manager.register("quit", close)
 
 while running:
     fpsClock.tick(30)

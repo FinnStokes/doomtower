@@ -16,8 +16,7 @@ class View:
         
         for e in pygame.event.get():
             if e.type == QUIT:
-                #self.event.notify("quit")
-                sys.exit()
+                self.event.notify("quit")
             elif e.type == VIDEORESIZE:
                 pygame.display.set_mode((e.size),pygame.RESIZABLE) 
             elif e.type == KEYDOWN:
@@ -29,4 +28,8 @@ class View:
             elif e.type == MOUSEBUTTONDOWN:
                 self.event.notify("mouse_down", e.pos, e.button )
             elif e.type == MOUSEBUTTONUP:
-                self.event.notify("mouse_up")
+                self.event.notify("mouse_up", e.pos, e.button)
+
+        self.render.draw()
+        self.input.draw()
+        pygame.display.update()

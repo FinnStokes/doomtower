@@ -4,14 +4,21 @@ from pygame.locals import *
 class Input:
     def __init__(self, window, event_manager):
         self.event = event_manager
+        self.window = window
+        
         self.widgets = list()
         self.pressed = dict()
-        self.widgets.append(Button(pygame.Rect(0,0,100,100)))
         self.over = None
+        
         self.event.register("key_down", self.key_down)
         self.event.register("mouse_move", self.mouse_move)
         self.event.register("mouse_down", self.mouse_down)
         self.event.register("mouse_up", self.mouse_up)
+        
+        close = pygame.image.load('img/GUI_Close.png')
+        self.widgets.append(Button(pygame.Rect(100,100,39,28),
+                                   out=close.subsurface(pygame.Rect(0,0,39,28)),
+                                   pressed=close.subsurface(pygame.Rect(39,0,39,28))))
 
     def key_down(self, key):
         if key == K_UP or key == K_w:
@@ -47,10 +54,16 @@ class Input:
                 self.pressed[button] = w
                 break
     
-    def mouse_up(self):
-        for button in self.pressed:
+    def mouse_up(self, pos, button):
+        if button in self.pressed:
             self.pressed[button].release(button)
-        self.pressed.clear()
+            del self.pressed[button]
+    
+    def draw(self):
+        for widget in self.widgets:
+            sprite = widget.sprite()
+            if sprite:
+                self.window.blit(sprite, widget.rect.topleft)
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False):
@@ -76,18 +89,18 @@ class Widget:
     def drag(self, rel):
         pass
     
-    def sprite():
+    def sprite(self):
         return None
     
-    def move(rel):
-        pass
+    def move(self, rel):
+        self.rect = self.rect.move(rel[0],rel[1])
 
 
 class Button(Widget):
     def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, pressed = None):
-        Widget.__init__(self, rect, enabled=enabled)
-        self.over = False
-        self.pressed = False
+        Widget.__init__(self, rect, enabled=enabled, draggable=True)
+        self.is_over = False
+        self.is_pressed = False
         self.out_sprite = out
         self.over_sprite = over
         self.pressed_sprite = pressed
@@ -98,27 +111,30 @@ class Button(Widget):
                 self.event = event
             else:
                 raise ValueError("event_manager missing from Button constructor.")
-       
+    
+    def drag(self, rel):
+        self.move(rel)
+    
     def over(self, buttons):
-        self.over = True
+        self.is_over = True
        
     def out(self, buttons):
-        self.out = True
+        self.is_over = False
        
     def press(self, button):
-        if button == LEFT:
+        if button == 1:
             if self.event:
                 self.event_manager.notify(self.event)
-            self.pressed = True
+            self.is_pressed = True
 
     def release(self, button):
-        if button == LEFT:
-            self.pressed = False
+        if button == 1:
+            self.is_pressed = False
 
-    def sprite():
-        if self.pressed and self.pressed_sprite:
+    def sprite(self):
+        if self.is_pressed and self.pressed_sprite:
             return self.pressed_sprite
-        elif self.over and self.over_sprite:
+        elif self.is_over and self.over_sprite:
             return self.over_sprite
         elif self.out_sprite:
             return self.out_sprite
@@ -129,8 +145,8 @@ class Button(Widget):
 class Toggle(Widget):
     def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, on = None, onover = None):
         Widget.__init__(self, rect, enabled=enabled)
-        self.over = False
-        self.on = False
+        self.is_over = False
+        self.is_on = False
         self.out_sprite = out
         self.over_sprite = over
         self.on_sprite = on
@@ -144,24 +160,24 @@ class Toggle(Widget):
                 raise ValueError("event_manager missing from Toggle constructor.")
        
     def over(self, buttons):
-        self.over = True
+        self.is_over = True
        
     def out(self, buttons):
-        self.over = False
+        self.is_over = False
        
     def press(self, button):
-        if button == LEFT:
+        if button == 1:
             self.on = not self.on
             if self.event:
                 self.event_manager.notify(self.event, self.on)
     
-    def sprite():
+    def sprite(self):
         if self.on:
-            if self.over and self.onover_sprite:
+            if self.is_over and self.onover_sprite:
                 return self.onover_sprite
             elif self.on_sprite:
                 return self.on_sprite
-        elif self.over and self.over_sprite:
+        elif self.is_over and self.over_sprite:
             return self.over_sprite
         elif self.out_sprite:
             return self.out_sprite
@@ -177,4 +193,12 @@ class DragBar(Widget):
         self.parent.move(rel)
 
 class PopupWindow:
-    pass
+    def __init__(self, rect, window_sprite, close_sprite, event_manager = None, open_event = None):
+        self.rect = rect
+        self.wigets = set()
+        self.widgets.append(Dragbar(pygame.Rect(rect.left, rect.top, rect.width, settings.DRAGBAR_HEIGHT)))
+    
+    def move(self, rel):
+        self.rect = self.rect.move(rel[0],rel[1])
+        for w in self.widgets:
+            w.move(rel)
