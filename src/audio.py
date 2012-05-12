@@ -72,7 +72,7 @@ class DoomMixer:
         pygame.mixer.music.play(-1)
 
     def play_room(self, floor, room_id):
-         self.roomsnd[room_id].play()
+         self.roomsnd[room_id - 1].play()
        
     def entity_hello(self, id, x, y, sprite, character):
         #sprite = (0, 1, 2)

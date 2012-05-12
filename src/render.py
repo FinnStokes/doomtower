@@ -216,11 +216,17 @@ class Render:
             raise ValueError("Invalid entity id.")
     
     def entity_in_elevator(self, entity_id, elevator_id):
-        entity = self.entities[entity_id]
-        if(elevator_id >= 0):
-            if entity.y in range(len(self.rooms)):
-                self.get_room(entity.y).entities.discard(entity)
-        entity[entity_id].elevator = elevator_id
+        if entity_id in self.entities:
+            entity = self.entities[entity_id]
+            if elevator_id >= 0:
+                if entity.y in range(len(self.rooms)):
+                    self.get_room(entity.y).entities.discard(entity)
+                if elevator_id in self.elevators:
+                    self.elevators[elvator_id].entities.add(entity)
+            else:
+                if entity.elevator in self.elevators:
+                    self.elevators[entity.elevator].entities.discard(entity)
+            entity.elevator = elevator_id
         
 
     def new_elevator(self, id, left, floors, y): 
@@ -271,3 +277,4 @@ class Elevator:
         self.y = y
         self.sprite = elevator_sprite
         self.width = 100
+        self.entities = set()

@@ -33,11 +33,11 @@ class Entity:
         self.event = event
         self.building = building
         self.elevator = None
-        event.register("input_move", self.move_to)
-        event.register("update", self.update)
-        event.notify("new_entity", self.id, self.x, self.y, sprite, character)
-        event.register("elevator_open", self.elevator_open)
-        event.register("remove_entity", self.remove_entity)
+        self.event.register("input_move", self.move_to)
+        self.event.register("update", self.update)
+        self.event.notify("new_entity", self.id, self.x, self.y, sprite, character)
+        self.event.register("elevator_open", self.elevator_open)
+        self.event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
@@ -92,6 +92,8 @@ class Entity:
         if self.id == id:
             self.event.deregister("input_move", self.move_to)
             self.event.deregister("update", self.update)
+            self.event.deregister("elevator_open", self.elevator_open)
+            self.event.deregister("remove_entity", self.remove_entity)
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
@@ -108,12 +110,12 @@ class Client(Entity):
                 self.state = "meeting"
                 self.progress = 0
                 print("meeting")
-            elif self.progress > 10:
+            elif self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
         elif self.state == "meeting":
-            if self.progress > 10:
+            if self.progress > 20:
                 self.state = "wait_manufacture"
                 print("wait_manufacture")
                 self.progress = 0
@@ -122,12 +124,12 @@ class Client(Entity):
                 self.state = "manufacture"
                 print("manufacture")
                 self.progress = 0
-            elif self.progress > 10:
+            elif self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
         elif self.state == "manufacture":
-            if self.progress > 10:
+            if self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
