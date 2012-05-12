@@ -11,7 +11,6 @@ room_images.append(pygame.image.load('img/Floor_Cosmo.png'))
 room_images.append(pygame.image.load('img/Floor_Psych.png'))
 room_images.append(pygame.image.load('img/Floor_Info.png'))
 room_images.append(pygame.image.load('img/Floor_Meeting.png'))
-mini_map_image = pygame.image.load('img/MiniMap.png')
 background_image = pygame.image.load('img/Building.png')
 roof_image = pygame.image.load('img/Roof.png')
 entity_images = []
@@ -32,6 +31,7 @@ class Render:
         self.event.register("update", self.update)
         self.event.register("set_scroll", self.pan_screen)
         self.event.register("step_scroll", self.step_screen)
+        self.event.register("scroll_to", self.scrollTo)
         self.event.register("new_room", self.new_room)
         self.event.register("update_room", self.update_room)
         self.event.register("new_entity", self.new_entity)
@@ -147,6 +147,7 @@ class Render:
             # Lift X / Lift Y
             lift_x = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
             lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)
+            # lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+50
             
             # Pulley / Rope XY
             floor_pulley_x = lift_x +28
@@ -208,6 +209,11 @@ class Render:
             #stop scrolling
             self.y_target = self.y_pan
 
+    # Scrolls directly to a room aka. No scroll
+    def scrollTo(self, floor):
+        screen_width, screen_height = self.window.get_size()
+        self.pan_screen(floor)
+      
     def step_screen(self, up):
         screen_width, screen_height = self.window.get_size()
         if up:

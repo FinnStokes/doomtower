@@ -10,8 +10,12 @@ hire = pygame.image.load('img/GUI_Hire.png')
 buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
 footer = pygame.image.load('img/GUI_Footer.png')
 shadow = pygame.image.load('img/Shadow.png')
+minimap = pygame.image.load('img/MiniMap.png')
+minimapbtnsprite = pygame.image.load('img/MiniMapBtns.png')
+minimapbg = pygame.image.load('img/MiniMapBG.png')
 build_img = pygame.image.load('img/BuildList.png')
 build_out = []
+
 for i in range(7):
     build_out.append(build_img.subsurface(pygame.Rect(0,128*i,320,128)))
 build_over = build_out
@@ -48,11 +52,21 @@ class Input:
         event_manager.register("new_entity", self.new_entity)
         event_manager.register("remove_entity", self.remove_entity)
 
+        # build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over,
+        self.funds = Text(pygame.Rect(100, 0, 0, 0), font, "")
+        event_manager.register("update_funds", self.update_funds)
+        self.widgets.append(self.funds)
+    
+        
+        # Add Hire Button to Widgets
+        # self.hire_btn = Toggle(pygame.Rect(20, 0, 128, 43),
         self.hire_btn = Toggle(pygame.Rect(450, 0, 128, 43),
                                out=buildhire_btn.subsurface(pygame.Rect(0,43,128,43)),
                                over=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                on=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                event_manager=event_manager, event="open_hire")
+        # Add Build Button to Widgets
+        # self.build_btn = Toggle(pygame.Rect(168, 0, 128, 43),
         self.build_btn = Toggle(pygame.Rect(600, 0, 128, 43),
                                 out=buildhire_btn.subsurface(pygame.Rect(0,0,128,43)),
                                 over=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
@@ -61,12 +75,59 @@ class Input:
         self.widgets.append(self.hire_btn)
         self.widgets.append(self.build_btn)
         
-        self.funds = Text(pygame.Rect(100, 0, 0, 0), font, "")
-        event_manager.register("update_funds", self.update_funds)
-        self.widgets.append(self.funds)
-    
+        # Add Footer to Widgets
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
+        
+        # Define MiniMap buttons
+        mBtnsOut = minimapbtnsprite.subsurface(pygame.Rect(0,0,106,32))
+        mBtnsOver = minimapbtnsprite.subsurface(pygame.Rect(106,0,106,32))
+        mBtnsOn = minimapbtnsprite.subsurface(pygame.Rect(106,0,106,32))
+        mBtnsYoffset = 32+1
+        
+        # Floor 10-1
+        self.btn10 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*0,106,32), floor=10, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn9 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*1,106,32), floor=9, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn8 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*2,106,32), floor=8, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn7 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*3,106,32), floor=7, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn6 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*4,106,32), floor=6, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn5 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*5,106,32), floor=5, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn4 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*6,106,32), floor=4, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn3 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*7,106,32), floor=3, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn2 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*8,106,32), floor=2, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btn1 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*9,106,32), floor=1, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        # Ground Floor
+        self.btn0 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*10,106,32), floor=0, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        # Basement Floors
+        self.btnB1 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*11,106,32), floor=-1, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btnB2 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*12,106,32), floor=-2, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btnB3 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*13,106,32), floor=-3, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btnB4 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*14,106,32), floor=-4, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        self.btnB5 = MiniMap(pygame.Rect(4,4+mBtnsYoffset*15,106,32), floor=-5, out=mBtnsOut, over=mBtnsOver, on=mBtnsOn, event_manager=event_manager, event="scroll_to")
+        
+        # Define MiniMap 
+        self.minimap = Static(pygame.Rect(0,0,114,600), minimap)
+        self.minimapbg = Static(pygame.Rect(0,0,114,600), minimapbg)
+
+        # Add MiniMap Stuff to Widget in the right order
+        self.widgets.append(self.minimap)
+        self.widgets.append(self.btn10)
+        self.widgets.append(self.btn9)
+        self.widgets.append(self.btn8)
+        self.widgets.append(self.btn7)
+        self.widgets.append(self.btn6)
+        self.widgets.append(self.btn5)
+        self.widgets.append(self.btn4)
+        self.widgets.append(self.btn3)
+        self.widgets.append(self.btn2)
+        self.widgets.append(self.btn1)
+        self.widgets.append(self.btn0)
+        self.widgets.append(self.btnB1)
+        self.widgets.append(self.btnB2)
+        self.widgets.append(self.btnB3)
+        self.widgets.append(self.btnB4)
+        self.widgets.append(self.btnB5)
+        self.widgets.append(self.minimapbg)
         
         updown_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, updown_out, updown_over, self.updown,
                                  event_manager, open_event="open_updown", open = False)
@@ -263,7 +324,47 @@ class Button(Widget):
         else:
             return None
 
-    
+class MiniMap(Widget):
+    def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, on = None, onover = None, floor = None):
+        Widget.__init__(self, rect, enabled=enabled)
+        self.floor = floor
+        self.is_over = False
+        self.out_sprite = out
+        self.over_sprite = over
+        self.on_sprite = on
+        self.onover_sprite = onover
+        self.event_manager = event_manager
+        self.event = None
+        if event:
+            if self.event_manager:
+                self.event = event
+                # self.event_manager.register(self.event, self.scrollTo)
+            else:
+                raise ValueError("event_manager missing from MiniMap constructor.")
+    # def scrollTo(self, floor):
+    #  print "Scroll to " + floor
+
+    def over(self, buttons):
+        self.is_over = True
+       
+    def out(self, buttons):
+        self.is_over = False
+       
+    def press(self, button):
+        if button == 1:
+            if self.event:
+              self.event_manager.notify(self.event, self.floor)
+
+    def sprite(self):
+        if not self.visible:
+            return None
+        elif self.is_over and self.over_sprite:
+            return self.over_sprite
+        elif self.out_sprite:
+            return self.out_sprite
+        else:
+            return None
+            
 class Toggle(Widget):
     def __init__(self, rect, enabled = True, event_manager = None, event = None, out = None, over = None, on = None, onover = None):
         Widget.__init__(self, rect, enabled=enabled)
