@@ -24,6 +24,7 @@ entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 elevator_sprite = pygame.image.load('img/Lift.png').subsurface(pygame.Rect(0,0,96,197))
 elevator_pulley = pygame.image.load('img/LiftPulley.png')
 elevator_rope = pygame.image.load('img/LiftRope.png')
+thought_image = pygame.image.load('img/SpeechBubbles.png')
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -130,6 +131,12 @@ class Render:
                     self.window.blit(entity.subsprite,
                                      (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
+                # Draw Scientist Thought
+                if entity.thought > 0:
+                    self.window.blit(thought_image,
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH),
+                                     y_offset + self.room_height - entity.height - 90),
+                                     pygame.Rect(0, entity.thought * 90, 160, 90))
         
         for elevator in self.elevators.itervalues():
             # Lift X / Lift Y
@@ -320,6 +327,7 @@ class Entity:
         self.elevator = -1
         self.x = x_coord
         self.y = y_coord
+        self.thought = 0
 
 class Elevator:
     def __init__(self, left, y, floors):
