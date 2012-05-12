@@ -4,9 +4,22 @@ import event
 import model
 import view
 import settings
-
+title_screen = pygame.image.load("img/DoomTowerTitleScreen.png")
+window = pygame.display.set_mode((1024,600),pygame.RESIZABLE)
+while True:
+    e = pygame.event.wait()
+    if e.type in (KEYDOWN, MOUSEBUTTONDOWN):
+        break
+    elif e.type == VIDEORESIZE:
+        pygame.display.set_mode((e.size),pygame.RESIZABLE) 
+    elif e.type == QUIT:
+        sys.exit()
+    width, height = window.get_size()
+    window.fill((217,86,74))
+    window.blit(title_screen, ((width-1024)/2,(height-600)/2))
+    pygame.display.update()
 event_manager = event.Event()
-player_view = view.View(event_manager)
+player_view = view.View(event_manager,window)
 game_model = model.Model(event_manager)
 pygame.init()
 
