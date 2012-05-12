@@ -143,7 +143,7 @@ class Render:
         for elevator in self.elevators.itervalues():
             # Lift X / Lift Y
             lift_x = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
-            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20
+            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)
             
             # Pulley / Rope XY
             floor_pulley_x = lift_x +28
@@ -151,7 +151,7 @@ class Render:
             floor_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
             
             # Rope Length
-            pull_to_elevator_distance = math.fabs(floor_y - lift_y) 
+            pull_to_elevator_distance = math.fabs(floor_y - lift_y) - 32
             
             #Draw Scientist
             for entity in elevator.entities:

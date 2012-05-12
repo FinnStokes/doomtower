@@ -28,8 +28,6 @@ accum = 0.0
 
 while running:
     fpsClock.tick(30)
-    #phasing out usage of refresh in favour of update
-    event_manager.notify("refresh")
     event_manager.notify("update", fpsClock.get_time()/1000.0)
     event_manager.update()
     accum +=  fpsClock.get_time()/1000.0

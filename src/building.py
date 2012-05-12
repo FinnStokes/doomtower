@@ -17,6 +17,8 @@ class Building:
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, bottom-top
         self.building_graph = path.Graph()
+        self.funds = settings.STARTING_FUNDS
+        self.event.notify("update_funds", self.funds)
  
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
             self.building_graph.addNode(i*3)
@@ -37,15 +39,11 @@ class Building:
             self.floors.append(Room()) 
             self.event.notify("new_room")
 
-
         # add lobby at ground floor
-        self.build_room(0,1)
+        self.next_up = 0
+        self.next_down = -1
+        self.build_room(True,1)
 
-        # add test floors
-        self.build_room(1,2)
-        self.build_room(-1,8)
-        self.build_room(2,4)
-        self.build_room(3,3)
     def update(self, dt):      
     #   Elevators
         for i in range(len(self.lifts[0])):
@@ -58,17 +56,26 @@ class Building:
 
         pass # update elevator position and room actions
     
-    def build_room(self, floor, room_id):
+    def build_room(self, top, room_id):
         # construct new room at floor (check that this is next above or below)
-        floor_index = floor-settings.BOTTOM_FLOOR
-        self.event.notify('update_room', floor_index, room_id)
-        self.floors[floor_index] = Room(room_id)
+        if top:
+            floor = self.next_up
+            self.next_up = self.next_up + 1
+        else:
+            floor = self.next_down
+            self.next_down = self.next_down - 1
+
+        if floor in range(settings.BOTTOM_FLOOR,settings.TOP_FLOOR):
+            if self.get_funds() >= settings.ROOM_COSTS[room_id]:
+                self.spend_funds(settings.ROOM_COSTS[room_id])
+                floor_index = floor-settings.BOTTOM_FLOOR
+                self.event.notify('update_room', floor_index, room_id)
+                self.floors[floor_index] = Room(room_id)
  
     def demolish_room(self, floor):
         floor_index = floor - settings.BOTTOM_FLOOR
         self.floors[floor_index] = Room()
     
-
     def get_room(self, floor):
         floor_index = floor-settings.BOTTOM_FLOOR
         return self.floors[floor_index].room_id
@@ -115,7 +122,17 @@ class Building:
 
     def save_game(self):
         pass
-
+    
+    def get_funds(self):
+        return self.funds
+    
+    def spend_funds(self, amount):
+        self.funds -= amount
+        self.event.notify("update_funds", self.funds)
+    
+    def gain_funds(self, amount):
+        self.funds += amount
+        self.event.notify("update_funds", self.funds)
 
 class Elevator:
     lift_speed = 0.5

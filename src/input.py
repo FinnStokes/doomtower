@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+pygame.font.init()
 
 import settings
 
@@ -19,6 +20,14 @@ hire_out = []
 for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
+# font
+font = pygame.font.Font("font/varsity.ttf", 24)
+build_ids = [2,3,4,5,6,7,8]
+updown_img = pygame.image.load('img/UpDown.png')
+updown_out = []
+for i in range(2):
+    updown_out.append(updown_img.subsurface(pygame.Rect(0,128*i,320,128)))
+updown_over = updown_out
 
 class Input:
     def __init__(self, window, event_manager, render):
@@ -39,12 +48,12 @@ class Input:
         event_manager.register("new_entity", self.new_entity)
         event_manager.register("remove_entity", self.remove_entity)
 
-        self.hire_btn = Toggle(pygame.Rect(20, 0, 128, 43),
+        self.hire_btn = Toggle(pygame.Rect(450, 0, 128, 43),
                                out=buildhire_btn.subsurface(pygame.Rect(0,43,128,43)),
                                over=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                on=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                event_manager=event_manager, event="open_hire")
-        self.build_btn = Toggle(pygame.Rect(168, 0, 128, 43),
+        self.build_btn = Toggle(pygame.Rect(600, 0, 128, 43),
                                 out=buildhire_btn.subsurface(pygame.Rect(0,0,128,43)),
                                 over=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
                                 on=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
@@ -52,21 +61,32 @@ class Input:
         self.widgets.append(self.hire_btn)
         self.widgets.append(self.build_btn)
         
+        self.funds = Text(pygame.Rect(100, 0, 0, 0), font, "")
+        event_manager.register("update_funds", lambda x: self.funds.setText(str(x)))
+        self.widgets.append(self.funds)
+    
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
+        
+        updown_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, updown_out, updown_over, self.updown,
+                                 event_manager, open_event="open_updown", open = False)
+        self.widgets.extend(updown_popup.widgets)
         
         build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over, self.build,
                                   event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
+        hire_popup = PopupWindow(pygame.Rect(424, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
                                  event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
+        
+        self.room_id = 0
         
         self.window_resize(self.window.get_size())
     
     def window_resize(self, size):
         self.footer.rect.bottom = size[1]
+        self.funds.rect.bottom = size[1] - 48
         self.hire_btn.rect.bottom = size[1] - 10
         self.build_btn.rect.bottom = size[1] - 10
     
@@ -147,7 +167,13 @@ class Input:
             self.event.notify("create_scientist", staff_id)
 
     def build(self, room_id):
-        pass
+        self.room_id = build_ids[room_id]
+        self.event.notify("open_updown", True)
+
+    def updown(self, id):
+        self.event.notify("input_build", id == 0, self.room_id)
+        self.event.notify("open_updown", False)
+        
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
@@ -292,6 +318,22 @@ class Static(Widget):
     def __init__(self, rect, sprite):
         Widget.__init__(self, rect, enabled=False)
         self.__sprite = sprite
+    
+    def sprite(self):
+        if self.visible:
+            return self.__sprite
+        else:
+            return None
+
+class Text(Widget):
+    def __init__(self, rect, font, text):
+        Widget.__init__(self, rect)
+        self.font = font
+        self.setText(text)
+    
+    def setText(self, text):
+        self.text = text
+        self.__sprite = font.render(text, True, (255, 255, 255))
     
     def sprite(self):
         if self.visible:
