@@ -95,7 +95,7 @@ class Building:
         elevator = self.lifts[side][index]
 
         #remove edges associated with elevator from building_graph
-        for i in range(len(elevator.floors))
+        for i in range(len(elevator.floors)):
             self.building_graph.removeEdge(floors[i]*3 + side*2,   floors[i+1]*3 + side*2)
             self.building_graph.removeEdge(floors[i+1]*3 + side*2, floors[i]*3 + side*2)
 
