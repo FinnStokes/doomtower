@@ -82,6 +82,7 @@ class Entity:
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
             else:
                 if floor == self.path[0] // 3:
+                    self.path.pop(0)
                     self.event.notify("entity_in_elevator", self.id, -1)
                     self.y = floor
                     self.elevator.exit()
