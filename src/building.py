@@ -165,6 +165,12 @@ class Elevator:
             return True
         else:
             return False
+    
+    def exit(self):
+        if self.occupied:
+            self.occupied = False
+            if len(self.pickups) > 0:
+                self.moving = True
 
 # room_id
 # 0 - Lobby
