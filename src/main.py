@@ -3,6 +3,7 @@ from pygame.locals import *
 import event
 import model
 import view
+import settings
 
 event_manager = event.Event()
 player_view = view.View(event_manager)
@@ -25,6 +26,7 @@ def close():
     running = False
 
 event_manager.register("quit", close)
+accum = 0.0
 
 while running:
     fpsClock.tick(30)
@@ -32,3 +34,9 @@ while running:
     event_manager.notify("refresh")
     event_manager.notify("update", fpsClock.get_time()/1000.0)
     event_manager.update()
+    accum +=  fpsClock.get_time()/1000.0
+    if int(accum) == settings.SPAWN_PERIOD:
+        event_manager.notify("create_client")
+        accum = 0.0    
+       
+

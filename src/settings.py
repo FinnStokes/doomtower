@@ -15,6 +15,10 @@ SCROLL_TIME = 20
 SPAWN_POSITION = 0.7
 SPAWN_FLOOR = 0
 
+# Period of client spawning (secs)
+SPAWN_PERIOD = 10
+
+
 # The horizontal speed the entities should move at in rooms per second
 ENTITY_SPEED = 0.2
 
