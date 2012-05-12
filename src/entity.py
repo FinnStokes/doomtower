@@ -36,6 +36,7 @@ class Entity:
         event.register("input_move", self.move_to)
         event.register("update", self.update)
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
+        event.register("elevator_open", self.elevator_open)
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
@@ -44,8 +45,6 @@ class Entity:
             dest = floor * 2
             self.path = self.building.building_graph.getPath(src, dest)
             if not self.path:
-                print self.building.building_graph.getEdge(src,dest)
-                print "no path from "+repr(src)+" to "+repr(dest)
                 return
             if self.path.pop(0) != src:
                 raise ValueError("Invalid path: start doesn't match")
@@ -69,9 +68,22 @@ class Entity:
                         self.x = self.x - self.speed*dt
                 self.event.notify("update_entity", self.id, self.x, self.y)
             elif self.path:
-                self.building.get_elevator(self.y, self.x < 0.5).call_to(self.y)
-                pass # Call elevator
+                self.elevator = self.building.get_elevator(self.y, self.x < 0.5)
+                self.elevator.call_to(self.y)
+                self.waiting = True
 
+    def elevator_open(self, id, floor):
+        if self.elevator and id == self.elevator.id:
+            if self.waiting:
+                if floor == self.y:
+                    self.waiting = not self.elevator.occupy(self.target)
+                    print self.waiting
+            else:
+                if floor == self.path[0] // 2:
+                    self.y = floor
+                    self.elevator.occupied = False
+                    self.elevator = None
+    
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
