@@ -208,10 +208,12 @@ class Render:
         if id in self.entities:
             oldx = self.entities[id].x
             oldy = self.entities[id].y
-            if oldy in range(len(self.rooms)):
+            if oldy in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
                 self.get_room(oldy).entities.discard(self.entities[id])
-            if y in range(len(self.rooms)):
+            if y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
                 self.get_room(y).entities.add(self.entities[id])
+                print y
+                print self.get_room(y).entities
             if x < oldx:
                 self.entities[id].face_left = True
                 self.entities[id].walking = True
@@ -229,7 +231,7 @@ class Render:
         if entity_id in self.entities:
             entity = self.entities[entity_id]
             if elevator_id >= 0:
-                if entity.y in range(len(self.rooms)):
+                if entity.y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
                     self.get_room(entity.y).entities.discard(entity)
                 if elevator_id in self.elevators:
                     self.elevators[elevator_id].entities.add(entity)
