@@ -20,6 +20,8 @@ for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
 
+build_ids = [2,3,4,5,6,7,8]
+
 class Input:
     def __init__(self, window, event_manager, render):
         self.event = event_manager
@@ -147,7 +149,7 @@ class Input:
             self.event.notify("create_scientist", staff_id)
 
     def build(self, room_id):
-        pass
+        self.event.notify("input_build", True, build_ids[room_id])
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
