@@ -167,11 +167,11 @@ class Render:
                     self.window.blit(entity.subsprite, (lift_x, lift_y + 32), entity.sub_rect)
                     
             # Draws Elevator Pulley
-            self.window.blit(elevator.sprite_pulley, (floor_pulley_x, floor_pulley_y), (0, 0, 42, 40))
+            # self.window.blit(elevator.sprite_pulley, (floor_pulley_x, floor_pulley_y), (0, 0, 42, 40))
             
             # Draws Elevator Ropes
-            self.window.blit(elevator.sprite_rope, (floor_pulley_x+42-10, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
-            self.window.blit(elevator.sprite_rope, (floor_pulley_x, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
+            # self.window.blit(elevator.sprite_rope, (floor_pulley_x+42-10, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
+            # self.window.blit(elevator.sprite_rope, (floor_pulley_x, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
             
             # Draws Elevator
             self.window.blit(elevator.sprite, (lift_x, lift_y))

@@ -13,8 +13,6 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 running = True
 
-event_manager.notify("create_client")
-
 event_manager.notify("input_elevator",True,[-4, -2, 0, 2, 4, 6, 8, 10])
 event_manager.notify("input_elevator",False,[-5, -4])
 event_manager.notify("input_elevator",False,[-3, -2])
@@ -29,15 +27,21 @@ def close():
     running = False
 
 event_manager.register("quit", close)
-accum = 0.0
+accum = settings.SPAWN_PERIOD_END
+total = 0
 
 while running:
     fpsClock.tick(30)
     event_manager.notify("update", fpsClock.get_time()/1000.0)
     event_manager.update()
-    accum +=  fpsClock.get_time()/1000.0
-    if int(accum) >= settings.SPAWN_PERIOD:
+    
+    time =  fpsClock.get_time()/1000.0
+    accum += time
+    total += time
+    period = settings.SPAWN_PERIOD - \
+            (settings.SPAWN_PERIOD - settings.SPAWN_PERIOD_END) * \
+            (total / settings.SPAWN_SCALE_TIME)
+    period = max(period, settings.SPAWN_PERIOD_END)
+    if int(accum) >= period:
         event_manager.notify("create_client")
-        accum = 0.0    
-       
-
+        accum = 0.0
