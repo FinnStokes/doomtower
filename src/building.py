@@ -168,7 +168,9 @@ class Elevator:
     # move to next floor in pickup queue  
     def move(self, dt):
         if not self.moving:
-            return None
+            if len(self.pickups) > 0:
+                self.moving = True
+            return
  
         if self.occupied:
             dest = self.target
