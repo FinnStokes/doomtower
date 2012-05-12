@@ -15,9 +15,14 @@ running = True
 
 event_manager.notify("create_client")
 
-event_manager.notify("input_elevator",True,[-1, 0, 3])
-event_manager.notify("input_elevator",False,[0, 1])
+event_manager.notify("input_elevator",True,[-4, -2, 0, 2, 4, 6, 8, 10])
+event_manager.notify("input_elevator",False,[-5, -4])
+event_manager.notify("input_elevator",False,[-3, -2])
+event_manager.notify("input_elevator",False,[-1, 0, 1])
 event_manager.notify("input_elevator",False,[2, 3])
+event_manager.notify("input_elevator",False,[4, 5])
+event_manager.notify("input_elevator",False,[6, 7])
+event_manager.notify("input_elevator",False,[8, 9])
 
 def close():
     global running
