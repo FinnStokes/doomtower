@@ -96,10 +96,13 @@ class Render:
                 self.y_pan += self.pan_speed
         # Draw ground and sky backgrounds
         if self.y_pan < -settings.GROUND_HEIGHT-screen_height:
+            # Entirely underground
             self.window.fill(settings.GROUND_COLOUR)
         else:
+            # Sky Background
             self.window.fill(settings.SKY_COLOUR)
             if self.y_pan < settings.GROUND_HEIGHT:
+                # If on screen, ground at bottom
                 self.window.fill(settings.GROUND_COLOUR, pygame.Rect(0,screen_height+self.y_pan-settings.GROUND_HEIGHT,screen_width, settings.GROUND_HEIGHT-self.y_pan))
         
         x_offset = (screen_width-self.room_width)/2
@@ -173,7 +176,7 @@ class Render:
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
         elif floor_height + self.room_height > self.y_pan + screen_height:
             #scroll up
-            self.y_target = floor_height + self.room_height + 2*self.room_padding - screen_height
+            self.y_target = floor_height + self.room_height + self.room_padding - screen_height
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed < (self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = (self.room_height/settings.SCROLL_TIME)
