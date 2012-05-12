@@ -13,8 +13,6 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 running = True
 
-event_manager.notify("create_client")
-
 event_manager.notify("input_elevator",True,[-4, -2, 0, 2, 4, 6, 8, 10])
 event_manager.notify("input_elevator",False,[-5, -4])
 event_manager.notify("input_elevator",False,[-3, -2])
@@ -29,7 +27,7 @@ def close():
     running = False
 
 event_manager.register("quit", close)
-accum = 0.0
+accum = settings.SPAWN_PERIOD_END
 total = 0
 
 while running:
