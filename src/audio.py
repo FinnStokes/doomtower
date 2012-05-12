@@ -44,7 +44,7 @@ class DoomMixer:
         #unique room sound should play when a room is built
         self.event.register("update_room", self.play_room) 
         self.event.register("new_entity", self.entity_hello )
-        self.event.register("remove_entity", self.entity_farewell )
+        self.event.register("remove_entity", self.entity_bye )
         self.event.register("update_funds", self.funds )
         self.event.register("insufficient_funds", self.insufficient_funds )
         
@@ -94,7 +94,7 @@ class DoomMixer:
         sprite = self.peeps[id][0]
         character = self.peeps[id][1]
         self.vox[sprite][character][1].play()
-        peeps.pop(id)
+        self.peeps.pop(id)
     
     def funds(self, funds):
         if funds > self.funds:
