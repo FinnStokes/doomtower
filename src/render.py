@@ -11,6 +11,7 @@ room_images.append(pygame.image.load('img/Floor_Cosmo.png'))
 room_images.append(pygame.image.load('img/Floor_Psych.png'))
 room_images.append(pygame.image.load('img/Floor_Info.png'))
 room_images.append(pygame.image.load('img/Floor_Meeting.png'))
+mini_map_image = pygame.image.load('img/MiniMap.png')
 background_image = pygame.image.load('img/Building.png')
 entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
@@ -23,6 +24,7 @@ entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 elevator_sprite = pygame.image.load('img/Lift.png').subsurface(pygame.Rect(0,0,96,197))
 elevator_pulley = pygame.image.load('img/LiftPulley.png')
 elevator_rope = pygame.image.load('img/LiftRope.png')
+thought_image = pygame.image.load('img/SpeechBubbles.png')
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -130,31 +132,44 @@ class Render:
                     self.window.blit(entity.subsprite,
                                      (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
+                # Draw Scientist Thought
+                if entity.thought > 0:
+                    self.window.blit(thought_image,
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH),
+                                     y_offset + self.room_height - entity.height - 90),
+                                     pygame.Rect(0, entity.thought * 90, 160, 90))
         
         for elevator in self.elevators.itervalues():
+            # Lift X / Lift Y
+            lift_x = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
+            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20
+            
+            # Pulley / Rope XY
+            floor_pulley_x = lift_x +28
+            floor_pulley_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
+            floor_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
+            
+            # Rope Length
+            pull_to_elevator_distance = math.fabs(floor_y - lift_y) 
+            
+            #Draw Scientist
             for entity in elevator.entities:
+                # Draws Scientist Body
                 if entity.sprite:
-                    self.window.blit(entity.sprite,
-                                     ((x_offset - (elevator.width if elevator.left else -self.room_width),
-                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
-                                     entity.main_rect)
+                    self.window.blit(entity.sprite, (lift_x, lift_y + 32), entity.main_rect)
+                # Draws Scientist Head
                 if entity.subsprite:
-                    self.window.blit(entity.subsprite,
-                                     ((x_offset - (elevator.width if elevator.left else -self.room_width),
-                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
-                                     entity.sub_rect)
+                    self.window.blit(entity.subsprite, (lift_x, lift_y + 32), entity.sub_rect)
+                    
+            # Draws Elevator Pulley
+            self.window.blit(elevator.sprite_pulley, (floor_pulley_x, floor_pulley_y), (0, 0, 42, 40))
+            
+            # Draws Elevator Ropes
+            self.window.blit(elevator.sprite_rope, (floor_pulley_x+42-10, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
+            self.window.blit(elevator.sprite_rope, (floor_pulley_x, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
             
             # Draws Elevator
-            self.window.blit(elevator.sprite,
-                             (x_offset - (elevator.width if elevator.left else -self.room_width), 
-                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)))
-            liftx = x_offset -2-42
-            lifty = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)
-            # Draws Elevator Pulley
-            self.window.blit(elevator.sprite_pulley, (liftx, lifty), (0, 0, 42, 40))
-            # Draws Elevator Ropes
-            self.window.blit(elevator.sprite_rope, (liftx+42-10, lifty+40), (0, 0, 10, 10))
-            self.window.blit(elevator.sprite_rope, (liftx, lifty+40), (0, 0, 10, 10))
+            self.window.blit(elevator.sprite, (lift_x, lift_y))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -274,7 +289,7 @@ class Render:
         print state
     def new_elevator(self, id, left, floors, y): 
         # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
-        self.elevators[id] = Elevator(left, y)
+        self.elevators[id] = Elevator(left, y, floors)
     
     def remove_elevator(self, id):
         del self.elevators[id]
@@ -314,11 +329,13 @@ class Entity:
         self.elevator = -1
         self.x = x_coord
         self.y = y_coord
+        self.thought = 0
 
 class Elevator:
-    def __init__(self, left, y):
+    def __init__(self, left, y, floors):
         self.left = left
         self.y = y
+        self.floors = floors
         self.sprite = elevator_sprite
         self.sprite_pulley = elevator_pulley
         self.sprite_rope = elevator_rope
