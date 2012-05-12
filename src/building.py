@@ -58,6 +58,10 @@ class Building:
         floor_index = floor-settings.BOTTOM_FLOOR
         self.event.notify('update_room', floor_index, room_id)
         self.floors[floor_index] = Room(room_id)
+    
+    def get_room(self, floor):
+        floor_index = floor-settings.BOTTOM_FLOOR
+        return self.floors[floor_index].room_id
 
     def build_elevator(self, left, floors):
         side = int(not left)
@@ -168,6 +172,15 @@ class Elevator:
             if len(self.pickups) > 0:
                 self.moving = True
 
+# room_id
+# 0 - Lobby
+# 1 - Waiting
+# 2 - Bio
+# 3 - Boom
+# 4 - Cosmo
+# 5 - Psych
+# 6 - Info
+# 7 - Meeting
 class Room:
     #product types
     products = {'time_bomb': 'boom',
@@ -195,7 +208,7 @@ class Room:
                      'meeting': [1000, 100, 300]
     }       
 
-    def __init__(self, room_id = 'empty', size = 1):
+    def __init__(self, room_id = 0, size = 1):
         self.room_id = room_id
         self.size = size
         self.jobs = []

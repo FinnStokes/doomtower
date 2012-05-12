@@ -1,6 +1,4 @@
-import settings
-import random
-import path
+import settings, random, path
 
 class Manager:
     def __init__(self, event, building):
@@ -39,6 +37,7 @@ class Entity:
         event.register("update", self.update)
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
         event.register("elevator_open", self.elevator_open)
+        event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
@@ -89,6 +88,10 @@ class Entity:
                     self.elevator = None
                     self.event.notify("update_entity", self.id, self.x, self.y)
     
+    def remove_entity(self, id):
+        if self.id == id:
+            self.event.deregister("input_move", self.move_to)
+            self.event.deregister("update", self.update)
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
@@ -98,12 +101,37 @@ class Client(Entity):
     
     def update(self, dt):
         Entity.update(self, dt)
-        
         self.progress += dt
-        if self.state == "wait_meeting" and self.progress > 10:
-            self.state = "left"
-            self.progress = 0
-            self.event.notify("remove_entity", self.id)
+        
+        if self.state == "wait_meeting":
+            if self.building.get_room(self.y) == 7:
+                self.state = "meeting"
+                self.progress = 0
+                print("meeting")
+            elif self.progress > 10:
+                self.state = "left"
+                self.progress = 0
+                self.event.notify("remove_entity", self.id)
+        elif self.state == "meeting":
+            if self.progress > 10:
+                self.state = "wait_manufacture"
+                print("wait_manufacture")
+                self.progress = 0
+        elif self.state == "wait_manufacture":
+            if self.building.get_room(self.y) == 3:
+                self.state = "manufacture"
+                print("manufacture")
+                self.progress = 0
+            elif self.progress > 10:
+                self.state = "left"
+                self.progress = 0
+                self.event.notify("remove_entity", self.id)
+        elif self.state == "manufacture":
+            if self.progress > 10:
+                self.state = "left"
+                self.progress = 0
+                self.event.notify("remove_entity", self.id)
+                print("left")
 
 class Scientist(Entity):
     def __init__(self, event, id, character, x, floor, building):
