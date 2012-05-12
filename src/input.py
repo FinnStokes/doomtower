@@ -116,7 +116,10 @@ class Input:
         self.widgets.append(entity)
     
     def remove_entity(self, id):
-        pass
+        for widget in self.widgets:
+            if hasattr(widget, "entity_id"):
+                if widget.entity_id == id:
+                    self.widgets.remove(widget)
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
@@ -314,10 +317,18 @@ class Entity(Widget):
         self.event = event_manager
         event_manager.register("update_entity", self.update_entity)
         event_manager.register("update", self.update)
+        event_manager.register("delete_entity", self.delete_entity)
     
     def update_entity(self, id, x, y):
         if self.entity_id == id:
             self.entity_pos = x, y
+        
+    def delete_entity(self, id):
+        if self.entity_id == id:
+            event_manager.deregister("update_entity", self.update_entity)
+            event_manager.deregister("update", self.update)
+            event_manager.deregister("delete_entity", self.delete_entity)
+            
     
     def update(self, dt):
         if not self.dragging:

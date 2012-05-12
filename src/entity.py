@@ -90,6 +90,17 @@ class Entity:
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
         Entity.__init__(self, event, id, x, floor, 2, character, building)
+        self.state = "wait_meeting"
+        self.progress = 0
+    
+    def update(self, dt):
+        Entity.update(self, dt)
+        
+        self.progress += dt
+        if self.state == "wait_meeting" and self.progress > 10:
+            self.state = "left"
+            self.progress = 0
+            self.event.notify("remove_entity", self.id)
 
 class Scientist(Entity):
     def __init__(self, event, id, character, x, floor, building):

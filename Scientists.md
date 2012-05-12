@@ -1,14 +1,14 @@
 Scientists
 ----------
 
-* Unnamed 1: Up to you
-* Unnamed 2: Up to you (Balding Guy)
+* Professor Korsakov
+* Professor Mayamato
 * Ernest Rutherford: New Zealand
 * Thomas Edison: American
 * JJ Thomson: British
 * Max Planck: German
 * Marie Curie: Polish
-* Nikola Telsa: Serbian
+* Nikola Tesla: Serbian
 * Albert Einstein: German
 * Isaac Newton: English 1700s
 

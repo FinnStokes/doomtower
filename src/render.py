@@ -66,6 +66,9 @@ class Render:
             if anim_step:
                 entity.anim_frame = (entity.anim_frame + 1)%entity.anim_length
             col += entity.anim_frame
+            if entity.walking:
+                row += 1
+                entity.walking = False
             if entity.face_left:
                 col += entity.anim_length
                 if entity.character >= 0:
@@ -104,11 +107,11 @@ class Render:
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
         
         for elevator in self.elevators.itervalues():
@@ -118,7 +121,7 @@ class Render:
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
-        return (screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
+        return (screen_width-704)/2 + pos[0]*(704-settings.ENTITY_WIDTH), screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
 
     def get_world_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -135,7 +138,7 @@ class Render:
         floor_height = (self.room_height+self.room_padding)*(target_floor)
         if floor_height < self.y_pan:
             #scroll down
-            self.y_target = floor_height
+            self.y_target = floor_height - settings.BOTTOM_PANEL_HEIGHT
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed > -(self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
@@ -182,7 +185,7 @@ class Render:
         if y in range(len(self.rooms)):
             self.get_room(y).entities.add(self.entities[id])
     
-    def remove_entity(self, id): # create entity with given sprite at given position
+    def remove_entity(self, id): # remove entity with given id
         if id in self.entities:
             y = self.entities[id].y
             if y in range(len(self.rooms)):
@@ -201,8 +204,12 @@ class Render:
                 self.get_room(y).entities.add(self.entities[id])
             if x < oldx:
                 self.entities[id].face_left = True
+                self.entities[id].walking = True
             elif x > oldx:
                 self.entities[id].face_left = False
+                self.entities[id].walking = True
+            else:
+                self.entities[id].walking = False
             self.entities[id].x = x
             self.entities[id].y = y
         else:
@@ -218,7 +225,6 @@ class Render:
     def update_elevator(self, id, y):
         # move elevator to floor y (may be non-integer)
         self.elevators[id].y = y
-    
 
 class Room:
     def __init__(self):
@@ -245,6 +251,7 @@ class Entity:
         self.face_left = True
         self.anim_frame = 0
         self.anim_length = 2
+        self.walking = False
         self.x = x_coord
         self.y = y_coord
 
