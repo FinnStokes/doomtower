@@ -44,7 +44,6 @@ while running:
             (settings.SPAWN_PERIOD - settings.SPAWN_PERIOD_END) * \
             (total / settings.SPAWN_SCALE_TIME)
     period = max(period, settings.SPAWN_PERIOD_END)
-    print(period)
     if int(accum) >= period:
         event_manager.notify("create_client")
         accum = 0.0
