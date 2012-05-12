@@ -113,10 +113,10 @@ class Entity:
             self.building.spend_funds(self.wage)
             self.wage_timer -= settings.WAGE_PERIOD
         
-        if not self.elevator:
+        if not self.elevator and not self.in_elevator:
             if self.path and self.path[0] // 3 == self.y:
                     self.target = (self.path.pop(0) % 3) / 2.0
-            
+
             if self.x != self.target:
                 if abs(self.x - self.target) < self.speed*dt:
                     self.x = self.target
@@ -126,10 +126,13 @@ class Entity:
                     else:
                         self.x = self.x - self.speed*dt
                 self.event.notify("update_entity", self.id, self.x, self.y)
-            elif self.path and not self.in_elevator:
+            elif self.path:
                 self.elevator = self.building.get_elevator(self.y, self.x < 0.5)
                 self.elevator.call_to(self.y)
                 self.waiting = True
+            else:
+                if random.random() < dt*0.5:
+                    self.target = random.random()
 
     def elevator_open(self, id, floor):
         if self.elevator and id == self.elevator.id:
