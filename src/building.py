@@ -17,6 +17,8 @@ class Building:
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, bottom-top
         self.building_graph = path.Graph()
+        self.funds = settings.STARTING_FUNDS
+        self.event.notify("update_funds", self.funds)
  
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
             self.building_graph.addNode(i*3)
@@ -115,7 +117,17 @@ class Building:
 
     def save_game(self):
         pass
-
+    
+    def get_funds(self):
+        return self.funds
+    
+    def spend_funds(self, amount):
+        self.funds -= amount
+        self.event.notify("update_funds", self.funds)
+    
+    def gain_funds(self, amount):
+        self.funds += amount
+        self.event.notify("update_funds", self.funds)
 
 class Elevator:
     lift_speed = 0.5

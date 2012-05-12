@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+pygame.font.init()
 
 import settings
 
@@ -19,6 +20,8 @@ hire_out = []
 for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
+# font
+font = pygame.font.Font("font/varsity.ttf", 24)
 
 class Input:
     def __init__(self, window, event_manager, render):
@@ -39,12 +42,12 @@ class Input:
         event_manager.register("new_entity", self.new_entity)
         event_manager.register("remove_entity", self.remove_entity)
 
-        self.hire_btn = Toggle(pygame.Rect(20, 0, 128, 43),
+        self.hire_btn = Toggle(pygame.Rect(450, 0, 128, 43),
                                out=buildhire_btn.subsurface(pygame.Rect(0,43,128,43)),
                                over=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                on=buildhire_btn.subsurface(pygame.Rect(128,43,128,43)),
                                event_manager=event_manager, event="open_hire")
-        self.build_btn = Toggle(pygame.Rect(168, 0, 128, 43),
+        self.build_btn = Toggle(pygame.Rect(600, 0, 128, 43),
                                 out=buildhire_btn.subsurface(pygame.Rect(0,0,128,43)),
                                 over=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
                                 on=buildhire_btn.subsurface(pygame.Rect(128,0,128,43)),
@@ -52,6 +55,10 @@ class Input:
         self.widgets.append(self.hire_btn)
         self.widgets.append(self.build_btn)
         
+        self.funds = Text(pygame.Rect(100, 0, 0, 0), font, "")
+        event_manager.register("update_funds", lambda x: self.funds.setText(str(x)))
+        self.widgets.append(self.funds)
+    
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
         
@@ -67,6 +74,7 @@ class Input:
     
     def window_resize(self, size):
         self.footer.rect.bottom = size[1]
+        self.funds.rect.bottom = size[1] - 48
         self.hire_btn.rect.bottom = size[1] - 10
         self.build_btn.rect.bottom = size[1] - 10
     
@@ -292,6 +300,22 @@ class Static(Widget):
     def __init__(self, rect, sprite):
         Widget.__init__(self, rect, enabled=False)
         self.__sprite = sprite
+    
+    def sprite(self):
+        if self.visible:
+            return self.__sprite
+        else:
+            return None
+
+class Text(Widget):
+    def __init__(self, rect, font, text):
+        Widget.__init__(self, rect)
+        self.font = font
+        self.setText(text)
+    
+    def setText(self, text):
+        self.text = text
+        self.__sprite = font.render(text, True, (255, 255, 255))
     
     def sprite(self):
         if self.visible:
