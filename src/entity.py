@@ -1,4 +1,4 @@
-import settings, random, path
+import settings, random, path, math
 
 class Manager:
     def __init__(self, event, building):
@@ -107,34 +107,35 @@ class Client(Entity):
         self.progress += dt
         
         if self.state == "wait_meeting":
-            if self.building.get_room(self.y) == 7:
+            if self.building.get_room(self.y) == settings.ROOM_MEETING:
                 self.state = "meeting"
                 self.progress = 0
-                print("meeting")
             elif self.progress > 20:
-                self.state = "left"
+                self.state = "leaving"
                 self.progress = 0
-                #self.event.notify("remove_entity", self.id)
+                self.event.notify("input_move", self.id, 0)
         elif self.state == "meeting":
             if self.progress > 20:
                 self.state = "wait_manufacture"
-                print("wait_manufacture")
                 self.progress = 0
         elif self.state == "wait_manufacture":
-            if self.building.get_room(self.y) == 3:
+            if self.building.get_room(self.y) == settings.ROOM_BOOM:
                 self.state = "manufacture"
-                print("manufacture")
                 self.progress = 0
             elif self.progress > 20:
-                self.state = "left"
+                self.state = "leaving"
                 self.progress = 0
-                #self.event.notify("remove_entity", self.id)
+                self.event.notify("input_move", self.id, 0)
         elif self.state == "manufacture":
             if self.progress > 20:
+                self.state = "leaving"
+                self.progress = 0
+                self.event.notify("input_move", self.id, 0)
+        elif self.state == "leaving":
+            if self.y == 0 and math.fabs(self.x - 0.5) < 0.01:
                 self.state = "left"
                 self.progress = 0
-                #self.event.notify("remove_entity", self.id)
-                print("left")
+                self.event.notify("remove_entity", self.id)
 
 class Scientist(Entity):
     def __init__(self, event, id, character, x, floor, building):
