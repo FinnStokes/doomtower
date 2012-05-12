@@ -34,7 +34,7 @@ class DoomMixer:
                       
           ]    
     
-    roomsources = ['snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/informatics', 'snd/meeting.ogg', 'snd/psycho.ogg', 'snd/reception.ogg']
+    roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics', 'snd/meeting.ogg']
     bgmsources = ['snd/sciencegroove.ogg', 'snd/sciencegroove2.ogg']
   
     
