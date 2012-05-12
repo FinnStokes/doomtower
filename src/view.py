@@ -8,7 +8,7 @@ class View:
     def __init__(self, event_manager):
         self.event = event_manager
         self.event.register("update", self.update)
-        window = pygame.display.set_mode((800,600),pygame.RESIZABLE)
+        window = pygame.display.set_mode((1024,600),pygame.RESIZABLE)
         pygame.display.set_caption('Doom Tower')
         self.render = render.Render(window, event_manager)
         self.mix = audio.DoomMixer(event_manager)
