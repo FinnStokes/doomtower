@@ -4,7 +4,7 @@ client_requests = []
 
 #Set the patience and potential requests for each client
 for i in range(10):
-    client_patience.append(20)
+    client_patience.append(30)
     client_requests.append({settings.ROOM_BOOM:0.5, settings.ROOM_BIO:0.5, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0, settings.ROOM_INFO: 0})
 class Manager:
     def __init__(self, event, building):
@@ -117,7 +117,6 @@ class Client(Entity):
                 break
             else:
                 rand -= chance
-        print self.request
     
     def update(self, dt):
         Entity.update(self, dt)
@@ -134,6 +133,7 @@ class Client(Entity):
                 self.set_state("wait_meeting")
             elif self.progress > settings.MEETING_TIME:
                 self.set_state("wait_manufacture")
+                self.event.notify("set_entity_request", self.id, self.request)
         elif self.state == "wait_manufacture":
             if self.building.get_room(self.y) == self.request:
                 self.set_state("manufacture")
@@ -143,6 +143,7 @@ class Client(Entity):
         elif self.state == "manufacture":
             if self.building.get_room(self.y) != self.request:
                 self.set_state("wait_manufacture")
+                self.event.notify("set_entity_request", self.id, self.request)
             if self.progress > settings.MANUFACTURE_TIME:
                 self.set_state("satisfied")
                 self.event.notify("input_move", self.id, 0)
