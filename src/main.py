@@ -31,3 +31,4 @@ while running:
     #phasing out usage of refresh in favour of update
     event_manager.notify("refresh")
     event_manager.notify("update", fpsClock.get_time()/1000.0)
+    event_manager.update()
