@@ -191,7 +191,7 @@ class Elevator:
         self.event.notify("elevator_open", self.id, self.y)
     
     def occupy(self, target):
-        if not self.occupied:
+        if not self.occupied and target in self.floors:
             self.occupied = True
             self.target = target
             self.moving = True

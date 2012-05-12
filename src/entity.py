@@ -46,19 +46,22 @@ class Entity:
         self.event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
+        self.waiting = False
+        self.elevator = None
         if entity == self.id and floor != self.y:
-            off = 0 if self.x <= 0.3 else (2 if self.x >= 0.7 else 1)
-            src = self.y * 3 + off
-            dest = floor * 3 + 1
-            self.path = self.building.building_graph.getPath(src, dest)
-            if not self.path:
-                return
-            if self.path.pop(0) != src:
-                raise ValueError("Invalid path: start doesn't match")
-            if self.path[0] // 3 == self.y:
-                self.target = (self.path.pop(0) % 3) / 2.0
-            else:
-                self.target = (src % 3) / 2.0
+            if not self.elevator or self.waiting:
+                off = 0 if self.x <= 0.3 else (2 if self.x >= 0.7 else 1)
+                src = self.y * 3 + off
+                dest = floor * 3 + 1
+                self.path = self.building.building_graph.getPath(src, dest)
+                if not self.path:
+                    return
+                if self.path.pop(0) != src:
+                    raise ValueError("Invalid path: start doesn't match")
+                if self.path[0] // 3 == self.y:
+                    self.target = (self.path.pop(0) % 3) / 2.0
+                else:
+                    self.target = (src % 3) / 2.0
     
     def update(self, dt):
         if not self.elevator:
