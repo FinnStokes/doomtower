@@ -119,7 +119,7 @@ class Render:
         floor_height = (self.room_height+self.room_padding)*(target_floor)
         if floor_height < self.y_pan:
             #scroll down
-            self.y_target = floor_height
+            self.y_target = floor_height - settings.BOTTOM_PANEL_HEIGHT
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed > -(self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
