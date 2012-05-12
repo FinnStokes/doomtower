@@ -37,6 +37,7 @@ class Entity:
         event.register("update", self.update)
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
         event.register("elevator_open", self.elevator_open)
+        event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
@@ -87,6 +88,10 @@ class Entity:
                     self.elevator.occupied = False
                     self.elevator = None
     
+    def remove_entity(self, id):
+        if self.id == id:
+            self.event.deregister("input_move", self.move_to)
+            self.event.deregister("update", self.update)
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
@@ -125,6 +130,7 @@ class Client(Entity):
             if self.progress > 10:
                 self.state = "left"
                 self.progress = 0
+                self.event.notify("remove_entity", self.id)
                 print("left")
 
 class Scientist(Entity):
