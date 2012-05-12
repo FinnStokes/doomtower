@@ -16,6 +16,10 @@ event_manager.notify("create_client")
 event_manager.notify("create_scientist")
 event_manager.notify("create_igor")
 
+event_manager.notify("input_elevator",True,[-1, 0, 3])
+event_manager.notify("input_elevator",False,[0, 1])
+event_manager.notify("input_elevator",False,[2, 3])
+
 def close():
     global running
     running = False
