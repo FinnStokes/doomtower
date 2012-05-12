@@ -139,7 +139,7 @@ class Render:
                 # Draw Scientist Thought
                 if entity.thought >= 0:
                     self.window.blit(thought_image,
-                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH),
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH) - 30,
                                      y_offset + self.room_height - entity.height - 90),
                                      pygame.Rect(0, entity.thought * 90, 160, 90))
         
