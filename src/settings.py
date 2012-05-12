@@ -27,3 +27,8 @@ DRAGBAR_HEIGHT = 75
 
 # The height of the bottom panel
 BOTTOM_PANEL_HEIGHT = 64
+
+# Details of the background 
+SKY_COLOUR = (196,207,255)
+GROUND_COLOUR = (115,57,0)
+GROUND_HEIGHT = 128

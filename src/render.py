@@ -79,7 +79,6 @@ class Render:
                 entity.sub_rect = pygame.Rect(subcol*entity.subwidth, subrow*entity.subheight, entity.subwidth, entity.subheight)
                 
     def draw(self): # render current game state
-        self.window.fill((196,207,255))
         screen_width, screen_height = self.window.get_size()
         if self.pan_speed > 0:
             if self.y_target - self.y_pan < self.pan_speed:
@@ -93,8 +92,15 @@ class Render:
                 self.pan_speed = 0
             else:
                 self.y_pan += self.pan_speed
+        # Draw ground and sky backgrounds
+        if self.y_pan < -settings.GROUND_HEIGHT-screen_height:
+            self.window.fill(settings.GROUND_COLOUR)
+        else:
+            self.window.fill(settings.SKY_COLOUR)
+            if self.y_pan < settings.GROUND_HEIGHT:
+                self.window.fill(settings.GROUND_COLOUR, pygame.Rect(0,screen_height+self.y_pan-settings.GROUND_HEIGHT,screen_width, settings.GROUND_HEIGHT-self.y_pan))
         
-        x_offset = (screen_width-704)/2
+        x_offset = (screen_width-self.room_width)/2
 
         bottom_room = self.y_pan//(self.room_height+self.room_padding)
         top_room = (self.y_pan + screen_height)//(self.room_height+self.room_padding) + 1
@@ -109,35 +115,35 @@ class Render:
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
         
         for elevator in self.elevators.itervalues():
             for entity in elevator.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -self.room_width), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -self.room_width), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
                                      entity.sub_rect)
                     
             self.window.blit(elevator.sprite,
-                             (x_offset - (elevator.width if elevator.left else -704), 
+                             (x_offset - (elevator.width if elevator.left else -self.room_width), 
                               screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
-        return (screen_width-704)/2 + pos[0]*(704-settings.ENTITY_WIDTH), screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
+        return (screen_width-self.room_width)/2 + pos[0]*(self.room_width-settings.ENTITY_WIDTH), screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
 
     def get_world_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
-        return (pos[0]-(screen_width-704)/2)/704, (screen_height + self.y_pan - pos[1] - self.room_padding)/(self.room_height+self.room_padding)
+        return (pos[0]-(screen_width-self.room_width)/2)/self.room_width, (screen_height + self.y_pan - pos[1] - self.room_padding)/(self.room_height+self.room_padding)
     
     def pan_screen(self, floor):
         if floor > self.building_height:
