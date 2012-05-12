@@ -1,0 +1,54 @@
+<html>
+<body>
+<input type="button" value="Advance Frame" onclick="advanceFrame()" />
+<canvas id="canvas" width="1024" height="600"></canvas>
+<script>
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext("2d");
+balls = [];
+
+function advanceFrame(){
+  for (var i=0; i < balls.length; i++)
+    balls[i].update();
+    
+  context.clearRect(0,0,1024,600);
+  
+  for (var i=0; i < balls.length; i++)
+    balls[i].draw();
+}
+
+function Ball(x,y, color){
+  this.x = x;
+  this.y = y;
+  this.vx = 2;
+  this.vy = -30;
+  this.color = color;
+  this.jump = true;
+  this.jumpSpeed = -30;
+  this.update = function(){
+    this.vy++; // Gravity
+    this.x += this.vx;
+    this.y += this.vy;
+    
+    if ( this.y > 360 ){
+      this.x = 170;
+      this.y = 360;
+      this.vy = this.jumpSpeed;
+    }
+  }
+  this.draw = function(){
+    context.fillStyle = color;
+    context.fillRect(this.x, this.y, 60, 60);
+  }
+}
+
+balls.push(new Ball(170, 0, "red"));
+balls.push(new Ball(170, -100, "red"));
+balls.push(new Ball(170, -300, "red"));
+balls.push(new Ball(170, -400, "red"));
+balls.push(new Ball(170, -500, "red"));
+
+setInterval(advanceFrame, 60);
+</script>
+</body>
+</html>
