@@ -74,20 +74,21 @@ class Entity:
             self.force_move(floor)    
 
     def force_move(self, floor):
-        self.waiting = False
-        self.elevator = None
-        off = 0 if self.x <= 0.5 else 2
-        src = self.y * 3 + off
-        dest = floor * 3 + 1
-        self.path = self.building.building_graph.getPath(src, dest)
-        if not self.path:
-            return
-        if self.path.pop(0) != src:
-            raise ValueError("Invalid path: start doesn't match")
-        if self.path[0] // 3 == self.y:
-            self.target = (self.path.pop(0) % 3) / 2.0
-        else:
-            self.target = (src % 3) / 2.0
+        if self.building.get_room(floor) > 0:
+            self.waiting = False
+            self.elevator = None
+            off = 0 if self.x <= 0.5 else 2
+            src = self.y * 3 + off
+            dest = floor * 3 + 1
+            self.path = self.building.building_graph.getPath(src, dest)
+            if not self.path:
+                return
+            if self.path.pop(0) != src:
+                raise ValueError("Invalid path: start doesn't match")
+            if self.path[0] // 3 == self.y:
+                self.target = (self.path.pop(0) % 3) / 2.0
+            else:
+                self.target = (src % 3) / 2.0
     
     def update(self, dt):
         # wages
