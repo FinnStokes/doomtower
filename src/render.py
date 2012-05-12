@@ -12,6 +12,7 @@ room_images.append(pygame.image.load('img/Floor_Psych.png'))
 room_images.append(pygame.image.load('img/Floor_Info.png'))
 room_images.append(pygame.image.load('img/Floor_Meeting.png'))
 background_image = pygame.image.load('img/Building.png')
+roof_image = pygame.image.load('img/Roof.png')
 entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
 entity_images.append(pygame.image.load('img/Igor.png'))
@@ -23,6 +24,7 @@ entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 elevator_sprite = pygame.image.load('img/Lift.png').subsurface(pygame.Rect(0,0,96,197))
 elevator_pulley = pygame.image.load('img/LiftPulley.png')
 elevator_rope = pygame.image.load('img/LiftRope.png')
+thought_image = pygame.image.load('img/SpeechBubbles.png')
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -40,12 +42,14 @@ class Render:
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("entity_in_elevator", self.entity_in_elevator)
+        self.event.register("set_entity_state", self.set_entity_state)
+        self.event.register("set_entity_request", self.set_entity_request)
         self.building_height = 0
         self.building_depth = 0
         self.window = window
         self.rooms = []
         self.elevators = dict()
-        self.y_pan = 0
+        self.y_pan = -120
         self.y_target = 0
         self.pan_speed = 0
         self.room_width = 704
@@ -121,6 +125,8 @@ class Render:
             if room_id in range (0,len(room_images)):
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
                 self.window.blit(background_image, (x_offset-40,y_offset))
+            if i == self.building_height:
+                self.window.blit(roof_image, (x_offset-40,y_offset-34))
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
@@ -130,11 +136,18 @@ class Render:
                     self.window.blit(entity.subsprite,
                                      (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
+                # Draw Scientist Thought
+                if entity.thought >= 0:
+                    self.window.blit(thought_image,
+                                     (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH) - 30,
+                                     y_offset + self.room_height - entity.height - 90),
+                                     pygame.Rect(0, entity.thought * 90, 160, 90))
         
         for elevator in self.elevators.itervalues():
             # Lift X / Lift Y
             lift_x = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
-            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+50
+            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)
+            # lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+50
             
             # Pulley / Rope XY
             floor_pulley_x = lift_x +28
@@ -142,7 +155,7 @@ class Render:
             floor_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
             
             # Rope Length
-            pull_to_elevator_distance = math.fabs(floor_y - lift_y) 
+            pull_to_elevator_distance = math.fabs(floor_y - lift_y) - 32
             
             #Draw Scientist
             for entity in elevator.entities:
@@ -215,6 +228,7 @@ class Render:
                 self.pan_screen(bottom_room - 1)
             else:
                 self.pan_screen(bottom_room)
+                
     def new_room(self):
         self.rooms.append(Room())
 
@@ -282,7 +296,28 @@ class Render:
                     self.elevators[entity.elevator].entities.discard(entity)
             entity.elevator = elevator_id
         
-
+    def set_entity_state(self, entity_id, state):
+        if entity_id in self.entities:
+            entity = self.entities[entity_id]
+            
+            if state == "meeting": 
+                entity.thought = 0
+            elif state == "leaving":
+                entity.thought = 7
+            elif state == "satisfied":
+                entity.carrying = True
+            elif state == "wait_scientist":
+                entity.thought = 6
+            elif state == "wait_manufacture":
+                pass
+            else:
+                entity.thought = -1
+                
+    def set_entity_request(self, entity_id, request):
+        if entity_id in self.entities:
+            entity = self.entities[entity_id]
+            if request in range(3,7):
+                entity.thought = request - 2
     def new_elevator(self, id, left, floors, y): 
         # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
         self.elevators[id] = Elevator(left, y, floors)
@@ -325,6 +360,7 @@ class Entity:
         self.elevator = -1
         self.x = x_coord
         self.y = y_coord
+        self.thought = -1
 
 class Elevator:
     def __init__(self, left, y, floors):

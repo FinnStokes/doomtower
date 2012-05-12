@@ -17,6 +17,9 @@ class Building:
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, bottom-top
         self.building_graph = path.Graph()
+        self.funds = settings.STARTING_FUNDS    
+        self.event.notify("update_funds", self.funds)
+        self.upkeep_timer = 0
  
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
             self.building_graph.addNode(i*3)
@@ -24,28 +27,18 @@ class Building:
             self.building_graph.addNode(i*3 + 2)
 
         #add initial edges
-        for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-            self.building_graph.addEdge(i*3,     i*3 + 1, 1)
-            self.building_graph.addEdge(i*3 + 1, i*3,     1)
-            self.building_graph.addEdge(i*3 + 1, i*3 + 2, 1)
-            self.building_graph.addEdge(i*3 + 2, i*3 + 1, 1)
-            self.building_graph.addEdge(i*3,     i*3 + 2, 1)
-            self.building_graph.addEdge(i*3 + 2, i*3,     1)
+        self.add_floor_graph(0)
 
         # fill building with empty floors
         for i in range(numfloors):
-            self.floors.append(Room()) 
+            self.floors.append(Room(self.event)) 
             self.event.notify("new_room")
 
-
         # add lobby at ground floor
-        self.build_room(0,1)
+        self.next_up = 0
+        self.next_down = -1
+        self.build_room(True,1)
 
-        # add test floors
-        self.build_room(1,2)
-        self.build_room(-1,8)
-        self.build_room(2,4)
-        self.build_room(3,3)
     def update(self, dt):      
     #   Elevators
         for i in range(len(self.lifts[0])):
@@ -53,22 +46,57 @@ class Building:
         for i in range(len(self.lifts[1])):
             self.lifts[1][i].move(dt)
     #   Rooms
+        self.upkeep_timer += dt
+        upkeep = 0
         for i in range(len(self.floors)):
             self.floors[i].operate(dt)
+            upkeep += settings.ROOM_UPKEEP[self.floors[i].room_id]
+        if upkeep > 0 and self.upkeep_timer > settings.UPKEEP_PERIOD:
+            self.spend_funds(upkeep)
+            self.upkeep_timer -= settings.UPKEEP_PERIOD
 
         pass # update elevator position and room actions
+
+    def add_floor_graph(self, i):
+        self.building_graph.addEdge(i*3,     i*3 + 1, 1)
+        self.building_graph.addEdge(i*3 + 1, i*3,     1)
+        self.building_graph.addEdge(i*3 + 1, i*3 + 2, 1)
+        self.building_graph.addEdge(i*3 + 2, i*3 + 1, 1)
+        self.building_graph.addEdge(i*3,     i*3 + 2, 1)
+        self.building_graph.addEdge(i*3 + 2, i*3,     1)
+
+    def del_floor_graph(self, i):
+        self.building_graph.removeEdge(i*3,     i*3 + 1, 1)
+        self.building_graph.removeEdge(i*3 + 1, i*3,     1)
+        self.building_graph.removeEdge(i*3 + 1, i*3 + 2, 1)
+        self.building_graph.removeEdge(i*3 + 2, i*3 + 1, 1)
+        self.building_graph.removeEdge(i*3,     i*3 + 2, 1)
+        self.building_graph.removeEdge(i*3 + 2, i*3,     1)
     
-    def build_room(self, floor, room_id):
+    def build_room(self, top, room_id):
         # construct new room at floor (check that this is next above or below)
-        floor_index = floor-settings.BOTTOM_FLOOR
-        self.event.notify('update_room', floor_index, room_id)
-        self.floors[floor_index] = Room(room_id)
+        if top:
+            floor = self.next_up
+            self.next_up = self.next_up + 1
+        else:
+            floor = self.next_down
+            self.next_down = self.next_down - 1
+
+        if floor in range(settings.BOTTOM_FLOOR,settings.TOP_FLOOR):
+            if self.get_funds() >= settings.ROOM_COSTS[room_id]:
+                self.add_floor_graph(floor)
+                self.spend_funds(settings.ROOM_COSTS[room_id])
+                floor_index = floor-settings.BOTTOM_FLOOR
+                self.event.notify('update_room', floor_index, room_id)
+                self.floors[floor_index] = Room(self.event, room_id)
+            else:
+                self.event.notify("insufficient_funds")
  
     def demolish_room(self, floor):
+        self.del_floor_graph(floor)
         floor_index = floor - settings.BOTTOM_FLOOR
         self.floors[floor_index] = Room()
     
-
     def get_room(self, floor):
         floor_index = floor-settings.BOTTOM_FLOOR
         return self.floors[floor_index].room_id
@@ -115,7 +143,17 @@ class Building:
 
     def save_game(self):
         pass
-
+    
+    def get_funds(self):
+        return self.funds
+    
+    def spend_funds(self, amount):
+        self.funds -= amount
+        self.event.notify("update_funds", self.funds)
+    
+    def gain_funds(self, amount):
+        self.funds += amount
+        self.event.notify("update_funds", self.funds)
 
 class Elevator:
     lift_speed = 0.5
@@ -151,7 +189,9 @@ class Elevator:
     # move to next floor in pickup queue  
     def move(self, dt):
         if not self.moving:
-            return None
+            if len(self.pickups) > 0:
+                self.moving = True
+            return
  
         if self.occupied:
             dest = self.target
@@ -175,7 +215,7 @@ class Elevator:
         self.event.notify("elevator_open", self.id, self.y)
     
     def occupy(self, target):
-        if not self.occupied:
+        if not self.occupied and target in self.floors:
             self.occupied = True
             self.target = target
             self.moving = True
@@ -226,7 +266,8 @@ class Room:
                      'meeting': [1000, 100, 300]
     }       
 
-    def __init__(self, room_id = 0, size = 1):
+    def __init__(self, event, room_id = 0, size = 1):
+        self.event = event
         self.room_id = room_id
         self.size = size
         self.jobs = []
@@ -237,3 +278,4 @@ class Room:
     def produce(self, product):
         if products[product] == self.room_id:
             self.jobs.append(product)
+
