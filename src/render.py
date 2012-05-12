@@ -21,6 +21,8 @@ entity_subimages.append(pygame.image.load('img/Scientist-Heads.png'))
 entity_subimages.append(None)
 entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 elevator_sprite = pygame.image.load('img/Lift.png').subsurface(pygame.Rect(0,0,96,197))
+elevator_pulley = pygame.image.load('img/LiftPulley.png')
+elevator_rope = pygame.image.load('img/LiftRope.png')
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -132,10 +134,19 @@ class Render:
                     self.window.blit(entity.subsprite,
                                      ((x_offset - (elevator.width if elevator.left else -self.room_width), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
                                      entity.sub_rect)
-                    
+            
+            # Draws Elevator
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -self.room_width), 
                               screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
+            # Draws Elevator Pulley
+            self.window.blit(elevator.sprite_pulley,
+                              (x_offset -2-42, 
+                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)),
+                              (0, 0, 42, 40))
+            # Draws Elevator Ropes
+            #self.window.blit(elevator.sprite_rope,
+            #                  (sx, sy), (x, y, w, h))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -220,8 +231,6 @@ class Render:
                 self.get_room(oldy).entities.discard(self.entities[id])
             if y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
                 self.get_room(y).entities.add(self.entities[id])
-                print y
-                print self.get_room(y).entities
             if x < oldx:
                 self.entities[id].face_left = True
                 self.entities[id].walking = True
@@ -296,5 +305,7 @@ class Elevator:
         self.left = left
         self.y = y
         self.sprite = elevator_sprite
+        self.sprite_pulley = elevator_pulley
+        self.sprite_rope = elevator_rope
         self.width = 100
         self.entities = set()
