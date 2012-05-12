@@ -76,7 +76,7 @@ class Building:
                     self.building_graph.addEdge(doors[i], doors[j], abs(floors_off[i] - floors_off[j])+0.1)   
                  
 
-    def remove_elevator(self, left, index)
+    def remove_elevator(self, left, index):
         pass
 
 
