@@ -297,6 +297,8 @@ class Render:
                 entity.thought = 7
             elif state == "satisfied":
                 entity.carrying = True
+            elif state == "wait_scientist":
+                entity.thought = 6
             elif state == "wait_manufacture":
                 pass
             else:

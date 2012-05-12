@@ -67,7 +67,7 @@ ANIMATION_TIME = 0.2
 SCROLL_TIME = 20
 
 # The x position and floor new entities should spawn at
-SPAWN_POSITION = 0.7
+SPAWN_POSITION = 0.5
 SPAWN_FLOOR = 0
 
 # Period of client spawning (secs)
@@ -107,3 +107,8 @@ ROOM_COSMO = 5
 ROOM_PSYCH = 6
 ROOM_INFO = 7
 ROOM_MEETING = 8
+
+# Entity IDs
+ENTITY_SCIENTIST = 0
+ENTITY_IGOR = 1
+ENTITY_CLIENT = 2
