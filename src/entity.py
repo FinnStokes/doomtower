@@ -78,7 +78,7 @@ class Entity:
             if self.waiting:
                 if floor == self.y:
                     self.waiting = not self.elevator.occupy(self.path[0] // 3)
-                    if self.waiting:
+                    if not self.waiting:
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
             else:
                 if floor == self.path[0] // 3:
