@@ -132,24 +132,25 @@ class Render:
         
         for elevator in self.elevators.itervalues():
             # Lift X / Lift Y
-            liftx = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
-            lifty = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20
+            lift_x = x_offset - (elevator.width-22 if elevator.left else -self.room_width+22)
+            lift_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20
             
             # Pulley / Rope XY
-            floor_pulley_x = liftx +28
+            floor_pulley_x = lift_x +28
             floor_pulley_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
+            floor_y = screen_height + self.y_pan - (self.room_height+self.room_padding)*(len(elevator.floors)+1)
             
             # Rope Length
-            pull_to_elevator_distance = lifty - floor_pulley_y + 40 - 60
-
+            pull_to_elevator_distance = math.fabs(floor_y - lift_y) 
+            
             #Draw Scientist
             for entity in elevator.entities:
                 # Draws Scientist Body
                 if entity.sprite:
-                    self.window.blit(entity.sprite, (liftx, lifty + 32), entity.main_rect)
+                    self.window.blit(entity.sprite, (lift_x, lift_y + 32), entity.main_rect)
                 # Draws Scientist Head
                 if entity.subsprite:
-                    self.window.blit(entity.subsprite, (liftx, lifty + 32), entity.sub_rect)
+                    self.window.blit(entity.subsprite, (lift_x, lift_y + 32), entity.sub_rect)
                     
             # Draws Elevator Pulley
             self.window.blit(elevator.sprite_pulley, (floor_pulley_x, floor_pulley_y), (0, 0, 42, 40))
@@ -159,7 +160,7 @@ class Render:
             self.window.blit(elevator.sprite_rope, (floor_pulley_x, floor_pulley_y+40), (0, 0, 10, pull_to_elevator_distance))
             
             # Draws Elevator
-            self.window.blit(elevator.sprite, (liftx, lifty))
+            self.window.blit(elevator.sprite, (lift_x, lift_y))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
