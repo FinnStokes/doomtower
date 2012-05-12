@@ -110,12 +110,12 @@ class Client(Entity):
                 self.state = "meeting"
                 self.progress = 0
                 print("meeting")
-            elif self.progress > 10:
+            elif self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
         elif self.state == "meeting":
-            if self.progress > 10:
+            if self.progress > 20:
                 self.state = "wait_manufacture"
                 print("wait_manufacture")
                 self.progress = 0
@@ -124,12 +124,12 @@ class Client(Entity):
                 self.state = "manufacture"
                 print("manufacture")
                 self.progress = 0
-            elif self.progress > 10:
+            elif self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
         elif self.state == "manufacture":
-            if self.progress > 10:
+            if self.progress > 20:
                 self.state = "left"
                 self.progress = 0
                 self.event.notify("remove_entity", self.id)
