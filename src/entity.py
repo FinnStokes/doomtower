@@ -210,6 +210,7 @@ class Client(Entity):
             elif self.progress > settings.MANUFACTURE_TIME:
                 # If the manufacture concludes, client satisfied
                 self.set_state("satisfied")
+                self.building.gain_funds(settings.ROOM_PAYS[self.request])
                 self.event.notify("input_move", self.id, 0)
                 
                 

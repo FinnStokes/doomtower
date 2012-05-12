@@ -71,6 +71,8 @@ class Building:
                 floor_index = floor-settings.BOTTOM_FLOOR
                 self.event.notify('update_room', floor_index, room_id)
                 self.floors[floor_index] = Room(room_id)
+            else:
+                self.event.notify("insufficient_funds")
  
     def demolish_room(self, floor):
         floor_index = floor - settings.BOTTOM_FLOOR
