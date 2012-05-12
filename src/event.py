@@ -1,24 +1,34 @@
 class Event():
     def __init__(self):
         self.handlers = dict()
+        self.added =[]
+        self.removed = []
 
     def register(self, event, handler):
-        if not event in self.handlers:
-            self.handlers[event] = set()
-        self.handlers[event].add(handler)
+        self.added.append((event, handler))
         return self
 
     def deregister(self, event, handler):
         if event in self.handlers:
-            try:
-                self.handlers.remove(handler)
-            except:
-                raise ValueError("Handler is not handling this event, so cannot deregister it.")
+            self.removed.append((event, handler))
         else:
             raise ValueError("Event is not registered, so cannot deregister it.")
         return self
 
     def notify(self, event, *args, **kargs):
+        # add handlers
+        for a in self.added:
+            if not a[0] in self.handlers:
+                self.handlers[a[0]] = set()
+            self.handlers[a[0]].add(a[1])
+        # clear removed handlers
+        for r in self.removed:
+            try:
+                self.handlers[r[0]].remove(r[1])
+            except:
+                raise ValueError("Handler is not handling this event, so cannot deregister it.")
+        self.removed = []
+        # Send events
         if event in self.handlers:
             for handler in self.handlers[event]:
                 handler(*args, **kargs)
