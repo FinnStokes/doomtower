@@ -160,6 +160,7 @@ class Client(Entity):
                 self.event.notify("set_entity_request", self.id, self.request)
             if self.progress > settings.MANUFACTURE_TIME:
                 self.set_state("satisfied")
+                self.building.gain_funds(settings.ROOM_PAYS[self.request])
                 self.event.notify("input_move", self.id, 0)
         elif self.state in ("leaving", "satisfied"):
             if self.y == 0 and math.fabs(self.x - 0.5) < 0.01:
