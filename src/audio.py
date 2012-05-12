@@ -30,8 +30,7 @@ class DoomMixer:
                         ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
                         ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
                         ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg'],  
-                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]
-                      
+                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]                     
           ]    
     
     roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics', 'snd/meeting.ogg']
