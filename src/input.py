@@ -19,8 +19,12 @@ hire_out = []
 for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
-
 build_ids = [2,3,4,5,6,7,8]
+updown_img = pygame.image.load('img/UpDown.png')
+updown_out = []
+for i in range(2):
+    updown_out.append(updown_img.subsurface(pygame.Rect(0,128*i,320,128)))
+updown_over = updown_out
 
 class Input:
     def __init__(self, window, event_manager, render):
@@ -57,13 +61,19 @@ class Input:
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
         
+        updown_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, updown_out, updown_over, self.updown,
+                                 event_manager, open_event="open_updown", open = False)
+        self.widgets.extend(updown_popup.widgets)
+        
         build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over, self.build,
                                   event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
+        hire_popup = PopupWindow(pygame.Rect(424, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
                                  event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
+        
+        self.room_id = 0
         
         self.window_resize(self.window.get_size())
     
@@ -149,7 +159,13 @@ class Input:
             self.event.notify("create_scientist", staff_id)
 
     def build(self, room_id):
-        self.event.notify("input_build", True, build_ids[room_id])
+        self.room_id = build_ids[room_id]
+        self.event.notify("open_updown", True)
+
+    def updown(self, id):
+        self.event.notify("input_build", id == 0, self.room_id)
+        self.event.notify("open_updown", False)
+        
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
