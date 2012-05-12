@@ -129,15 +129,15 @@ class Input:
         self.widgets.append(self.btnB5)
         self.widgets.append(self.minimapbg)
         
-        updown_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, updown_out, updown_over, self.updown,
+        updown_popup = PopupWindow(pygame.Rect(126, 20, 384, 384), build, interface_btn, updown_out, updown_over, self.updown,
                                  event_manager, open_event="open_updown", open = False)
         self.widgets.extend(updown_popup.widgets)
         
-        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over, self.build,
+        build_popup = PopupWindow(pygame.Rect(126, 20, 384, 384), build, interface_btn, build_out, build_over, self.build,
                                   event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(424, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
+        hire_popup = PopupWindow(pygame.Rect(530, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
                                  event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
         
