@@ -11,6 +11,7 @@ room_images.append(pygame.image.load('img/Floor_Cosmo.png'))
 room_images.append(pygame.image.load('img/Floor_Psych.png'))
 room_images.append(pygame.image.load('img/Floor_Info.png'))
 room_images.append(pygame.image.load('img/Floor_Meeting.png'))
+mini_map_image = pygame.image.load('img/MiniMap.png')
 background_image = pygame.image.load('img/Building.png')
 entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
