@@ -187,7 +187,7 @@ class Render:
             raise ValueError("Invalid entity id.")
     
     def update_entity(self, id, x, y): # change entity position
-        if self.entities[id]:
+        if id in self.entities:
             oldx = self.entities[id].x
             oldy = self.entities[id].y
             if oldy in range(len(self.rooms)):
