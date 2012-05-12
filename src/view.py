@@ -19,6 +19,7 @@ class View:
                 self.event.notify("quit")
             elif e.type == VIDEORESIZE:
                 pygame.display.set_mode((e.size),pygame.RESIZABLE) 
+                self.event.notify("window_resize", e.size)
             elif e.type == KEYDOWN:
                 self.event.notify("key_down", e.key)
             elif e.type == KEYUP:

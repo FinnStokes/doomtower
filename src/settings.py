@@ -15,4 +15,4 @@ SPAWN_FLOOR = 0
 ENTITY_SPEED = 5
 
 # The height of the drag bar for pop-up windows in pixels
-DRAGBAR_HEIGHT = 100
+DRAGBAR_HEIGHT = 75
