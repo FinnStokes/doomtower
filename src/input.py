@@ -16,7 +16,7 @@ for i in range(7):
 build_over = build_out
 hire_img = pygame.image.load('img/HireList.png')
 hire_out = []
-for i in range(10):
+for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
 
@@ -55,11 +55,11 @@ class Input:
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
         
-        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over,
+        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over, self.build,
                                   event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, hire_out, hire_over,
+        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, hire_out, hire_over, self.hire,
                                  event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
         
@@ -139,6 +139,15 @@ class Input:
             if hasattr(widget, "entity_id"):
                 if widget.entity_id == id:
                     self.widgets.remove(widget)
+
+    def hire(self, staff_id):
+        if staff_id == 10:
+            self.event.notify("create_igor")
+        else:
+            self.event.notify("create_scientist", staff_id)
+
+    def build(self, room_id):
+        pass
 
 class Widget:
     def __init__(self, rect, enabled = True, draggable = False, visible = True):
@@ -291,8 +300,10 @@ class Static(Widget):
             return None
 
 class PopupWindow:
-    def __init__(self, rect, window_sprite, close_sprite, out_sprites, over_sprites, event_manager, open_event = None, open = False):
+    def __init__(self, rect, window_sprite, close_sprite, out_sprites, over_sprites, on_press, event_manager, open_event = None, open = False):
         self.widgets = list()
+        self.on_press = on_press
+        self.offset = (0,0)
         self.widgets.append(Button(pygame.Rect(rect.right-49,rect.top+10,39,28),
                                    out=close_sprite.subsurface(pygame.Rect(0,0,39,28)),
                                    over=close_sprite.subsurface(pygame.Rect(39,0,39,28)),
@@ -306,12 +317,12 @@ class PopupWindow:
                                    over=close_sprite.subsurface(pygame.Rect(39,56,39,28)),
                                    on_press=self.down))
         self.widgets.append(DragBar(pygame.Rect(rect.left, rect.top, rect.width, settings.DRAGBAR_HEIGHT), self))
-        self.firstBuild = Button(pygame.Rect(rect.left+10, rect.top+98, 320, 128),
-                                 over=out_sprites[0], out=out_sprites[0])
-        self.secondBuild = Button(pygame.Rect(rect.left+10, rect.top+246, 320, 128),
-                                 over=out_sprites[1], out=out_sprites[1])
-        self.widgets.append(self.firstBuild)
-        self.widgets.append(self.secondBuild)
+        self.first = Button(pygame.Rect(rect.left+10, rect.top+98, 320, 128),
+                            over=out_sprites[0], out=out_sprites[0], on_press=self.on_first)
+        self.second = Button(pygame.Rect(rect.left+10, rect.top+226, 320, 128),
+                             over=out_sprites[1], out=out_sprites[1], on_press=self.on_second)
+        self.widgets.append(self.first)
+        self.widgets.append(self.second)
         self.over_sprites = out_sprites
         self.out_sprites = out_sprites
         self.scroll = 0
@@ -327,32 +338,40 @@ class PopupWindow:
         for widget in self.widgets:
             widget.visible = open
             widget.enabled = open
+            self.move(self.offset)
     
     def close(self):
         self.set_open(False)
         self.event_manager.notify(self.open_event, False)
     
-    def up(self):
-        if self.scroll > 0:
-            self.scroll = self.scroll - 1
-            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
-            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
-            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
-            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
-    
-    def down(self):
-        if self.scroll + 2 < min(len(self.over_sprites),len(self.out_sprites)):
-            self.scroll = self.scroll + 1
-            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
-            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
-            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
-            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
-    
     def open(self):
         self.set_open(True)
         self.event_manager.notify(self.open_event, True)
     
+    def up(self):
+        if self.scroll > 0:
+            self.scroll = self.scroll - 1
+            self.first.over_sprite = self.over_sprites[self.scroll]
+            self.first.out_sprite = self.out_sprites[self.scroll]
+            self.second.over_sprite = self.over_sprites[self.scroll + 1]
+            self.second.out_sprite = self.out_sprites[self.scroll + 1]
+    
+    def down(self):
+        if self.scroll + 2 < min(len(self.over_sprites),len(self.out_sprites)):
+            self.scroll = self.scroll + 1
+            self.first.over_sprite = self.over_sprites[self.scroll]
+            self.first.out_sprite = self.out_sprites[self.scroll]
+            self.second.over_sprite = self.over_sprites[self.scroll + 1]
+            self.second.out_sprite = self.out_sprites[self.scroll + 1]
+    
+    def on_first(self):
+        self.on_press(self.scroll)
+    
+    def on_second(self):
+        self.on_press(self.scroll+1)
+    
     def move(self, rel):
+        self.offset = (self.offset[0] - rel[0], self.offset[1] - rel[1])
         for w in self.widgets:
             w.move(rel)
 

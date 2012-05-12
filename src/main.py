@@ -14,8 +14,6 @@ fpsClock = pygame.time.Clock()
 running = True
 
 event_manager.notify("create_client")
-event_manager.notify("create_scientist")
-event_manager.notify("create_igor")
 
 event_manager.notify("input_elevator",True,[-1, 0, 3])
 event_manager.notify("input_elevator",False,[0, 1])
