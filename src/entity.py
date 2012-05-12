@@ -12,23 +12,25 @@ class Manager:
         event.register("create_igor", self.create_igor)
     
     def create_client(self):
-        e = Client(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        e = Client(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
         self.nextId = self.nextId + 1
     
     def create_scientist(self):
-        e = Scientist(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        e = Scientist(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
         self.nextId = self.nextId + 1
     
     def create_igor(self):
-        e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR)
+        e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
         self.nextId = self.nextId + 1
-    
+
 class Entity:
     def __init__(self, event, id, x, floor, sprite, character, building):
         self.id = id
         self.x = x
         self.y = floor
         self.target = self.x
+        self.path = None
+        self.waiting = False
         self.speed = settings.ENTITY_SPEED
         self.event = event
         self.building = building
@@ -37,27 +39,36 @@ class Entity:
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
     
     def move_to(self, entity, floor):
-        
-        off = (0, 1)[self.x <= 0.5]
-        src = self.y * 2 + off
-        dest = floor * 2
-    
-        if entity == self.id:
-            if floor != self.y:
-                self.building.building_graph.getPath(src, dest)           
-                #self.target = 0
-                #self.y = floor
+        if entity == self.id and floor != self.y:
+            off = (0, 1)[self.x <= 0.5]
+            src = self.y * 2 + off
+            dest = floor * 2
+            self.path = self.building.building_graph.getPath(src, dest)
+            if self.path.popleft() != src:
+                raise ValueError("Invalid path: start doesn't match")
+            if self.path[0] // 2 == self.y:
+                self.target = self.path.popleft() % 2
+            else:
+                self.target = src % 2
     
     def update(self, dt):
-        if self.x != self.target:
-            if abs(self.x - self.target) < self.speed*dt:
-                self.x = self.target
-            else:
-                if self.x < self.target:
-                    self.x = self.x + self.speed*dt
+        if not self.elevator:
+            if self.path and self.path[0] // 2 == self.y:
+                    self.target = self.path.popleft() % 2
+            
+            if self.x != self.target:
+                if abs(self.x - self.target) < self.speed*dt:
+                    self.x = self.target
                 else:
-                    self.x = self.x - self.speed*dt
-            self.event.notify("update_entity", self.id, self.x, self.y)
+                    if self.x < self.target:
+                        self.x = self.x + self.speed*dt
+                    else:
+                        self.x = self.x - self.speed*dt
+                self.event.notify("update_entity", self.id, self.x, self.y)
+            elif self.path:
+                self.building.get_elevator(self.y, self.x < 0.5).call_to(self.y)
+                pass # Call elevator
+
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):

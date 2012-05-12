@@ -101,7 +101,12 @@ class Render:
                                      entity.sub_rect)
     
     def get_screen_pos(self, pos):
-        return ((screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1])
+        screen_width, screen_height = self.window.get_size()
+        return (screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
+
+    def get_world_pos(self, pos):
+        screen_width, screen_height = self.window.get_size()
+        return (pos[0]-(screen_width-704)/2)/704, (screen_height + self.y_pan - pos[1] - self.room_padding)/(self.room_height+self.room_padding)
     
     def pan_screen(self, floor):
         if floor > self.building_height:
