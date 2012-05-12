@@ -8,11 +8,13 @@ build = pygame.image.load('img/GUI_Build.png')
 hire = pygame.image.load('img/GUI_Hire.png')
 buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
 footer = pygame.image.load('img/GUI_Footer.png')
+shadow = pygame.image.load('img/Shadow.png')
 
 class Input:
-    def __init__(self, window, event_manager):
+    def __init__(self, window, event_manager, render):
         self.event = event_manager
         self.window = window
+        self.render = render
         
         self.widgets = list()
         self.pressed = dict()
@@ -82,6 +84,10 @@ class Input:
                 self.over = None
     
     def mouse_down(self, pos, button):
+        if button == 4:
+            self.event.notify("step_scroll", True)
+        elif button == 5:
+            self.event.notify("step_scroll", False)
         for w in self.widgets:
             if w.enabled and w.contains(pos):
                 w.press(button)
@@ -106,7 +112,8 @@ class Input:
                 self.window.blit(sprite, widget.rect.topleft)
     
     def new_entity(self, id, x, y, sprite, character):
-        pass
+        entity = Entity(pygame.Rect(0,0,100,160), id, x, y, shadow, self.event, self.render)
+        self.widgets.append(entity)
     
     def remove_entity(self, id):
         pass
@@ -295,20 +302,46 @@ class PopupWindow:
             w.move(rel)
 
 class Entity(Widget):
-    def __init__(self, rect, entity_id, entity_x, entity_y, event_manager, render):
-        Widget.__init__(self, rect)
+    def __init__(self, rect, entity_id, entity_x, entity_y, sprite, event_manager, render):
+        Widget.__init__(self, rect, draggable=True)
         self.entity_id = entity_id
-        self.entity_x = entity_x
-        self.entity_y = entity_y
+        self.entity_pos = entity_x, entity_y
+        #self.offset_x = 0
+        #self.offset_y = 0
         self.render = render
-        event_manager.register("update_entity", update_entity)
+        self.sprite_img = sprite
+        self.dragging = False
+        self.event = event_manager
+        event_manager.register("update_entity", self.update_entity)
+        event_manager.register("update", self.update)
     
     def update_entity(self, id, x, y):
         if self.entity_id == id:
-            self.entity_x = x
-            self.entity_y = y
+            self.entity_pos = x, y
     
     def update(self, dt):
-            self.rect.bottomleft = render.get_screen_pos((self.entity_x, self.entity_y))
-        
-        
+        if not self.dragging:
+            self.rect.bottomleft = self.render.get_screen_pos(self.entity_pos)
+            #self.rect.bottomleft = self.rect.bottomleft[0] + self.offset_x, self.rect.bottomleft[1] + self.offset_y
+    
+    def drag(self, rel):
+        self.rect.left = self.rect.left + rel[0]
+        self.rect.bottom = self.rect.bottom + rel[1]
+    
+    def press(self, button):
+        if button == 1:
+            self.dragging = True
+    
+    def release(self, button):
+        if button == 1:
+            self.dragging = False
+            pos = self.render.get_world_pos(self.rect.center)
+            self.event.notify("input_move", self.entity_id, pos[1]//1)
+            #self.offset_x = 0
+            #self.offset_y = 0
+    
+    def sprite(self):
+        if self.dragging:
+            return self.sprite_img
+        else:
+            return None
