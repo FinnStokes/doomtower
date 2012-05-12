@@ -49,7 +49,8 @@ Tips
 ----
 * To start off you should probably build a Meeting Room and a Boom Lab, and hire
   two Scientists.
+* Staff and Rooms have upkeep costs, so avoid expanding too much.
 * In the Build panel, each Room has a set of pale and yellow dots. The more
-  dots a room has the greater the upkeep cost, and the more yellow does it has
-  the greater the payment you receive for products made from it.
+  pale dots a room has the greater the upkeep cost, and the more yellow dots it
+  has the greater the value of products made from it.
 * Waiting Rooms are useless, don't waste your money!
