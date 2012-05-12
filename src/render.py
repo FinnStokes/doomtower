@@ -15,6 +15,10 @@ entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
 entity_images.append(pygame.image.load('img/Igor.png'))
 entity_images.append(pygame.image.load('img/MadScientist.png'))
+entity_subimages = []
+entity_subimages.append(pygame.image.load('img/Scientist-Heads.png'))
+entity_subimages.append(None)
+entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -73,6 +77,10 @@ class Render:
                     self.window.blit(entity.sprite,
                                      (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
                                      pygame.Rect(0,0,entity.width,entity.height))
+                if entity.subsprite:
+                    self.window.blit(entity.subsprite,
+                                     (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
+                                     pygame.Rect(0,entity.character*entity.subheight,entity.subwidth, entity.subheight))
     
     def pan_screen(self, floor):
         if floor > self.building_height:
@@ -127,8 +135,8 @@ class Render:
     def get_room(self, floor_number):
         return self.rooms[floor_number - settings.BOTTOM_FLOOR]
     
-    def new_entity(self, id, x, y, sprite):
-        self.entities[id] = Entity(sprite, x, y)
+    def new_entity(self, id, x, y, sprite, character):
+        self.entities[id] = Entity(sprite, character, x, y)
         if y in range(len(self.rooms)):
             self.get_room(y).entities.add(self.entities[id])
     
@@ -172,11 +180,15 @@ class Room:
         self.id = room_id
 
 class Entity:
-    def __init__(self, sprite_id, x_coord, y_coord):
+    def __init__(self, sprite_id, character_id, x_coord, y_coord):
         self.sprite = None
         self.width = 100
         self.height = 160
+        self.subwidth = 92
+        self.subheight = 86
         if sprite_id in range(len(entity_images)):
             self.sprite = entity_images[sprite_id]
+            self.subsprite = entity_subimages[sprite_id]
+            self.character = character_id
         self.x = x_coord
         self.y = y_coord

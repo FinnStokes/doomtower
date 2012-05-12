@@ -28,6 +28,20 @@ Entities
 * 0: Standing
 * 1: Walking
 
+
+Heads
+-----
+
+(Relative to Entity)
+* Position: 0, 0
+* Dimensions: 92, 86
+
+### Sprite Sheet
+
+* X Index, Name
+* 0: Facing Right
+* 1: Facing Left
+
 Lifts
 -----
 
