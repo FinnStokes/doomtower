@@ -27,13 +27,7 @@ class Building:
             self.building_graph.addNode(i*3 + 2)
 
         #add initial edges
-        for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-            self.building_graph.addEdge(i*3,     i*3 + 1, 1)
-            self.building_graph.addEdge(i*3 + 1, i*3,     1)
-            self.building_graph.addEdge(i*3 + 1, i*3 + 2, 1)
-            self.building_graph.addEdge(i*3 + 2, i*3 + 1, 1)
-            self.building_graph.addEdge(i*3,     i*3 + 2, 1)
-            self.building_graph.addEdge(i*3 + 2, i*3,     1)
+        self.add_floor_graph(0)
 
         # fill building with empty floors
         for i in range(numfloors):
@@ -62,6 +56,22 @@ class Building:
             self.upkeep_timer -= settings.UPKEEP_PERIOD
 
         pass # update elevator position and room actions
+
+    def add_floor_graph(self, i):
+        self.building_graph.addEdge(i*3,     i*3 + 1, 1)
+        self.building_graph.addEdge(i*3 + 1, i*3,     1)
+        self.building_graph.addEdge(i*3 + 1, i*3 + 2, 1)
+        self.building_graph.addEdge(i*3 + 2, i*3 + 1, 1)
+        self.building_graph.addEdge(i*3,     i*3 + 2, 1)
+        self.building_graph.addEdge(i*3 + 2, i*3,     1)
+
+    def del_floor_graph(self, i):
+        self.building_graph.removeEdge(i*3,     i*3 + 1, 1)
+        self.building_graph.removeEdge(i*3 + 1, i*3,     1)
+        self.building_graph.removeEdge(i*3 + 1, i*3 + 2, 1)
+        self.building_graph.removeEdge(i*3 + 2, i*3 + 1, 1)
+        self.building_graph.removeEdge(i*3,     i*3 + 2, 1)
+        self.building_graph.removeEdge(i*3 + 2, i*3,     1)
     
     def build_room(self, top, room_id):
         # construct new room at floor (check that this is next above or below)
@@ -74,6 +84,7 @@ class Building:
 
         if floor in range(settings.BOTTOM_FLOOR,settings.TOP_FLOOR):
             if self.get_funds() >= settings.ROOM_COSTS[room_id]:
+                self.add_floor_graph(floor)
                 self.spend_funds(settings.ROOM_COSTS[room_id])
                 floor_index = floor-settings.BOTTOM_FLOOR
                 self.event.notify('update_room', floor_index, room_id)
@@ -82,6 +93,7 @@ class Building:
                 self.event.notify("insufficient_funds")
  
     def demolish_room(self, floor):
+        self.del_floor_graph(floor)
         floor_index = floor - settings.BOTTOM_FLOOR
         self.floors[floor_index] = Room()
     
