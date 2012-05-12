@@ -93,11 +93,12 @@ class Event():
 # This event should be produced when an entity is removed.
 # Render should react by deleting the relevant graphic.
 
-# update_entity(id, x, y)
+# update_entity(id, x, y, carrying)
 # This event should be produced when an entity changes position.
 #  The integer id should be the unique identifier amongst entities.
 #  The float x should indicate how far across the building the entity is (0 = left wall, 1 = right wall).
 #  The integer y should indicate what floor the entity is on.
+#  The boolean carrying should be if the entity is carrying.
 # Render should react by moving the entity graphic.
 
 # entity_in_elevator(entity_id, elevator_id)
