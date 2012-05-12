@@ -65,10 +65,10 @@ class Entity:
         self.event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
-        self.waiting = False
-        self.elevator = None
         if entity == self.id:
-            if not self.elevator or self.waiting:
+            if not self.in_elevator:
+                self.waiting = False
+                self.elevator = None
                 off = 0 if self.x <= 0.5 else 2
                 src = self.y * 3 + off
                 dest = floor * 3 + 1
@@ -89,6 +89,8 @@ class Entity:
             self.building.spend_funds(self.wage)
             self.wage_timer -= settings.WAGE_PERIOD
         
+        if self.id == 0:
+            print(repr(self.waiting)+" "+repr(self.in_elevator)+" "+repr(self.elevator))
         if not self.elevator:
             if self.path and self.path[0] // 3 == self.y:
                     self.target = (self.path.pop(0) % 3) / 2.0
@@ -113,12 +115,12 @@ class Entity:
             print(repr(self.id)+"basic elevator "+repr(self.waiting))
             if self.waiting:
                 if floor == self.y:
-                    self.waiting = not self.elevator.occupy(self.path[0] // 3)
-                    if not self.waiting:
+                    self.in_elevator = self.elevator.occupy(self.path[0] // 3)
+                    if self.in_elevator:
+                        self.waiting = False
                         print(repr(self.id)+" get in "+repr(self.waiting))
-                        self.in_elevator = True
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
-            elif self.in_elevator:
+            if self.in_elevator:
                 if floor == self.path[0] // 3:
                     self.path.pop(0)
                     self.in_elevator = False
