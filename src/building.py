@@ -170,7 +170,9 @@ class Elevator:
     # move to next floor in pickup queue  
     def move(self, dt):
         if not self.moving:
-            return None
+            if len(self.pickups) > 0:
+                self.moving = True
+            return
  
         if self.occupied:
             dest = self.target
@@ -194,7 +196,7 @@ class Elevator:
         self.event.notify("elevator_open", self.id, self.y)
     
     def occupy(self, target):
-        if not self.occupied:
+        if not self.occupied and target in self.floors:
             self.occupied = True
             self.target = target
             self.moving = True

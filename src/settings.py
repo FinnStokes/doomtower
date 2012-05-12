@@ -54,7 +54,7 @@ ANIMATION_TIME = 0.2
 SCROLL_TIME = 20
 
 # The x position and floor new entities should spawn at
-SPAWN_POSITION = 0.7
+SPAWN_POSITION = 0.5
 SPAWN_FLOOR = 0
 
 # Period of client spawning (secs)
