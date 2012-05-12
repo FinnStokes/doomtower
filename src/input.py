@@ -141,7 +141,7 @@ class Input:
                     self.widgets.remove(widget)
 
     def hire(self, staff_id):
-        self.event.notify("create_scientist")
+        self.event.notify("create_scientist", staff_id)
 
     def build(self, room_id):
         pass

@@ -19,8 +19,8 @@ class Manager:
         e = Client(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
         self.nextId = self.nextId + 1
     
-    def create_scientist(self):
-        e = Scientist(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
+    def create_scientist(self, character):
+        e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
         self.nextId = self.nextId + 1
     
     def create_igor(self):
