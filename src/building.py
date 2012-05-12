@@ -19,13 +19,18 @@ class Building:
         self.building_graph = path.Graph()
  
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-            self.building_graph.addNode(i*2)
-            self.building_graph.addNode(i*2 + 1)
+            self.building_graph.addNode(i*3)
+            self.building_graph.addNode(i*3 + 1)
+            self.building_graph.addNode(i*3 + 2)
 
         #add initial edges
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-            self.building_graph.addEdge(i*2,     i*2 + 1, 1)
-            self.building_graph.addEdge(i*2 + 1, i*2,     1)
+            self.building_graph.addEdge(i*3,     i*3 + 1, 1)
+            self.building_graph.addEdge(i*3 + 1, i*3,     1)
+            self.building_graph.addEdge(i*3 + 1, i*3 + 2, 1)
+            self.building_graph.addEdge(i*3 + 2, i*3 + 1, 1)
+            self.building_graph.addEdge(i*3,     i*3 + 2, 1)
+            self.building_graph.addEdge(i*3 + 2, i*3,     1)
 
         # fill building with empty floors
         for i in range(numfloors):
@@ -76,8 +81,8 @@ class Building:
         
         #add edges provided by elevator to building_graph
         for i in range(len(floors)-1):
-            self.building_graph.addEdge(floors[i]*2 + side,   floors[i+1]*2 + side, abs(floors[i] - floors[i+1])+0.1)
-            self.building_graph.addEdge(floors[i+1]*2 + side, floors[i]*2 + side,   abs(floors[i] - floors[i+1])+0.1)
+            self.building_graph.addEdge(floors[i]*3 + side*2,   floors[i+1]*3 + side*2, abs(floors[i] - floors[i+1])+0.1)
+            self.building_graph.addEdge(floors[i+1]*3 + side*2, floors[i]*3 + side*2,   abs(floors[i] - floors[i+1])+0.1)
                  
 
     def remove_elevator(self, left, index):
