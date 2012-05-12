@@ -203,8 +203,8 @@ class Render:
             if y in range(len(self.rooms)):
                 self.get_room(y).entities.remove(self.entities[id])
             del self.entities[id]
-        else:
-            raise ValueError("Invalid entity id.")
+        #else:
+            #raise ValueError("Invalid entity id.")
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
@@ -224,8 +224,8 @@ class Render:
                 self.entities[id].walking = False
             self.entities[id].x = x
             self.entities[id].y = y
-        else:
-            raise ValueError("Invalid entity id.")
+        #else:
+            #raise ValueError("Invalid entity id.")
     
     def entity_in_elevator(self, entity_id, elevator_id):
         if entity_id in self.entities:
