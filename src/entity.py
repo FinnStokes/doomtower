@@ -86,11 +86,11 @@ class Entity:
         self.event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
-        if entity == self.id and not self.in_elevator and self.controllable:
+        if entity == self.id and self.controllable:
             self.force_move(floor)    
 
     def force_move(self, floor):
-        if self.building.get_room(floor) > 0:
+        if self.building.get_room(floor) > 0 and not self.in_elevator:
             self.waiting = False
             self.elevator = None
             off = 0 if self.x <= 0.5 else 2
@@ -151,6 +151,9 @@ class Entity:
                     self.elevator.exit()
                     self.elevator = None
                     self.event.notify("update_entity", self.id, self.x, self.y)
+                    if not self.controllable and self.path[-1] != 1:
+                        self.force_move(0)
+                        
     
     def remove_entity(self, id):
         if self.id == id:
