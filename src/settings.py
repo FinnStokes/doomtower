@@ -32,6 +32,18 @@ SCIENTIST_COSTS = [
 ]
 IGOR_COST = 200
 
+# Pays
+ROOM_PAYS = [ 0,
+    0, # LOBBY
+    0, # WAITING
+    2000, # BIO
+    1000, # BOOM
+    8000, # COSMO
+    2500, # PSYCH
+    500, # INFO
+    0, # MEETING
+]
+
 # Period of staff wages (secs)
 WAGE_PERIOD = 30
 
@@ -82,3 +94,8 @@ ROOM_COSMO = 5
 ROOM_PSYCH = 6
 ROOM_INFO = 7
 ROOM_MEETING = 8
+
+# Entity IDs
+ENTITY_SCIENTIST = 0
+ENTITY_IGOR = 1
+ENTITY_CLIENT = 2

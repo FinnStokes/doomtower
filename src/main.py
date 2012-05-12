@@ -31,7 +31,7 @@ while running:
     event_manager.notify("update", fpsClock.get_time()/1000.0)
     event_manager.update()
     accum +=  fpsClock.get_time()/1000.0
-    if int(accum) == settings.SPAWN_PERIOD:
+    if int(accum) >= settings.SPAWN_PERIOD:
         event_manager.notify("create_client")
         accum = 0.0    
        
