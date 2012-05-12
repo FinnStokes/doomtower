@@ -12,6 +12,8 @@ while True:
         break
     elif e.type == VIDEORESIZE:
         pygame.display.set_mode((e.size),pygame.RESIZABLE) 
+    elif e.type == QUIT:
+        sys.exit()
     width, height = window.get_size()
     window.fill((217,86,74))
     window.blit(title_screen, ((width-1024)/2,(height-600)/2))
