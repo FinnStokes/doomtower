@@ -3,7 +3,32 @@ BOTTOM_FLOOR = -5
 
 ROOM_WIDTH = 706
 ROOM_HEIGHT = 256
+
+# Funds
 STARTING_FUNDS = 10000
+ROOM_COSTS = [ 0,
+    0, # LOBBY
+    5000, # WAITING
+    10000, # BIO
+    5000, # BOOM
+    10000, # COSMO
+    5000, # PSYCH
+    1000, # INFO
+    5000, # MEETING
+]
+SCIENTIST_COSTS = [
+    500, # Korsakov
+    500, # Mayamoto
+    500, # Rutherford
+    500, # Edison
+    500, # Thomson
+    500, # Planck
+    500, # Curie
+    500, # Tesla
+    500, # Einstein
+    500, # Newton
+]
+IGOR_COST = 200
 
 # The number of seconds spent on each frame of the animation
 ANIMATION_TIME = 0.2

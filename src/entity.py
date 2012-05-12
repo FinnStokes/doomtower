@@ -20,12 +20,16 @@ class Manager:
         self.nextId = self.nextId + 1
     
     def create_scientist(self, character):
-        e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
-        self.nextId = self.nextId + 1
+        if self.building.get_funds() >= settings.SCIENTIST_COSTS[character]:
+            self.building.spend_funds(settings.SCIENTIST_COSTS[character])
+            e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
+            self.nextId = self.nextId + 1
     
     def create_igor(self):
-        e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
-        self.nextId = self.nextId + 1
+         if self.building.get_funds() >= settings.IGOR_COST:
+            self.building.spend_funds(settings.IGOR_COST)
+            e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
+            self.nextId = self.nextId + 1
 
 class Entity:
     def __init__(self, event, id, x, floor, sprite, character, building):
