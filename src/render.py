@@ -34,7 +34,7 @@ class Render:
         self.event.register("new_elevator", self.new_elevator)
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
-        
+        self.event.register("entity_in_elevator", self.entity_in_elevator)
         self.building_height = 0
         self.building_depth = 0
         self.window = window
@@ -215,6 +215,14 @@ class Render:
         else:
             raise ValueError("Invalid entity id.")
     
+    def entity_in_elevator(self, entity_id, elevator_id):
+        entity = self.entities[entity_id]
+        if(elevator_id >= 0):
+            if entity.y in range(len(self.rooms)):
+                self.get_room(entity.y).entities.discard(entity)
+        entity[entity_id].elevator = elevator_id
+        
+
     def new_elevator(self, id, left, floors, y): 
         # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
         self.elevators[id] = Elevator(left, y)
@@ -252,6 +260,8 @@ class Entity:
         self.anim_frame = 0
         self.anim_length = 2
         self.walking = False
+        # The id of the current elevator the entity is in "-1 means in the building"
+        self.elevator = -1
         self.x = x_coord
         self.y = y_coord
 

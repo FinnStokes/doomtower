@@ -84,3 +84,9 @@ class Event():
 #  The float x should indicate how far across the building the entity is (0 = left wall, 1 = right wall).
 #  The integer y should indicate what floor the entity is on.
 # Render should react by moving the entity graphic.
+
+# entity_in_elevator(entity_id, elevator_id)
+# This event should be produced when an entity moves into or back from an elevator.
+#  The integer entity_id should be the unique identifier amongst entities.
+#  The integer elevator_id should be the unique identifier amongst elevators if the entity is moving into an elvator
+#   or -1 if the entity is moving out.
