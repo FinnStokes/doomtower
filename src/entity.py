@@ -41,23 +41,23 @@ class Entity:
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
-            off = (0, 1)[self.x <= 0.5]
-            src = self.y * 2 + off
-            dest = floor * 2
+            off = 0 if self.x <= 0.3 else (2 if self.x >= 0.7 else 1)
+            src = self.y * 3 + off
+            dest = floor * 3 + 1
             self.path = self.building.building_graph.getPath(src, dest)
             if not self.path:
                 return
             if self.path.pop(0) != src:
                 raise ValueError("Invalid path: start doesn't match")
-            if self.path[0] // 2 == self.y:
-                self.target = self.path.pop(0) % 2
+            if self.path[0] // 3 == self.y:
+                self.target = (self.path.pop(0) % 3) / 2.0
             else:
-                self.target = src % 2
+                self.target = (src % 3) / 2.0
     
     def update(self, dt):
         if not self.elevator:
-            if self.path and self.path[0] // 2 == self.y:
-                    self.target = self.path.pop(0) % 2
+            if self.path and self.path[0] // 3 == self.y:
+                    self.target = (self.path.pop(0) % 3) / 2.0
             
             if self.x != self.target:
                 if abs(self.x - self.target) < self.speed*dt:
@@ -77,11 +77,11 @@ class Entity:
         if self.elevator and id == self.elevator.id:
             if self.waiting:
                 if floor == self.y:
-                    self.waiting = not self.elevator.occupy(self.path[0] // 2)
+                    self.waiting = not self.elevator.occupy(self.path[0] // 3)
                     if self.waiting:
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
             else:
-                if floor == self.path[0] // 2:
+                if floor == self.path[0] // 3:
                     self.event.notify("entity_in_elevator", self.id, -1)
                     self.y = floor
                     self.elevator.exit()
