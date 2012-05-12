@@ -5,7 +5,19 @@ client_requests = []
 #Set the patience and potential requests for each client
 for i in range(10):
     client_patience.append(30)
-    client_requests.append({settings.ROOM_BOOM:0.5, settings.ROOM_BIO:0.5, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0, settings.ROOM_INFO: 0})
+    
+client_requests.append({settings.ROOM_BOOM:1, settings.ROOM_BIO:0, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0, settings.ROOM_INFO: 0})
+client_requests.append({settings.ROOM_BOOM:0.8, settings.ROOM_BIO:0, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0.2, settings.ROOM_INFO: 0})
+client_requests.append({settings.ROOM_BOOM:0.5, settings.ROOM_BIO:0, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0.3, settings.ROOM_INFO: 0.2})
+client_requests.append({settings.ROOM_BOOM:0.3, settings.ROOM_BIO:0, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0.3, settings.ROOM_INFO: 0.5})
+client_requests.append({settings.ROOM_BOOM:0, settings.ROOM_BIO:0.2, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0.5, settings.ROOM_INFO: 0.3})
+client_requests.append({settings.ROOM_BOOM:0, settings.ROOM_BIO:0.5, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0.5, settings.ROOM_INFO: 0})
+client_requests.append({settings.ROOM_BOOM:0, settings.ROOM_BIO:0.5, settings.ROOM_COSMO:0.2, settings.ROOM_PSYCH:0.3, settings.ROOM_INFO: 0})
+client_requests.append({settings.ROOM_BOOM:0.2, settings.ROOM_BIO:0, settings.ROOM_COSMO:0.3, settings.ROOM_PSYCH:0.5, settings.ROOM_INFO: 0.2})
+client_requests.append({settings.ROOM_BOOM:0, settings.ROOM_BIO:0, settings.ROOM_COSMO:0.3, settings.ROOM_PSYCH:0.7, settings.ROOM_INFO: 0})
+client_requests.append({settings.ROOM_BOOM:0, settings.ROOM_BIO:0, settings.ROOM_COSMO:1, settings.ROOM_PSYCH:0, settings.ROOM_INFO: 0})
+
+
 class Manager:
     def __init__(self, event, building):
         self.event = event
@@ -17,7 +29,11 @@ class Manager:
         event.register("create_igor", self.create_igor)
 
     def create_client(self):
-        self.entities[self.nextId] = Client(self.event, self.nextId, random.randint(0,9), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, self)
+        if self.nextId <= 20:
+            client_range = 2 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
+        else:
+            client_range = 10
+        self.entities[self.nextId] = Client(self.event, self.nextId, random.randint(0,client_range), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, self)
         self.nextId = self.nextId + 1
     
     def create_scientist(self, character):
