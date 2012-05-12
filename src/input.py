@@ -26,7 +26,7 @@ for i in range(11):
 hire_over = hire_out
 # font
 font = pygame.font.Font("font/8-bit_wonder.ttf", 27)
-build_ids = [2,3,4,5,6,7,8]
+build_ids = [8,7,4,6,3,5,2]
 updown_img = pygame.image.load('img/UpDown.png')
 updown_out = []
 for i in range(2):
