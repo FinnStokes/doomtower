@@ -115,6 +115,16 @@ class Render:
                                      entity.sub_rect)
         
         for elevator in self.elevators.itervalues():
+            for entity in elevator.entities:
+                if entity.sprite:
+                    self.window.blit(entity.sprite,
+                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     entity.main_rect)
+                if entity.subsprite:
+                    self.window.blit(entity.subsprite,
+                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     entity.sub_rect)
+                    
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -704), 
                               screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
@@ -222,7 +232,7 @@ class Render:
                 if entity.y in range(len(self.rooms)):
                     self.get_room(entity.y).entities.discard(entity)
                 if elevator_id in self.elevators:
-                    self.elevators[elvator_id].entities.add(entity)
+                    self.elevators[elevator_id].entities.add(entity)
             else:
                 if entity.elevator in self.elevators:
                     self.elevators[entity.elevator].entities.discard(entity)
