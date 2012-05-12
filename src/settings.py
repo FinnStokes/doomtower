@@ -20,3 +20,6 @@ ENTITY_SPEED = 0.2
 
 # The height of the drag bar for pop-up windows in pixels
 DRAGBAR_HEIGHT = 75
+
+# The height of the bottom panel
+BOTTOM_PANEL_HEIGHT = 64

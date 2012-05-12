@@ -46,23 +46,34 @@ class Render:
         self.room_padding = 10
         self.entities = dict()
         self.anim_timer = 0
-        self.anim_state = False
         
     def update(self, dt):
         self.anim_timer += dt
         if(self.anim_timer > settings.ANIMATION_TIME):
-            dx = 0
-            if(self.anim_state):
-                dx = -1
-                self.anim_state = False
-            else:
-                dx = 1
-                self.anim_state = True
-            for room in self.rooms:
-                for entity in room.entities:
-                    entity.main_rect.move_ip(dx*entity.width,0)
+            anim_step = True
             self.anim_timer -= settings.ANIMATION_TIME
+        else:
+            anim_step = False
 
+        for id in self.entities:
+            entity = self.entities[id]
+            col = 0
+            row = 0
+            subrow = entity.character
+            subcol = 0
+            if anim_step:
+                entity.anim_frame = (entity.anim_frame + 1)%entity.anim_length
+            col += entity.anim_frame
+            if entity.walking:
+                row += 1
+            if entity.face_left:
+                col += entity.anim_length
+                if entity.character >= 0:
+                    subcol += 1
+            entity.main_rect = pygame.Rect(col*entity.width, row*entity.height, entity.width, entity.height)
+            if entity.character >= 0:
+                entity.sub_rect = pygame.Rect(subcol*entity.subwidth, subrow*entity.subheight, entity.subwidth, entity.subheight)
+                
     def draw(self): # render current game state
         self.window.fill((0,0,0))
         screen_width, screen_height = self.window.get_size()
@@ -119,7 +130,7 @@ class Render:
         floor_height = (self.room_height+self.room_padding)*(target_floor)
         if floor_height < self.y_pan:
             #scroll down
-            self.y_target = floor_height
+            self.y_target = floor_height - settings.BOTTOM_PANEL_HEIGHT
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed > -(self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
@@ -166,7 +177,7 @@ class Render:
         if y in range(len(self.rooms)):
             self.get_room(y).entities.add(self.entities[id])
     
-    def remove_entity(self, id): # create entity with given sprite at given position
+    def remove_entity(self, id): # remove entity with given id
         if id in self.entities:
             y = self.entities[id].y
             if y in range(len(self.rooms)):
@@ -177,11 +188,20 @@ class Render:
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
+            oldx = self.entities[id].x
             oldy = self.entities[id].y
             if oldy in range(len(self.rooms)):
                 self.get_room(oldy).entities.discard(self.entities[id])
             if y in range(len(self.rooms)):
                 self.get_room(y).entities.add(self.entities[id])
+            if x < oldx:
+                self.entities[id].face_left = True
+                self.entities[id].walking = True
+            elif x > oldx:
+                self.entities[id].face_left = False
+                self.entities[id].walking = True
+            else:
+                self.entities[id].walking = False
             self.entities[id].x = x
             self.entities[id].y = y
         else:
@@ -215,9 +235,13 @@ class Entity:
             self.subwidth = 92
             self.subheight = 86
             self.sub_rect = pygame.Rect(0,self.subheight*character_id,self.subwidth, self.subheight)
-            self.character = character_id
+        self.character = character_id
         if sprite_id in range(len(entity_images)):
             self.sprite = entity_images[sprite_id]
             self.subsprite = entity_subimages[sprite_id]
+        self.face_left = True
+        self.anim_frame = 0
+        self.anim_length = 2
+        self.walking = False
         self.x = x_coord
         self.y = y_coord
