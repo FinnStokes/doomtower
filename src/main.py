@@ -25,14 +25,21 @@ def close():
 
 event_manager.register("quit", close)
 accum = 0.0
+total = 0
 
 while running:
     fpsClock.tick(30)
     event_manager.notify("update", fpsClock.get_time()/1000.0)
     event_manager.update()
-    accum +=  fpsClock.get_time()/1000.0
-    if int(accum) >= settings.SPAWN_PERIOD:
+    
+    time =  fpsClock.get_time()/1000.0
+    accum += time
+    total += time
+    period = settings.SPAWN_PERIOD - \
+            (settings.SPAWN_PERIOD - settings.SPAWN_PERIOD_END) * \
+            (total / settings.SPAWN_SCALE_TIME)
+    period = max(period, settings.SPAWN_PERIOD_END)
+    print(period)
+    if int(accum) >= period:
         event_manager.notify("create_client")
-        accum = 0.0    
-       
-
+        accum = 0.0

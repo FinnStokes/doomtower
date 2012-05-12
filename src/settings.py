@@ -5,7 +5,7 @@ ROOM_WIDTH = 706
 ROOM_HEIGHT = 256
 
 # Funds
-STARTING_FUNDS = 10000
+STARTING_FUNDS = 12000
 
 # Costs
 ROOM_COSTS = [ 0,
@@ -71,8 +71,9 @@ SPAWN_POSITION = 0.5
 SPAWN_FLOOR = 0
 
 # Period of client spawning (secs)
-SPAWN_PERIOD = 10
-
+SPAWN_PERIOD = 30
+SPAWN_SCALE_TIME = 60 * 10 # 10min
+SPAWN_PERIOD_END = 15
 
 # The horizontal speed the entities should move at in rooms per second
 ENTITY_SPEED = 0.2
