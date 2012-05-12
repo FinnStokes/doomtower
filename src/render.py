@@ -120,16 +120,18 @@ class Render:
             for entity in elevator.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -704),
+                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     ((x_offset - (elevator.width if elevator.left else -704), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -704),
+                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
                                      entity.sub_rect)
                     
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -704), 
-                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
+                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -289,4 +291,5 @@ class Elevator:
         self.y = y
         self.sprite = elevator_sprite
         self.width = 100
+        self.height = 197
         self.entities = set()
