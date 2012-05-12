@@ -15,7 +15,6 @@ class DoomMixer:
                      ['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
                      ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
                      ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg']
-                  
     ]
 
     scientistsources = [['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
@@ -31,7 +30,7 @@ class DoomMixer:
     ]
 
     igorsources = ['snd/igoryeth.ogg', 'snd/igordirection.ogg']
-    roomsource = ['snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/informatics', 'snd/meeting.ogg', 'snd/psycho.ogg', 'snd/reception.ogg']
+    roomsources = ['snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/informatics', 'snd/meeting.ogg', 'snd/psycho.ogg', 'snd/reception.ogg']
     bgmsources = ['snd/sciencegroove.ogg', 'snd/sciencegroove2.ogg']
   
     def __init__(self, event_manager):
@@ -39,43 +38,37 @@ class DoomMixer:
         #unique room sound should play when a room is built
         self.event.register("input_build", self.play_room) 
  
+        self.roomsnd = []
         self.clientvox = []
         self.sciencevox = []
-
         self.bgm = []
         #load sounds
+        pygame.mixer.init()
 
-        for i in range(len(clientsources)):
+        for i in range(len(DoomMixer.clientsources)):
             arr = []
-            for j in range(len(clientsources[i])):
-                arr.append(pygame.mixer.Sound(clientsources[i][j]))
+            for j in range(len(DoomMixer.clientsources[i])):
+                arr.append(pygame.mixer.Sound(DoomMixer.clientsources[i][j]))
             self.clientvox.append(arr)
                     
-        for i in range(len(scientistsources)):
+        for i in range(len(DoomMixer.scientistsources)):
             arr = []
-            for j in range(len(scientistsources[i])):
-                arr.append(pygame.mixer.Sound(scientistsources[i][j]))
+            for j in range(len(DoomMixer.scientistsources[i])):
+                arr.append(pygame.mixer.Sound(DoomMixer.scientistsources[i][j]))
             self.sciencevox.append(arr)
                     
-        for i in range(len(roomsources)):
-            self.room_snd.append(pygame.mixer.Sound(roomsources[i]))
+        for i in range(len(DoomMixer.roomsources)):
+            self.roomsnd.append(pygame.mixer.Sound(DoomMixer.roomsources[i]))
            
-        for i in range(len(bgmsources)):
-            self.bgm.append(pygame.mixer.Sound(bgmsources[i]))   
+        for i in range(len(DoomMixer.bgmsources)):
+            self.bgm.append(DoomMixer.bgmsources[i])   
         
-        pygame.mixer.init()
-        pygame.mixer.music.queue(self.bgm[0])   
-  
+        pygame.mixer.music.load(self.bgm[1])   
+        pygame.mixer.music.play(-1)
+
     def play_room(self, floor, room_id):
         self.room_snd[room_id].play()
-    
-
-    
-
-    # generic audio call
-    def make_noise(self):
-        pass
-
+       
 
     # play new background music, current track faded out or cut
     def playbgm(self, title, sharp = True):
