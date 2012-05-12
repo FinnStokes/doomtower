@@ -46,21 +46,13 @@ class Render:
         self.room_padding = 10
         self.entities = dict()
         self.anim_timer = 0
-        self.anim_state = False
         
     def update(self, dt):
         self.anim_timer += dt
         if(self.anim_timer > settings.ANIMATION_TIME):
-            dx = 0
-            if(self.anim_state):
-                dx = -1
-                self.anim_state = False
-            else:
-                dx = 1
-                self.anim_state = True
             for room in self.rooms:
                 for entity in room.entities:
-                    entity.main_rect.move_ip(dx*entity.width,0)
+                    entity.anim_frame = (entity.anim_frame + 1)%entity.anim_length
             self.anim_timer -= settings.ANIMATION_TIME
 
     def draw(self): # render current game state
@@ -172,11 +164,16 @@ class Render:
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
+            oldx = self.entities[id].x
             oldy = self.entities[id].y
             if oldy in range(len(self.rooms)):
                 self.get_room(oldy).entities.discard(self.entities[id])
             if y in range(len(self.rooms)):
                 self.get_room(y).entities.add(self.entities[id])
+            if x < oldx:
+                self.face_left = true
+            elif x > oldx:
+                self.face_left = false
             self.entities[id].x = x
             self.entities[id].y = y
         else:
@@ -214,5 +211,8 @@ class Entity:
         if sprite_id in range(len(entity_images)):
             self.sprite = entity_images[sprite_id]
             self.subsprite = entity_subimages[sprite_id]
+        self.face_left = true
+        self.anim_frame = 0
+        self.anim_length = 2
         self.x = x_coord
         self.y = y_coord
