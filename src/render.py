@@ -34,6 +34,7 @@ class Render:
         self.event.register("new_entity", self.new_entity)
         self.event.register("remove_entity", self.remove_entity)
         self.event.register("update_entity", self.update_entity)
+        self.event.register("entity_carrying", self.entity_carrying)
         self.event.register("new_elevator", self.new_elevator)
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
@@ -76,6 +77,8 @@ class Render:
                 col += entity.anim_length
                 if entity.character >= 0:
                     subcol += 1
+            if entity.carrying:
+                row += 2
             entity.main_rect = pygame.Rect(col*entity.width, row*entity.height, entity.width, entity.height)
             if entity.character >= 0:
                 entity.sub_rect = pygame.Rect(subcol*entity.subwidth, subrow*entity.subheight, entity.subwidth, entity.subheight)
@@ -183,6 +186,7 @@ class Render:
         else:
             #stop scrolling
             self.y_target = self.y_pan
+
     def step_screen(self, up):
         screen_width, screen_height = self.window.get_size()
         if up:
@@ -228,24 +232,28 @@ class Render:
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
-            oldx = self.entities[id].x
-            oldy = self.entities[id].y
+            entity = self.entities[id]
+            oldx = entity.x
+            oldy = entity.y
             if oldy in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-                self.get_room(oldy).entities.discard(self.entities[id])
+                self.get_room(oldy).entities.discard(entity)
             if y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-                self.get_room(y).entities.add(self.entities[id])
+                self.get_room(y).entities.add(entity)
             if x < oldx:
-                self.entities[id].face_left = True
-                self.entities[id].walking = True
+                entity.face_left = True
+                entity.walking = True
             elif x > oldx:
-                self.entities[id].face_left = False
-                self.entities[id].walking = True
+                entity.face_left = False
+                entity.walking = True
             else:
-                self.entities[id].walking = False
-            self.entities[id].x = x
-            self.entities[id].y = y
+                entity.walking = False
+            entity.x = x
+            entity.y = y
         else:
             raise ValueError("Invalid entity id.")
+    
+    def entity_carrying(self, carrying_value):
+        self.entities[id] = carrying_value
     
     def entity_in_elevator(self, entity_id, elevator_id):
         if entity_id in self.entities:
@@ -282,6 +290,7 @@ class Room:
 
 class Entity:
     def __init__(self, sprite_id, character_id, x_coord, y_coord):
+        self.carrying = False
         self.sprite = None
         self.width = 100
         self.height = 160
