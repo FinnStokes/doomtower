@@ -6,6 +6,8 @@ ROOM_HEIGHT = 256
 
 # Funds
 STARTING_FUNDS = 10000
+
+# Costs
 ROOM_COSTS = [ 0,
     0, # LOBBY
     5000, # WAITING
@@ -29,6 +31,9 @@ SCIENTIST_COSTS = [
     500, # Newton
 ]
 IGOR_COST = 200
+
+# Period of staff wages (secs)
+WAGE_PERIOD = 30
 
 # The number of seconds spent on each frame of the animation
 ANIMATION_TIME = 0.2

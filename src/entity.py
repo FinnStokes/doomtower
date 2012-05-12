@@ -20,19 +20,21 @@ class Manager:
         self.nextId = self.nextId + 1
     
     def create_scientist(self, character):
-        if self.building.get_funds() >= settings.SCIENTIST_COSTS[character]:
-            self.building.spend_funds(settings.SCIENTIST_COSTS[character])
-            e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
+        wage = settings.SCIENTIST_COSTS[character]
+        if self.building.get_funds() >= wage:
+            self.building.spend_funds(wage)
+            e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
     
     def create_igor(self):
-         if self.building.get_funds() >= settings.IGOR_COST:
-            self.building.spend_funds(settings.IGOR_COST)
-            e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building)
+        wage = settings.IGOR_COST
+        if self.building.get_funds() >= wage:
+            self.building.spend_funds(wage)
+            e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
 
 class Entity:
-    def __init__(self, event, id, x, floor, sprite, character, building):
+    def __init__(self, event, id, x, floor, sprite, character, building, wage):
         self.id = id
         self.x = x
         self.y = floor
@@ -43,6 +45,8 @@ class Entity:
         self.event = event
         self.building = building
         self.elevator = None
+        self.wage = wage
+        self.wage_timer = 0
         self.event.register("input_move", self.move_to)
         self.event.register("update", self.update)
         self.event.notify("new_entity", self.id, self.x, self.y, sprite, character)
@@ -65,6 +69,12 @@ class Entity:
                 self.target = (src % 3) / 2.0
     
     def update(self, dt):
+        # wages
+        self.wage_timer += dt
+        if self.wage > 0 and self.wage_timer > settings.WAGE_PERIOD:
+            self.building.spend_funds(self.wage)
+            self.wage_timer -= settings.WAGE_PERIOD
+        
         if not self.elevator:
             if self.path and self.path[0] // 3 == self.y:
                     self.target = (self.path.pop(0) % 3) / 2.0
@@ -108,7 +118,7 @@ class Entity:
 
 class Client(Entity):
     def __init__(self, event, id, character, x, floor, building):
-        Entity.__init__(self, event, id, x, floor, 2, character, building)
+        Entity.__init__(self, event, id, x, floor, 2, character, building, 0)
         self.state = "wait_meeting"
         self.progress = 0
         self.event = event
@@ -162,10 +172,10 @@ class Client(Entity):
         self.progress = 0
 
 class Scientist(Entity):
-    def __init__(self, event, id, character, x, floor, building):
-        Entity.__init__(self, event, id, x, floor, 0, character, building)
+    def __init__(self, event, id, character, x, floor, building, wage):
+        Entity.__init__(self, event, id, x, floor, 0, character, building, wage)
 
 
 class Igor(Entity):
-    def __init__(self, event, id, x, floor, building):
-        Entity.__init__(self, event, id, x, floor, 1, -1, building)
+    def __init__(self, event, id, x, floor, building, wage):
+        Entity.__init__(self, event, id, x, floor, 1, -1, building, wage)
