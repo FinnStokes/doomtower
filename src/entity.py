@@ -26,6 +26,8 @@ class Manager:
             self.building.spend_funds(wage)
             self.entities[self.nextId] = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
+        else:
+            self.event.notify("insufficient_funds")
     
     def create_igor(self):
         wage = settings.IGOR_COST
@@ -33,7 +35,9 @@ class Manager:
             self.building.spend_funds(wage)
             self.entities[self.nextId] = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
-        
+        else:
+            self.event.notify("insufficient_funds")
+  
     def entity_count(self, room, type):
         count = 0
         for entity in self.entities:
@@ -41,7 +45,7 @@ class Manager:
                 if self.entities[entity].y == room:
                     count += 1
         return count
-        
+
 class Entity:
     def __init__(self, event, id, x, floor, type, character, building, wage):
         self.id = id
@@ -58,6 +62,7 @@ class Entity:
         self.wage = wage
         self.wage_timer = 0
         self.type = type
+        self.controllable = True
         self.event.register("input_move", self.move_to)
         self.event.register("update", self.update)
         self.event.notify("new_entity", self.id, self.x, self.y, type, character)
@@ -65,22 +70,24 @@ class Entity:
         self.event.register("remove_entity", self.remove_entity)
     
     def move_to(self, entity, floor):
+        if entity == self.id and not self.in_elevator and self.controllable:
+            self.force_move(floor)    
+
+    def force_move(self, floor):
         self.waiting = False
         self.elevator = None
-        if entity == self.id:
-            if not self.elevator or self.waiting:
-                off = 0 if self.x <= 0.5 else 2
-                src = self.y * 3 + off
-                dest = floor * 3 + 1
-                self.path = self.building.building_graph.getPath(src, dest)
-                if not self.path:
-                    return
-                if self.path.pop(0) != src:
-                    raise ValueError("Invalid path: start doesn't match")
-                if self.path[0] // 3 == self.y:
-                    self.target = (self.path.pop(0) % 3) / 2.0
-                else:
-                    self.target = (src % 3) / 2.0
+        off = 0 if self.x <= 0.5 else 2
+        src = self.y * 3 + off
+        dest = floor * 3 + 1
+        self.path = self.building.building_graph.getPath(src, dest)
+        if not self.path:
+            return
+        if self.path.pop(0) != src:
+            raise ValueError("Invalid path: start doesn't match")
+        if self.path[0] // 3 == self.y:
+            self.target = (self.path.pop(0) % 3) / 2.0
+        else:
+            self.target = (src % 3) / 2.0
     
     def update(self, dt):
         # wages
@@ -103,22 +110,19 @@ class Entity:
                         self.x = self.x - self.speed*dt
                 self.event.notify("update_entity", self.id, self.x, self.y)
             elif self.path and not self.in_elevator:
-                print(repr(self.id)+"call")
                 self.elevator = self.building.get_elevator(self.y, self.x < 0.5)
                 self.elevator.call_to(self.y)
                 self.waiting = True
 
     def elevator_open(self, id, floor):
         if self.elevator and id == self.elevator.id:
-            print(repr(self.id)+"basic elevator "+repr(self.waiting))
             if self.waiting:
                 if floor == self.y:
-                    self.waiting = not self.elevator.occupy(self.path[0] // 3)
-                    if not self.waiting:
-                        print(repr(self.id)+" get in "+repr(self.waiting))
-                        self.in_elevator = True
+                    self.in_elevator = self.elevator.occupy(self.path[0] // 3)
+                    if self.in_elevator:
+                        self.waiting = False
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
-            elif self.in_elevator:
+            if self.in_elevator:
                 if floor == self.path[0] // 3:
                     self.path.pop(0)
                     self.in_elevator = False
@@ -171,7 +175,8 @@ class Client(Entity):
             elif self.progress > client_patience[self.character]:
                 # If the client is not in the waiting room, leave after patience has elapsed
                 self.set_state("leaving")
-                self.event.notify("input_move", self.id, 0)
+                self.controllable = False
+                self.force_move(0)
                 
               
         elif self.state == "meeting":
@@ -203,7 +208,8 @@ class Client(Entity):
             elif self.progress > client_patience[self.character]:
                 # Otherwise, leave once patience has elapsed
                 self.set_state("leaving")
-                self.event.notify("input_move", self.id, 0)
+                self.controllable = False
+                self.force_move(0)
                 
                 
         elif self.state == "manufacture":
@@ -219,8 +225,9 @@ class Client(Entity):
             elif self.progress > settings.MANUFACTURE_TIME:
                 # If the manufacture concludes, client satisfied
                 self.set_state("satisfied")
+                self.controllable = False
                 self.building.gain_funds(settings.ROOM_PAYS[self.request])
-                self.event.notify("input_move", self.id, 0)
+                self.force_move(0)
                 
                 
         elif self.state == "wait_scientist":
@@ -230,7 +237,8 @@ class Client(Entity):
             elif self.progress > client_patience[self.character]:
                 # Otherwise, leave once patience has elapsed
                 self.set_state("leaving")
-                self.event.notify("input_move", self.id, 0)
+                self.controllable = False
+                self.force_move(0)
             
             
         elif self.state in ("leaving", "satisfied"):
