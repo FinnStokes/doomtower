@@ -30,8 +30,7 @@ class DoomMixer:
                         ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
                         ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
                         ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg'],  
-                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]
-                      
+                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]                     
           ]    
     
     roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics', 'snd/meeting.ogg']
@@ -73,7 +72,7 @@ class DoomMixer:
         pygame.mixer.music.play(-1)
 
     def play_room(self, floor, room_id):
-         self.roomsnd[room_id].play()
+         self.roomsnd[room_id - 1].play()
        
     def entity_hello(self, id, x, y, sprite, character):
         #sprite = (0, 1, 2)

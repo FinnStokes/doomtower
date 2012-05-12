@@ -43,7 +43,7 @@ class Building:
 
         # add test floors
         self.build_room(1,2)
-        self.build_room(-1,3)
+        self.build_room(-1,8)
         self.build_room(2,4)
         self.build_room(3,3)
     def update(self, dt):      
@@ -178,14 +178,15 @@ class Elevator:
                 self.moving = True
 
 # room_id
-# 0 - Lobby
-# 1 - Waiting
-# 2 - Bio
-# 3 - Boom
-# 4 - Cosmo
-# 5 - Psych
-# 6 - Info
-# 7 - Meeting
+# 0 - Empty
+# 1 - Lobby
+# 2 - Waiting
+# 3 - Bio
+# 4 - Boom
+# 5 - Cosmo
+# 6 - Psych
+# 7 - Info
+# 8 - Meeting
 class Room:
     #product types
     products = {'time_bomb': 'boom',
