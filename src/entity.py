@@ -77,16 +77,16 @@ class Entity:
         if self.elevator and id == self.elevator.id:
             if self.waiting:
                 if floor == self.y:
-                    self.waiting = not self.elevator.occupy(self.target)
+                    self.waiting = not self.elevator.occupy(self.path[0] // 2)
                     if self.waiting:
                         self.event.notify("entity_in_elevator", self.id, self.elevator.id)
-                    print self.waiting
             else:
                 if floor == self.path[0] // 2:
                     self.event.notify("entity_in_elevator", self.id, -1)
                     self.y = floor
-                    self.elevator.occupied = False
+                    self.elevator.exit()
                     self.elevator = None
+                    self.event.notify("update_entity", self.id, self.x, self.y)
     
     def remove_entity(self, id):
         if self.id == id:

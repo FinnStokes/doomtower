@@ -7,17 +7,10 @@ class DoomMixer:
 
 # audio source files
 #should be separated by event type
-    clientsources = [['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
-                     ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
-                     ['snd/browngreeting.ogg', 'snd/brownfarewell.ogg'],
-                     ['snd/dextergreeting.ogg', 'snd/dexterfarewell.ogg'],
-                     ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
-                     ['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
-                     ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
-                     ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg']
-    ]
+    
 
-    scientistsources = [['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
+
+    vox = [[            ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
                         ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
                         ['snd/curiegreeting.ogg', 'snd/curiefarewell.ogg'],
                         ['snd/edisongreeting.ogg', 'snd/edisonfarewell.ogg'],
@@ -26,37 +19,49 @@ class DoomMixer:
                         ['snd/planckgreeting.ogg', 'snd/planckfarewell.ogg'],
                         ['snd/rutherfordgreeting.ogg', 'snd/rutherfordfarewell.ogg'],
                         ['snd/teslagreeting.ogg', 'snd/teslafarewell.ogg'],
-                        ['snd/thomsongreeting.ogg', 'snd/thomsonfarewell.ogg']
-    ]
-
-    igorsources = ['snd/igoryeth.ogg', 'snd/igordirection.ogg']
+                        ['snd/thomsongreeting.ogg', 'snd/thomsonfarewell.ogg']],
+                        [['snd/igoryeth.ogg', 'snd/igordirection.ogg']],
+                        [['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
+                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
+                        ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
+                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
+                        ['snd/browngreeting.ogg', 'snd/brownfarewell.ogg'],
+                        ['snd/dextergreeting.ogg', 'snd/dexterfarewell.ogg'],
+                        ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
+                        ['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
+                        ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
+                        ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg']]  
+           ]    
+    
     roomsources = ['snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/informatics', 'snd/meeting.ogg', 'snd/psycho.ogg', 'snd/reception.ogg']
     bgmsources = ['snd/sciencegroove.ogg', 'snd/sciencegroove2.ogg']
   
+    
+
     def __init__(self, event_manager):
         self.event = event_manager
         #unique room sound should play when a room is built
-        self.event.register("input_build", self.play_room) 
- 
+        self.event.register("update_room", self.play_room) 
+        self.event.register("new_entity", self.entity_hello )
         self.roomsnd = []
+        self.vox = []
         self.clientvox = []
         self.sciencevox = []
         self.bgm = []
+
+        self.peeps = {}
         #load sounds
         pygame.mixer.init()
 
-        for i in range(len(DoomMixer.clientsources)):
+        for i in range(len(DoomMixer.vox)):
             arr = []
-            for j in range(len(DoomMixer.clientsources[i])):
-                arr.append(pygame.mixer.Sound(DoomMixer.clientsources[i][j]))
-            self.clientvox.append(arr)
-                    
-        for i in range(len(DoomMixer.scientistsources)):
-            arr = []
-            for j in range(len(DoomMixer.scientistsources[i])):
-                arr.append(pygame.mixer.Sound(DoomMixer.scientistsources[i][j]))
-            self.sciencevox.append(arr)
-                    
+            for j in range(len(DoomMixer.vox[i])):
+                array = []
+                for k in range(len(DoomMixer.vox[i][j])):
+                    array.append(pygame.mixer.Sound(DoomMixer.vox[i][j][k]))
+                arr.append(array)
+            self.vox.append(arr)
+                                       
         for i in range(len(DoomMixer.roomsources)):
             self.roomsnd.append(pygame.mixer.Sound(DoomMixer.roomsources[i]))
            
@@ -67,8 +72,20 @@ class DoomMixer:
         pygame.mixer.music.play(-1)
 
     def play_room(self, floor, room_id):
-        self.room_snd[room_id].play()
+         self.roomsnd[room_id].play()
        
+    def entity_hello(self, id, x, y, sprite, character):
+        #sprite = (0, 1, 2)
+        #scientist, igor, client
+        self.peeps[id] = (sprite, character);
+        self.vox[sprite][character][0].play()
+        
+    def entity_bye(self, id): 
+        sprite = self.peeps[id][0]
+        character = self.peeps[id][1]
+        self.vox[sprite][character][1].play()
+        peeps.pop(id)
+         
 
     # play new background music, current track faded out or cut
     def playbgm(self, title, sharp = True):
