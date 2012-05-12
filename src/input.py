@@ -9,6 +9,16 @@ hire = pygame.image.load('img/GUI_Hire.png')
 buildhire_btn = pygame.image.load('img/BuildHireButtons.png')
 footer = pygame.image.load('img/GUI_Footer.png')
 shadow = pygame.image.load('img/Shadow.png')
+build_img = pygame.image.load('img/BuildList.png')
+build_out = []
+for i in range(7):
+    build_out.append(build_img.subsurface(pygame.Rect(0,128*i,320,128)))
+build_over = build_out
+hire_img = pygame.image.load('img/HireList.png')
+hire_out = []
+for i in range(10):
+    hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
+hire_over = hire_out
 
 class Input:
     def __init__(self, window, event_manager, render):
@@ -45,10 +55,12 @@ class Input:
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
         self.widgets.append(self.footer)
         
-        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, event_manager, open_event="open_build", open = False)
+        build_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), build, interface_btn, build_out, build_over,
+                                  event_manager, open_event="open_build", open = False)
         self.widgets.extend(build_popup.widgets)
         
-        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, event_manager, open_event="open_hire", open = False)
+        hire_popup = PopupWindow(pygame.Rect(20, 20, 384, 384), hire, interface_btn, hire_out, hire_over,
+                                 event_manager, open_event="open_hire", open = False)
         self.widgets.extend(hire_popup.widgets)
         
         self.window_resize(self.window.get_size())
@@ -272,13 +284,30 @@ class Static(Widget):
             return None
 
 class PopupWindow:
-    def __init__(self, rect, window_sprite, close_sprite, event_manager, open_event = None, open = False):
+    def __init__(self, rect, window_sprite, close_sprite, out_sprites, over_sprites, event_manager, open_event = None, open = False):
         self.widgets = list()
         self.widgets.append(Button(pygame.Rect(rect.right-49,rect.top+10,39,28),
                                    out=close_sprite.subsurface(pygame.Rect(0,0,39,28)),
                                    over=close_sprite.subsurface(pygame.Rect(39,0,39,28)),
                                    on_press=self.close))
+        self.widgets.append(Button(pygame.Rect(rect.right-49,rect.top+98,39,28),
+                                   out=close_sprite.subsurface(pygame.Rect(0,28,39,28)),
+                                   over=close_sprite.subsurface(pygame.Rect(39,28,39,28)),
+                                   on_press=self.up))
+        self.widgets.append(Button(pygame.Rect(rect.right-49,rect.bottom-43,39,28),
+                                   out=close_sprite.subsurface(pygame.Rect(0,56,39,28)),
+                                   over=close_sprite.subsurface(pygame.Rect(39,56,39,28)),
+                                   on_press=self.down))
         self.widgets.append(DragBar(pygame.Rect(rect.left, rect.top, rect.width, settings.DRAGBAR_HEIGHT), self))
+        self.firstBuild = Button(pygame.Rect(rect.left+10, rect.top+98, 320, 128),
+                                 over=out_sprites[0], out=out_sprites[0])
+        self.secondBuild = Button(pygame.Rect(rect.left+10, rect.top+226, 320, 128),
+                                 over=out_sprites[1], out=out_sprites[1])
+        self.widgets.append(self.firstBuild)
+        self.widgets.append(self.secondBuild)
+        self.over_sprites = out_sprites
+        self.out_sprites = out_sprites
+        self.scroll = 0
         self.widgets.append(Static(rect, window_sprite))
         self.set_open(open)
         self.event_manager = event_manager
@@ -295,6 +324,22 @@ class PopupWindow:
     def close(self):
         self.set_open(False)
         self.event_manager.notify(self.open_event, False)
+    
+    def up(self):
+        if self.scroll > 0:
+            self.scroll = self.scroll - 1
+            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
+            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
+            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
+            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
+    
+    def down(self):
+        if self.scroll + 2 < min(len(self.over_sprites),len(self.out_sprites)):
+            self.scroll = self.scroll + 1
+            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
+            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
+            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
+            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
     
     def open(self):
         self.set_open(True)

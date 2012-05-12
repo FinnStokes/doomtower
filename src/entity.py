@@ -1,5 +1,11 @@
 import settings, random, path, math
+client_patience = []
+client_requests = []
 
+#Set the patience and potential requests for each client
+for i in range(10):
+    client_patience.append(20)
+    client_requests.append({settings.ROOM_BOOM:0.5, settings.ROOM_BIO:0.5, settings.ROOM_COSMO:0, settings.ROOM_PSYCH:0, settings.ROOM_INFO: 0})
 class Manager:
     def __init__(self, event, building):
         self.event = event
@@ -101,6 +107,7 @@ class Client(Entity):
         Entity.__init__(self, event, id, x, floor, 2, character, building)
         self.state = "wait_meeting"
         self.progress = 0
+        self.character = character
     
     def update(self, dt):
         Entity.update(self, dt)
@@ -110,24 +117,27 @@ class Client(Entity):
             if self.building.get_room(self.y) == settings.ROOM_MEETING:
                 self.state = "meeting"
                 self.progress = 0
-            elif self.progress > 20:
+            elif self.progress > client_patience[self.character]:
                 self.state = "leaving"
                 self.progress = 0
                 self.event.notify("input_move", self.id, 0)
         elif self.state == "meeting":
-            if self.progress > 20:
+            if self.progress > client_patience[self.character]:
                 self.state = "wait_manufacture"
                 self.progress = 0
         elif self.state == "wait_manufacture":
             if self.building.get_room(self.y) == settings.ROOM_BOOM:
                 self.state = "manufacture"
                 self.progress = 0
-            elif self.progress > 20:
+            elif self.progress > client_patience[self.character]:
                 self.state = "leaving"
                 self.progress = 0
                 self.event.notify("input_move", self.id, 0)
         elif self.state == "manufacture":
-            if self.progress > 20:
+            if self.building.get_room(self.y) != settings.ROOM_BOOM:
+                self.state = "wait_manufacture"
+            if self.progress > settings.MANUFACTURE_TIME:
+                self.event.notify("entity_carrying", self.id, True)
                 self.state = "leaving"
                 self.progress = 0
                 self.event.notify("input_move", self.id, 0)

@@ -259,8 +259,8 @@ class Render:
         #else:
             #raise ValueError("Invalid entity id.")
     
-    def entity_carrying(self, carrying_value):
-        self.entities[id] = carrying_value
+    def entity_carrying(self, id, carrying_value):
+        self.entities[id].carrying = carrying_value
     
     def entity_in_elevator(self, entity_id, elevator_id):
         if entity_id in self.entities:
