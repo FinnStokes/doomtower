@@ -105,6 +105,7 @@ class Render:
             y_offset = screen_height + self.y_pan - (self.room_height+self.room_padding)*(i+1)
             if room_id in range (0,len(room_images)):
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
+                self.window.blit(background_image, (x_offset-40,y_offset))
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
