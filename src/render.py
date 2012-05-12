@@ -78,7 +78,7 @@ class Render:
                 entity.sub_rect = pygame.Rect(subcol*entity.subwidth, subrow*entity.subheight, entity.subwidth, entity.subheight)
                 
     def draw(self): # render current game state
-        self.window.fill((0,0,0))
+        self.window.fill((196,207,255))
         screen_width, screen_height = self.window.get_size()
         if self.pan_speed > 0:
             if self.y_target - self.y_pan < self.pan_speed:
