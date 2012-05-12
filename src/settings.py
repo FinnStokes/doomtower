@@ -34,7 +34,8 @@ SKY_COLOUR = (196,207,255)
 GROUND_COLOUR = (115,57,0)
 GROUND_HEIGHT = 96
 
-# Time taken to manufacture the weapon
+# Time taken for stages of process
+MEETING_TIME = 10
 MANUFACTURE_TIME = 5
 
 # Room IDs

@@ -107,7 +107,17 @@ class Client(Entity):
         Entity.__init__(self, event, id, x, floor, 2, character, building)
         self.state = "wait_meeting"
         self.progress = 0
+        self.event = event
         self.character = character
+        self.request = -1
+        rand = random.random()
+        for room, chance in client_requests[character].items():
+            if rand < chance:
+                self.request = room
+                break
+            else:
+                rand -= chance
+        print self.request
     
     def update(self, dt):
         Entity.update(self, dt)
@@ -115,37 +125,36 @@ class Client(Entity):
         
         if self.state == "wait_meeting":
             if self.building.get_room(self.y) == settings.ROOM_MEETING:
-                self.state = "meeting"
-                self.progress = 0
+                self.set_state("meeting")
             elif self.progress > client_patience[self.character]:
-                self.state = "leaving"
-                self.progress = 0
+                self.set_state("leaving")
                 self.event.notify("input_move", self.id, 0)
         elif self.state == "meeting":
-            if self.progress > client_patience[self.character]:
-                self.state = "wait_manufacture"
-                self.progress = 0
+            if self.building.get_room(self.y) != settings.ROOM_MEETING:
+                self.set_state("wait_meeting")
+            elif self.progress > settings.MEETING_TIME:
+                self.set_state("wait_manufacture")
         elif self.state == "wait_manufacture":
-            if self.building.get_room(self.y) == settings.ROOM_BOOM:
-                self.state = "manufacture"
-                self.progress = 0
+            if self.building.get_room(self.y) == self.request:
+                self.set_state("manufacture")
             elif self.progress > client_patience[self.character]:
-                self.state = "leaving"
-                self.progress = 0
+                self.set_state("leaving")
                 self.event.notify("input_move", self.id, 0)
         elif self.state == "manufacture":
-            if self.building.get_room(self.y) != settings.ROOM_BOOM:
-                self.state = "wait_manufacture"
+            if self.building.get_room(self.y) != self.request:
+                self.set_state("wait_manufacture")
             if self.progress > settings.MANUFACTURE_TIME:
-                self.event.notify("entity_carrying", self.id, True)
-                self.state = "leaving"
-                self.progress = 0
+                self.set_state("satisfied")
                 self.event.notify("input_move", self.id, 0)
-        elif self.state == "leaving":
+        elif self.state in ("leaving", "satisfied"):
             if self.y == 0 and math.fabs(self.x - 0.5) < 0.01:
-                self.state = "left"
-                self.progress = 0
+                self.set_state("left")
                 self.event.notify("remove_entity", self.id)
+
+    def set_state(self, state):
+        self.state = state
+        self.event.notify("set_entity_state", self.id, state)
+        self.progress = 0
 
 class Scientist(Entity):
     def __init__(self, event, id, character, x, floor, building):

@@ -24,13 +24,13 @@ class DoomMixer:
                        [['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
                         ['snd/dextergreeting.ogg', 'snd/dexterfarewell.ogg'],
                         ['snd/browngreeting.ogg', 'snd/brownfarewell.ogg'],   
-                        ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
-                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
-                        ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
+                        ['snd/evilgreeting.ogg', 'snd/evilfarewell.ogg'],
+                        ['snd/rustygreeting.ogg', 'snd/rustyfarewell.ogg'],
+                        ['snd/jonasgreeting.ogg', 'snd/jonasfarewell.ogg'],
                         ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
                         ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
                         ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg'],  
-                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]                     
+                        ['snd/nogreeting.ogg', 'snd/nofarewell.ogg']]                     
           ]    
     
     roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics', 'snd/meeting.ogg']
