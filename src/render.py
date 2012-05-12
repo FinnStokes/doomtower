@@ -220,7 +220,7 @@ class Render:
         if(elevator_id >= 0):
             if entity.y in range(len(self.rooms)):
                 self.get_room(entity.y).entities.discard(entity)
-        entity[entity_id].elevator = elevator_id
+        entity.elevator = elevator_id
         
 
     def new_elevator(self, id, left, floors, y): 
