@@ -432,6 +432,7 @@ class Entity(Widget):
         event_manager.register("update", self.update)
         event_manager.register("delete_entity", self.delete_entity)
         event_manager.register("entity_in_elevator", self.entity_in_elevator)
+        event_manager.register("set_entity_state", self.set_state)
     
     def update_entity(self, id, x, y):
         if self.entity_id == id:
@@ -442,6 +443,8 @@ class Entity(Widget):
             event_manager.deregister("update_entity", self.update_entity)
             event_manager.deregister("update", self.update)
             event_manager.deregister("delete_entity", self.delete_entity)
+            event_manager.deregister("entity_in_elevator", self.entity_in_elevator)
+            event_manager.deregister("set_entity_state", self.set_state)
     
     def entity_in_elevator(self, id, elevator):
         if self.entity_id == id:
@@ -452,6 +455,12 @@ class Entity(Widget):
                 self.enabled = False
                 self.visible = False
                 self.dragging = False
+
+    def set_state(self, id, state):
+        if self.entity_id == id and state in ("leaving", "satisfied"):
+            self.enabled = False
+            self.visible = False
+            self.dragging = False
                 
     
     def update(self, dt):
