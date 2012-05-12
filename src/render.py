@@ -13,6 +13,7 @@ room_images.append(pygame.image.load('img/Floor_Info.png'))
 room_images.append(pygame.image.load('img/Floor_Meeting.png'))
 mini_map_image = pygame.image.load('img/MiniMap.png')
 background_image = pygame.image.load('img/Building.png')
+roof_image = pygame.image.load('img/Roof.png')
 entity_images = []
 entity_images.append(pygame.image.load('img/Scientist.png'))
 entity_images.append(pygame.image.load('img/Igor.png'))
@@ -48,7 +49,7 @@ class Render:
         self.window = window
         self.rooms = []
         self.elevators = dict()
-        self.y_pan = 0
+        self.y_pan = -120
         self.y_target = 0
         self.pan_speed = 0
         self.room_width = 704
@@ -124,6 +125,8 @@ class Render:
             if room_id in range (0,len(room_images)):
                 self.window.blit(room_images[room_id], (x_offset,y_offset))
                 self.window.blit(background_image, (x_offset-40,y_offset))
+            if i == self.building_height:
+                self.window.blit(roof_image, (x_offset-40,y_offset-34))
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
