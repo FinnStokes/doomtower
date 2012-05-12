@@ -24,16 +24,20 @@ class Manager:
         wage = settings.SCIENTIST_COSTS[character]
         if self.building.get_funds() >= wage:
             self.building.spend_funds(wage)
-            e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
+            self.entities[self.nextId] = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
+        else:
+            self.event.notify("insufficient_funds")
     
     def create_igor(self):
         wage = settings.IGOR_COST
         if self.building.get_funds() >= wage:
             self.building.spend_funds(wage)
-            e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
+            self.entities[self.nextId] = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
-        
+        else:
+            self.event.notify("insufficient_funds")
+  
     def entity_count(self, room, type):
         count = 0
         for entity in self.entities:
@@ -41,7 +45,7 @@ class Manager:
                 if self.entities[entity].y == room:
                     count += 1
         return count
-        
+
 class Entity:
     def __init__(self, event, id, x, floor, type, character, building, wage):
         self.id = id

@@ -17,8 +17,9 @@ class Building:
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, bottom-top
         self.building_graph = path.Graph()
-        self.funds = settings.STARTING_FUNDS
+        self.funds = settings.STARTING_FUNDS    
         self.event.notify("update_funds", self.funds)
+        self.upkeep_timer = 0
  
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
             self.building_graph.addNode(i*3)
@@ -36,7 +37,7 @@ class Building:
 
         # fill building with empty floors
         for i in range(numfloors):
-            self.floors.append(Room()) 
+            self.floors.append(Room(self.event)) 
             self.event.notify("new_room")
 
         # add lobby at ground floor
@@ -51,8 +52,14 @@ class Building:
         for i in range(len(self.lifts[1])):
             self.lifts[1][i].move(dt)
     #   Rooms
+        self.upkeep_timer += dt
+        upkeep = 0
         for i in range(len(self.floors)):
             self.floors[i].operate(dt)
+            upkeep += settings.ROOM_UPKEEP[self.floors[i].room_id]
+        if upkeep > 0 and self.upkeep_timer > settings.UPKEEP_PERIOD:
+            self.spend_funds(upkeep)
+            self.upkeep_timer -= settings.UPKEEP_PERIOD
 
         pass # update elevator position and room actions
     
@@ -70,7 +77,7 @@ class Building:
                 self.spend_funds(settings.ROOM_COSTS[room_id])
                 floor_index = floor-settings.BOTTOM_FLOOR
                 self.event.notify('update_room', floor_index, room_id)
-                self.floors[floor_index] = Room(room_id)
+                self.floors[floor_index] = Room(self.event, room_id)
             else:
                 self.event.notify("insufficient_funds")
  
@@ -247,7 +254,8 @@ class Room:
                      'meeting': [1000, 100, 300]
     }       
 
-    def __init__(self, room_id = 0, size = 1):
+    def __init__(self, event, room_id = 0, size = 1):
+        self.event = event
         self.room_id = room_id
         self.size = size
         self.jobs = []
@@ -258,3 +266,4 @@ class Room:
     def produce(self, product):
         if products[product] == self.room_id:
             self.jobs.append(product)
+

@@ -43,9 +43,22 @@ ROOM_PAYS = [ 0,
     500, # INFO
     0, # MEETING
 ]
+ROOM_UPKEEP = [ 0,
+    0, # LOBBY
+    0, # WAITING
+    1000, # BIO
+    500, # BOOM
+    2000, # COSMO
+    500, # PSYCH
+    100, # INFO
+    0, # MEETING
+]
 
 # Period of staff wages (secs)
 WAGE_PERIOD = 30
+
+# Period of room upkeep costs (secs)
+UPKEEP_PERIOD = 60
 
 # The number of seconds spent on each frame of the animation
 ANIMATION_TIME = 0.2
