@@ -21,7 +21,7 @@ for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
 # font
-font = pygame.font.Font("font/varsity.ttf", 24)
+font = pygame.font.Font("font/8-bit_wonder.ttf", 27)
 build_ids = [2,3,4,5,6,7,8]
 updown_img = pygame.image.load('img/UpDown.png')
 updown_out = []
@@ -62,7 +62,7 @@ class Input:
         self.widgets.append(self.build_btn)
         
         self.funds = Text(pygame.Rect(100, 0, 0, 0), font, "")
-        event_manager.register("update_funds", lambda x: self.funds.setText(str(x)))
+        event_manager.register("update_funds", self.update_funds)
         self.widgets.append(self.funds)
     
         self.footer = Static(pygame.Rect(0, 0, 384, 64), footer)
@@ -83,6 +83,12 @@ class Input:
         self.room_id = 0
         
         self.window_resize(self.window.get_size())
+    
+    def update_funds(self, funds):
+        funds_str = str(funds)
+        if funds >= 1000:
+            funds_str = str(funds // 1000) + ' %(x)03d' % {'x':(funds % 1000)}
+        self.funds.setText(funds_str)
     
     def window_resize(self, size):
         self.footer.rect.bottom = size[1]
@@ -333,7 +339,7 @@ class Text(Widget):
     
     def setText(self, text):
         self.text = text
-        self.__sprite = font.render(text, True, (255, 255, 255))
+        self.__sprite = font.render(text, False, (255, 255, 255))
     
     def sprite(self):
         if self.visible:
