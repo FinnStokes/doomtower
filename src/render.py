@@ -34,6 +34,7 @@ class Render:
         self.event.register("new_entity", self.new_entity)
         self.event.register("remove_entity", self.remove_entity)
         self.event.register("update_entity", self.update_entity)
+        self.event.register("entity_carrying", self.entity_carrying)
         self.event.register("new_elevator", self.new_elevator)
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
@@ -76,6 +77,8 @@ class Render:
                 col += entity.anim_length
                 if entity.character >= 0:
                     subcol += 1
+            if entity.carrying:
+                row += 2
             entity.main_rect = pygame.Rect(col*entity.width, row*entity.height, entity.width, entity.height)
             if entity.character >= 0:
                 entity.sub_rect = pygame.Rect(subcol*entity.subwidth, subrow*entity.subheight, entity.subwidth, entity.subheight)
@@ -96,10 +99,13 @@ class Render:
                 self.y_pan += self.pan_speed
         # Draw ground and sky backgrounds
         if self.y_pan < -settings.GROUND_HEIGHT-screen_height:
+            # Entirely underground
             self.window.fill(settings.GROUND_COLOUR)
         else:
+            # Sky Background
             self.window.fill(settings.SKY_COLOUR)
             if self.y_pan < settings.GROUND_HEIGHT:
+                # If on screen, ground at bottom
                 self.window.fill(settings.GROUND_COLOUR, pygame.Rect(0,screen_height+self.y_pan-settings.GROUND_HEIGHT,screen_width, settings.GROUND_HEIGHT-self.y_pan))
         
         x_offset = (screen_width-self.room_width)/2
@@ -139,14 +145,13 @@ class Render:
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -self.room_width), 
                               screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
+            liftx = x_offset -2-42
+            lifty = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)
             # Draws Elevator Pulley
-            self.window.blit(elevator.sprite_pulley,
-                              (x_offset -2-42, 
-                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)),
-                              (0, 0, 42, 40))
+            self.window.blit(elevator.sprite_pulley, (liftx, lifty), (0, 0, 42, 40))
             # Draws Elevator Ropes
-            #self.window.blit(elevator.sprite_rope,
-            #                  (sx, sy), (x, y, w, h))
+            self.window.blit(elevator.sprite_rope, (liftx+42-10, lifty+40), (0, 0, 10, 10))
+            self.window.blit(elevator.sprite_rope, (liftx, lifty+40), (0, 0, 10, 10))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -173,13 +178,14 @@ class Render:
                 self.pan_speed = -(self.room_height/settings.SCROLL_TIME)
         elif floor_height + self.room_height > self.y_pan + screen_height:
             #scroll up
-            self.y_target = floor_height + self.room_height + 2*self.room_padding - screen_height
+            self.y_target = floor_height + self.room_height + self.room_padding - screen_height
             self.pan_speed = (self.y_target - self.y_pan)/settings.SCROLL_TIME
             if self.pan_speed < (self.room_height/settings.SCROLL_TIME):
                 self.pan_speed = (self.room_height/settings.SCROLL_TIME)
         else:
             #stop scrolling
             self.y_target = self.y_pan
+
     def step_screen(self, up):
         screen_width, screen_height = self.window.get_size()
         if up:
@@ -225,24 +231,28 @@ class Render:
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
-            oldx = self.entities[id].x
-            oldy = self.entities[id].y
+            entity = self.entities[id]
+            oldx = entity.x
+            oldy = entity.y
             if oldy in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-                self.get_room(oldy).entities.discard(self.entities[id])
+                self.get_room(oldy).entities.discard(entity)
             if y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
-                self.get_room(y).entities.add(self.entities[id])
+                self.get_room(y).entities.add(entity)
             if x < oldx:
-                self.entities[id].face_left = True
-                self.entities[id].walking = True
+                entity.face_left = True
+                entity.walking = True
             elif x > oldx:
-                self.entities[id].face_left = False
-                self.entities[id].walking = True
+                entity.face_left = False
+                entity.walking = True
             else:
-                self.entities[id].walking = False
-            self.entities[id].x = x
-            self.entities[id].y = y
+                entity.walking = False
+            entity.x = x
+            entity.y = y
         else:
             raise ValueError("Invalid entity id.")
+    
+    def entity_carrying(self, carrying_value):
+        self.entities[id] = carrying_value
     
     def entity_in_elevator(self, entity_id, elevator_id):
         if entity_id in self.entities:
@@ -279,6 +289,7 @@ class Room:
 
 class Entity:
     def __init__(self, sprite_id, character_id, x_coord, y_coord):
+        self.carrying = False
         self.sprite = None
         self.width = 100
         self.height = 160
