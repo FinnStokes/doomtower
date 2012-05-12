@@ -66,15 +66,16 @@ class Building:
             self.next_down = self.next_down - 1
 
         if floor in range(settings.BOTTOM_FLOOR,settings.TOP_FLOOR):
-            floor_index = floor-settings.BOTTOM_FLOOR
-            self.event.notify('update_room', floor_index, room_id)
-            self.floors[floor_index] = Room(room_id)
+            if self.get_funds() >= settings.ROOM_COSTS[room_id]:
+                self.spend_funds(settings.ROOM_COSTS[room_id])
+                floor_index = floor-settings.BOTTOM_FLOOR
+                self.event.notify('update_room', floor_index, room_id)
+                self.floors[floor_index] = Room(room_id)
  
     def demolish_room(self, floor):
         floor_index = floor - settings.BOTTOM_FLOOR
         self.floors[floor_index] = Room()
     
-
     def get_room(self, floor):
         floor_index = floor-settings.BOTTOM_FLOOR
         return self.floors[floor_index].room_id
