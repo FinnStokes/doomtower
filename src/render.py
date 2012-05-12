@@ -42,6 +42,7 @@ class Render:
         self.event.register("update_elevator", self.update_elevator)
         self.event.register("entity_in_elevator", self.entity_in_elevator)
         self.event.register("set_entity_state", self.set_entity_state)
+        self.event.register("set_entity_request", self.set_entity_request)
         self.building_height = 0
         self.building_depth = 0
         self.window = window
@@ -133,7 +134,7 @@ class Render:
                                      (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
                 # Draw Scientist Thought
-                if entity.thought > 0:
+                if entity.thought >= 0:
                     self.window.blit(thought_image,
                                      (x_offset + entity.x*(self.room_width-settings.ENTITY_WIDTH),
                                      y_offset + self.room_height - entity.height - 90),
@@ -218,6 +219,7 @@ class Render:
                 self.pan_screen(bottom_room - 1)
             else:
                 self.pan_screen(bottom_room)
+                
     def new_room(self):
         self.rooms.append(Room())
 
@@ -286,7 +288,25 @@ class Render:
             entity.elevator = elevator_id
         
     def set_entity_state(self, entity_id, state):
-        print state
+        if entity_id in self.entities:
+            entity = self.entities[entity_id]
+            
+            if state == "meeting": 
+                entity.thought = 0
+            elif state == "leaving":
+                entity.thought = 7
+            elif state == "satisfied":
+                entity.carrying = True
+            elif state == "wait_manufacture":
+                pass
+            else:
+                entity.thought = -1
+                
+    def set_entity_request(self, entity_id, request):
+        if entity_id in self.entities:
+            entity = self.entities[entity_id]
+            if request in range(3,7):
+                entity.thought = request - 2
     def new_elevator(self, id, left, floors, y): 
         # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
         self.elevators[id] = Elevator(left, y, floors)
@@ -329,7 +349,7 @@ class Entity:
         self.elevator = -1
         self.x = x_coord
         self.y = y_coord
-        self.thought = 0
+        self.thought = -1
 
 class Elevator:
     def __init__(self, left, y, floors):
