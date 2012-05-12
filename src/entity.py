@@ -80,9 +80,10 @@ class Client(Entity):
         Entity.__init__(self, event, id, x, floor, 2, character, building)
         self.state = "wait_meeting"
         self.progress = 0
-        event.register("update", self.update)
     
     def update(self, dt):
+        Entity.update(self, dt)
+        
         self.progress += dt
         if self.state == "wait_meeting" and self.progress > 10:
             self.state = "left"
