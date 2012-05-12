@@ -118,6 +118,13 @@ class Input:
             del self.pressed[button]
     
     def draw(self):
+        screen_width, screen_height = self.window.get_size()
+        # Draw bottom panel of HUD
+        self.window.fill(settings.BOTTOM_PANEL_COLOUR, pygame.Rect(0,
+            screen_height - settings.BOTTOM_PANEL_HEIGHT,
+            screen_width,
+            screen_height))
+        
         for widget in reversed(self.widgets):
             sprite = widget.sprite()
             if sprite:
