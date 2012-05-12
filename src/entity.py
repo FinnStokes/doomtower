@@ -25,6 +25,8 @@ class Manager:
             self.building.spend_funds(wage)
             e = Scientist(self.event, self.nextId, character, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
+        else:
+            self.event.notify("insufficient_funds")
     
     def create_igor(self):
         wage = settings.IGOR_COST
@@ -32,6 +34,8 @@ class Manager:
             self.building.spend_funds(wage)
             e = Igor(self.event, self.nextId, settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, wage)
             self.nextId = self.nextId + 1
+        else:
+            self.event.notify("insufficient_funds")
 
 class Entity:
     def __init__(self, event, id, x, floor, sprite, character, building, wage):
