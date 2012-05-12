@@ -64,6 +64,8 @@ class Render:
             if anim_step:
                 entity.anim_frame = (entity.anim_frame + 1)%entity.anim_length
             col += entity.anim_frame
+            if entity.walking:
+                row += 1
             if entity.face_left:
                 col += entity.anim_length
                 if entity.character >= 0:
@@ -194,8 +196,12 @@ class Render:
                 self.get_room(y).entities.add(self.entities[id])
             if x < oldx:
                 self.entities[id].face_left = True
+                self.entities[id].walking = True
             elif x > oldx:
                 self.entities[id].face_left = False
+                self.entities[id].walking = True
+            else:
+                self.entities[id].walking = False
             self.entities[id].x = x
             self.entities[id].y = y
         else:
@@ -236,5 +242,6 @@ class Entity:
         self.face_left = True
         self.anim_frame = 0
         self.anim_length = 2
+        self.walking = False
         self.x = x_coord
         self.y = y_coord
