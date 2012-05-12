@@ -3,6 +3,7 @@ class Event():
         self.handlers = dict()
         self.added =[]
         self.removed = []
+        self.events = []
 
     def register(self, event, handler):
         self.added.append((event, handler))
@@ -16,6 +17,9 @@ class Event():
         return self
 
     def notify(self, event, *args, **kargs):
+        self.events.append((event, args, kargs))
+    
+    def update(self):
         # add handlers
         for a in self.added:
             if not a[0] in self.handlers:
@@ -29,10 +33,11 @@ class Event():
                 raise ValueError("Handler is not handling this event, so cannot deregister it.")
         self.removed = []
         # Send events
-        if event in self.handlers:
-            for handler in self.handlers[event]:
-                handler(*args, **kargs)
-
+        for e in self.events:
+            if e[0] in self.handlers:
+                for handler in self.handlers[e[0]]:
+                    handler(*e[1], **e[2])
+        self.events = []
 
 # update(dt)
 # This event should be produced periodically with dt set to the time in seconds since it was last produced.
@@ -88,11 +93,12 @@ class Event():
 # This event should be produced when an entity is removed.
 # Render should react by deleting the relevant graphic.
 
-# update_entity(id, x, y)
+# update_entity(id, x, y, carrying)
 # This event should be produced when an entity changes position.
 #  The integer id should be the unique identifier amongst entities.
 #  The float x should indicate how far across the building the entity is (0 = left wall, 1 = right wall).
 #  The integer y should indicate what floor the entity is on.
+#  The boolean carrying should be if the entity is carrying.
 # Render should react by moving the entity graphic.
 
 # entity_in_elevator(entity_id, elevator_id)

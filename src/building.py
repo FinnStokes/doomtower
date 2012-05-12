@@ -63,7 +63,12 @@ class Building:
         floor_index = floor-settings.BOTTOM_FLOOR
         self.event.notify('update_room', floor_index, room_id)
         self.floors[floor_index] = Room(room_id)
+ 
+    def demolish_room(self, floor):
+        floor_index = floor - settings.BOTTOM_FLOOR
+        self.floors[floor_index] = Room()
     
+
     def get_room(self, floor):
         floor_index = floor-settings.BOTTOM_FLOOR
         return self.floors[floor_index].room_id
@@ -86,7 +91,14 @@ class Building:
                  
 
     def remove_elevator(self, left, index):
-        pass
+        side = int(not left)
+        elevator = self.lifts[side][index]
+
+        #remove edges associated with elevator from building_graph
+        for i in range(len(elevator.floors)):
+            self.building_graph.removeEdge(floors[i]*3 + side*2,   floors[i+1]*3 + side*2)
+            self.building_graph.removeEdge(floors[i+1]*3 + side*2, floors[i]*3 + side*2)
+
 
 
     #gets elevator servicing given floor on given side of building       
