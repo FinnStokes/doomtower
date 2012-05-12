@@ -145,14 +145,13 @@ class Render:
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -self.room_width), 
                               screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
+            liftx = x_offset -2-42
+            lifty = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)
             # Draws Elevator Pulley
-            self.window.blit(elevator.sprite_pulley,
-                              (x_offset -2-42, 
-                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)),
-                              (0, 0, 42, 40))
+            self.window.blit(elevator.sprite_pulley, (liftx, lifty), (0, 0, 42, 40))
             # Draws Elevator Ropes
-            #self.window.blit(elevator.sprite_rope,
-            #                  (sx, sy), (x, y, w, h))
+            self.window.blit(elevator.sprite_rope, (liftx+42-10, lifty+40), (0, 0, 10, 10))
+            self.window.blit(elevator.sprite_rope, (liftx, lifty+40), (0, 0, 10, 10))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
