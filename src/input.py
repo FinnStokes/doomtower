@@ -16,7 +16,7 @@ for i in range(7):
 build_over = build_out
 hire_img = pygame.image.load('img/HireList.png')
 hire_out = []
-for i in range(10):
+for i in range(11):
     hire_out.append(hire_img.subsurface(pygame.Rect(0,128*i,320,128)))
 hire_over = hire_out
 
@@ -141,7 +141,10 @@ class Input:
                     self.widgets.remove(widget)
 
     def hire(self, staff_id):
-        self.event.notify("create_scientist")
+        if staff_id == 10:
+            self.event.notify("create_igor")
+        else:
+            self.event.notify("create_scientist", staff_id)
 
     def build(self, room_id):
         pass
