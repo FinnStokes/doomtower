@@ -175,7 +175,7 @@ class Render:
         if y in range(len(self.rooms)):
             self.get_room(y).entities.add(self.entities[id])
     
-    def remove_entity(self, id): # create entity with given sprite at given position
+    def remove_entity(self, id): # remove entity with given id
         if id in self.entities:
             y = self.entities[id].y
             if y in range(len(self.rooms)):
