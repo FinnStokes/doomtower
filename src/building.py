@@ -26,7 +26,6 @@ class Building:
         for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
             self.building_graph.addEdge(i*2,     i*2 + 1, 1)
             self.building_graph.addEdge(i*2 + 1, i*2,     1)
-            print "added link from "+repr(i*2)+" to "+repr(i*2 + 1)
 
         # fill building with empty floors
         for i in range(numfloors):
@@ -59,6 +58,10 @@ class Building:
         floor_index = floor-settings.BOTTOM_FLOOR
         self.event.notify('update_room', floor_index, room_id)
         self.floors[floor_index] = Room(room_id)
+    
+    def get_room(self, floor):
+        floor_index = floor-settings.BOTTOM_FLOOR
+        return self.floors[floor_index].room_id
 
     def build_elevator(self, left, floors):
         side = int(not left)
@@ -75,7 +78,6 @@ class Building:
         for i in range(len(floors)-1):
             self.building_graph.addEdge(floors[i]*2 + side,   floors[i+1]*2 + side, abs(floors[i] - floors[i+1])+0.1)
             self.building_graph.addEdge(floors[i+1]*2 + side, floors[i]*2 + side,   abs(floors[i] - floors[i+1])+0.1)
-            print "added link from "+repr(floors[i]*2 + side)+" to "+repr(floors[i+1]*2 + side)
                  
 
     def remove_elevator(self, left, index):
@@ -112,6 +114,8 @@ class Elevator:
         self.pickups = []
      #   self.ascending = True
         self.moving = False
+        self.occupied = False
+        self.target = 0
 
     # calculate distance from given floor
     def distance_from(self, floor):
@@ -132,22 +136,51 @@ class Elevator:
         if not self.moving:
             return None
  
-        dest = self.pickups[0]
-
-        if self.y != dest:
-            distance = self.distance_from(dest)
-            self.y = self.y + Elevator.lift_speed * dt * (distance / abs(distance))
-            pass
+        if self.occupied:
+            dest = self.target
         else:
-            self.pickups.pop(0)
+            dest = self.pickups[0]
+        
+        deltay = Elevator.lift_speed * dt
+        if deltay <= abs(dest - self.y):
+            distance = self.distance_from(dest)
+            self.y = self.y - deltay * (distance / abs(distance))
+        else:
+            if not self.occupied:
+                self.pickups.pop(0)
+            self.y = dest
             self.open_doors()
+        self.event.notify("update_elevator", self.id, self.y)
 
     # when elevator reaches a requested floor it must stop and allow ingress/egress
     def open_doors(self):
         self.moving = False
-        self.event.notify("elevator_open", self.y)
+        self.event.notify("elevator_open", self.id, self.y)
     
+    def occupy(self, target):
+        if not self.occupied:
+            self.occupied = True
+            self.target = target
+            self.moving = True
+            return True
+        else:
+            return False
+    
+    def exit(self):
+        if self.occupied:
+            self.occupied = False
+            if len(self.pickups) > 0:
+                self.moving = True
 
+# room_id
+# 0 - Lobby
+# 1 - Waiting
+# 2 - Bio
+# 3 - Boom
+# 4 - Cosmo
+# 5 - Psych
+# 6 - Info
+# 7 - Meeting
 class Room:
     #product types
     products = {'time_bomb': 'boom',
@@ -175,7 +208,7 @@ class Room:
                      'meeting': [1000, 100, 300]
     }       
 
-    def __init__(self, room_id = 'empty', size = 1):
+    def __init__(self, room_id = 0, size = 1):
         self.room_id = room_id
         self.size = size
         self.jobs = []

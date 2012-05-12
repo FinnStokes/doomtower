@@ -19,6 +19,7 @@ entity_subimages = []
 entity_subimages.append(pygame.image.load('img/Scientist-Heads.png'))
 entity_subimages.append(None)
 entity_subimages.append(pygame.image.load('img/MadScientist-Heads.png'))
+elevator_sprite = pygame.image.load('img/Lift.png').subsurface(pygame.Rect(0,0,96,197))
 class Render:
     def __init__(self, window, event_manager):
         self.event = event_manager
@@ -33,11 +34,12 @@ class Render:
         self.event.register("new_elevator", self.new_elevator)
         self.event.register("remove_elevator", self.remove_elevator)
         self.event.register("update_elevator", self.update_elevator)
-        
+        self.event.register("entity_in_elevator", self.entity_in_elevator)
         self.building_height = 0
         self.building_depth = 0
         self.window = window
         self.rooms = []
+        self.elevators = dict()
         self.y_pan = 0
         self.y_target = 0
         self.pan_speed = 0
@@ -111,6 +113,11 @@ class Render:
                     self.window.blit(entity.subsprite,
                                      (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
+        
+        for elevator in self.elevators.itervalues():
+            self.window.blit(elevator.sprite,
+                             (x_offset - (elevator.width if elevator.left else -704), 
+                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -208,14 +215,24 @@ class Render:
         else:
             raise ValueError("Invalid entity id.")
     
-    def new_elevator(self, id, left, floors, y):
-        pass # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
+    def entity_in_elevator(self, entity_id, elevator_id):
+        entity = self.entities[entity_id]
+        if(elevator_id >= 0):
+            if entity.y in range(len(self.rooms)):
+                self.get_room(entity.y).entities.discard(entity)
+        entity[entity_id].elevator = elevator_id
+        
+
+    def new_elevator(self, id, left, floors, y): 
+        # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)
+        self.elevators[id] = Elevator(left, y)
     
     def remove_elevator(self, id):
-        pass
+        del self.elevators[id]
     
     def update_elevator(self, id, y):
-        pass # move elevator to floor y (may be non-integer)
+        # move elevator to floor y (may be non-integer)
+        self.elevators[id].y = y
 
 class Room:
     def __init__(self):
@@ -243,5 +260,14 @@ class Entity:
         self.anim_frame = 0
         self.anim_length = 2
         self.walking = False
+        # The id of the current elevator the entity is in "-1 means in the building"
+        self.elevator = -1
         self.x = x_coord
         self.y = y_coord
+
+class Elevator:
+    def __init__(self, left, y):
+        self.left = left
+        self.y = y
+        self.sprite = elevator_sprite
+        self.width = 100
