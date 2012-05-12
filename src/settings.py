@@ -12,7 +12,7 @@ ANIMATION_TIME = 0.2
 SCROLL_TIME = 20
 
 # The x position and floor new entities should spawn at
-SPAWN_POSITION = 0.5
+SPAWN_POSITION = 0.7
 SPAWN_FLOOR = 0
 
 # The horizontal speed the entities should move at in rooms per second

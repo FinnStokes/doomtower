@@ -1,7 +1,7 @@
 import os, sys, event, path, settings
 #encapsulates all building data in the current game
 class Building:
-    floor_height = 10
+    #floor_height = 10
 
     def __init__(self, event_manager):
         numfloors = settings.TOP_FLOOR - settings.BOTTOM_FLOOR +1
@@ -12,17 +12,21 @@ class Building:
         self.event.register("update", self.update)
         self.player_funds = settings.STARTING_FUNDS
         self.floors = []
-        self.lifts = []
+        self.lifts = [],[]
+        self.nextElevator = 0
         #Graph with elevator doors as nodes and paths between as edges
         #indexed left-right, bottom-top
         self.building_graph = path.Graph()
  
-        for i in range(numfloors * 2):
-            self.building_graph.addNode(i)
+        for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
+            self.building_graph.addNode(i*2)
+            self.building_graph.addNode(i*2 + 1)
 
         #add initial edges
-        for i in range(0, numfloors * 2, 2):
-            self.building_graph.addEdge(i, i+1, 1)
+        for i in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
+            self.building_graph.addEdge(i*2,     i*2 + 1, 1)
+            self.building_graph.addEdge(i*2 + 1, i*2,     1)
+            print "added link from "+repr(i*2)+" to "+repr(i*2 + 1)
 
         # fill building with empty floors
         for i in range(numfloors):
@@ -40,8 +44,10 @@ class Building:
         self.build_room(3,3)
     def update(self, dt):      
     #   Elevators
-        for i in range(len(self.lifts)):
-            self.lifts[i].move(dt)
+        for i in range(len(self.lifts[0])):
+            self.lifts[0][i].move(dt)
+        for i in range(len(self.lifts[1])):
+            self.lifts[1][i].move(dt)
     #   Rooms
         for i in range(len(self.floors)):
             self.floors[i].operate(dt)
@@ -56,36 +62,32 @@ class Building:
 
     def build_elevator(self, left, floors):
         side = int(not left)
-        doors = []
-        floors_off = []
-
-        #get elevator doors serviced
-        for i in range(len(floors)):
-            doors.append((floors[i] - settings.BOTTOM_FLOOR) * 2 + side )           
-            floors_off.append(floors[i] - settings.BOTTOM_FLOOR)
+        doors = []        
 
         # construct new elevator servicing given floors (on left if left is true, on right if false)
         # determine initial position (initialised to minimum floor)          
-        self.lifts[side].append( Elevator(floors, min(floors) * floor_height))
-        self.event.notify('new_elevator', left, floors)
+        elevator = Elevator(self.nextElevator, floors, min(floors), self.event)
+        self.nextElevator = self.nextElevator + 1
+        self.lifts[side].append( elevator )# * floor_height))
+        self.event.notify('new_elevator', elevator.id, left, floors, elevator.y)
         
         #add edges provided by elevator to building_graph
-        for i in range(len(doors)):
-            for j in range(len(doors)):
-                if not (doors[j] == doors[i]):
-                    self.building_graph.addEdge(doors[i], doors[j], abs(floors_off[i] - floors_off[j])+0.1)   
+        for i in range(len(floors)-1):
+            self.building_graph.addEdge(floors[i]*2 + side,   floors[i+1]*2 + side, abs(floors[i] - floors[i+1])+0.1)
+            self.building_graph.addEdge(floors[i+1]*2 + side, floors[i]*2 + side,   abs(floors[i] - floors[i+1])+0.1)
+            print "added link from "+repr(floors[i]*2 + side)+" to "+repr(floors[i+1]*2 + side)
                  
 
     def remove_elevator(self, left, index):
         pass
 
 
-    #gets elevator at given floor on given side of building       
+    #gets elevator servicing given floor on given side of building       
     def get_elevator(self, floor, left): 
-        
-        for i in range(len(self.lifts[int(not left)])):               
-            if floor == self.lifts[int(not left)][i].curr_floor:
-                return self.lifts[int(not left)]
+        side = int(not left)
+        for i in range(len(self.lifts[side])):               
+            if floor in self.lifts[side][i].floors:
+                return self.lifts[side][i]
   
         return None  # get the elevator at floor (on left if left is true, on right if false)
 
@@ -97,13 +99,14 @@ class Building:
 
 
 class Elevator:
-    lift_speed = 2
+    lift_speed = 0.5
 
     #elevator will service a list of arbitrary floors and be initially positioned at the lowest
-    def __init__(self, floors, y):
+    def __init__(self, id, floors, y, event_manager):
         self.floors = floors
-        self.curr_floor = min(floors)
+        self.id = id
         self.y = y
+        self.event = event_manager
         self.capacity = 1
         self.occupants = 0
         self.pickups = []
@@ -112,7 +115,7 @@ class Elevator:
 
     # calculate distance from given floor
     def distance_from(self, floor):
-        return self.curr_floor - floor
+        return self.y - floor
     
     # add floor to queue of passenger pickups
     def call_to(self, floor):
@@ -131,19 +134,18 @@ class Elevator:
  
         dest = self.pickups[0]
 
-        if self.curr_floor != dest:
-            distance = distance_from(self, dest)
+        if self.y != dest:
+            distance = self.distance_from(dest)
             self.y = self.y + Elevator.lift_speed * dt * (distance / abs(distance))
-            self.curr_floor = int( float(self.y) / float(Building.floor_height))
             pass
         else:
             self.pickups.pop(0)
-            open_doors(self)
+            self.open_doors()
 
     # when elevator reaches a requested floor it must stop and allow ingress/egress
     def open_doors(self):
         self.moving = False
-        self.event.notify("elevator_open", self.curr_floor)
+        self.event.notify("elevator_open", self.y)
     
 
 class Room:

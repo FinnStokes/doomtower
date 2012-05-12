@@ -34,6 +34,7 @@ class Entity:
         self.speed = settings.ENTITY_SPEED
         self.event = event
         self.building = building
+        self.elevator = None
         event.register("input_move", self.move_to)
         event.register("update", self.update)
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
@@ -44,17 +45,21 @@ class Entity:
             src = self.y * 2 + off
             dest = floor * 2
             self.path = self.building.building_graph.getPath(src, dest)
-            if self.path.popleft() != src:
+            if not self.path:
+                print self.building.building_graph.getEdge(src,dest)
+                print "no path from "+repr(src)+" to "+repr(dest)
+                return
+            if self.path.pop(0) != src:
                 raise ValueError("Invalid path: start doesn't match")
             if self.path[0] // 2 == self.y:
-                self.target = self.path.popleft() % 2
+                self.target = self.path.pop(0) % 2
             else:
                 self.target = src % 2
     
     def update(self, dt):
         if not self.elevator:
             if self.path and self.path[0] // 2 == self.y:
-                    self.target = self.path.popleft() % 2
+                    self.target = self.path.pop(0) % 2
             
             if self.x != self.target:
                 if abs(self.x - self.target) < self.speed*dt:
