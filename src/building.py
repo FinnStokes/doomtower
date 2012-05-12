@@ -162,6 +162,11 @@ class Elevator:
         else:
             return False
     
+    def exit(self):
+        if self.occupied:
+            self.occupied = False
+            if len(self.pickups) > 0:
+                self.moving = True
 
 class Room:
     #product types
