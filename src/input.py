@@ -348,18 +348,18 @@ class PopupWindow:
     def up(self):
         if self.scroll > 0:
             self.scroll = self.scroll - 1
-            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
-            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
-            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
-            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
+            self.first.over_sprite = self.over_sprites[self.scroll]
+            self.first.out_sprite = self.out_sprites[self.scroll]
+            self.second.over_sprite = self.over_sprites[self.scroll + 1]
+            self.second.out_sprite = self.out_sprites[self.scroll + 1]
     
     def down(self):
         if self.scroll + 2 < min(len(self.over_sprites),len(self.out_sprites)):
             self.scroll = self.scroll + 1
-            self.firstBuild.over_sprite = self.over_sprites[self.scroll]
-            self.firstBuild.out_sprite = self.out_sprites[self.scroll]
-            self.secondBuild.over_sprite = self.over_sprites[self.scroll + 1]
-            self.secondBuild.out_sprite = self.out_sprites[self.scroll + 1]
+            self.first.over_sprite = self.over_sprites[self.scroll]
+            self.first.out_sprite = self.out_sprites[self.scroll]
+            self.second.over_sprite = self.over_sprites[self.scroll + 1]
+            self.second.out_sprite = self.out_sprites[self.scroll + 1]
     
     def on_first(self):
         self.on_press(self.scroll)
