@@ -136,16 +136,17 @@ class Elevator:
             dest = self.target
         else:
             dest = self.pickups[0]
-            
+        
         deltay = Elevator.lift_speed * dt
         if deltay <= abs(dest - self.y):
             distance = self.distance_from(dest)
-            self.y = self.y + deltay * (distance / abs(distance))
+            self.y = self.y - deltay * (distance / abs(distance))
         else:
             if not self.occupied:
                 self.pickups.pop(0)
             self.y = dest
             self.open_doors()
+        self.event.notify("update_elevator", self.id, self.y)
 
     # when elevator reaches a requested floor it must stop and allow ingress/egress
     def open_doors(self):
@@ -156,6 +157,7 @@ class Elevator:
         if not self.occupied:
             self.occupied = True
             self.target = target
+            self.moving = True
             return True
         else:
             return False

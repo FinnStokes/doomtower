@@ -38,6 +38,7 @@ class Entity:
         event.register("input_move", self.move_to)
         event.register("update", self.update)
         event.notify("new_entity", self.id, self.x, self.y, sprite, character)
+        event.register("elevator_open", self.elevator_open)
     
     def move_to(self, entity, floor):
         if entity == self.id and floor != self.y:
@@ -71,14 +72,14 @@ class Entity:
             elif self.path:
                 self.elevator = self.building.get_elevator(self.y, self.x < 0.5)
                 self.elevator.call_to(self.y)
+                self.waiting = True
 
     def elevator_open(self, id, floor):
-        if id == self.elevator.id:
+        if self.elevator and id == self.elevator.id:
             if self.waiting:
                 if floor == self.y:
-                    self.waiting = not self.elevator.occupy()
-                    if not self.waiting:
-                        self.elevator.goto(self.path[0] // 2)
+                    self.waiting = not self.elevator.occupy(self.target)
+                    print self.waiting
             else:
                 if floor == self.path[0] // 2:
                     self.y = floor
