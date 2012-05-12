@@ -12,26 +12,27 @@ class DoomMixer:
 
     vox = [[            ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
                         ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
-                        ['snd/curiegreeting.ogg', 'snd/curiefarewell.ogg'],
-                        ['snd/edisongreeting.ogg', 'snd/edisonfarewell.ogg'],
-                        ['snd/einsteingreeting.ogg', 'snd/einsteinfarewell.ogg'],
-                        ['snd/newtongreeting.ogg', 'snd/newtonfarewell.ogg'],
-                        ['snd/planckgreeting.ogg', 'snd/planckfarewell.ogg'],
                         ['snd/rutherfordgreeting.ogg', 'snd/rutherfordfarewell.ogg'],
+                        ['snd/edisongreeting.ogg', 'snd/edisonfarewell.ogg'],
+                        ['snd/planckgreeting.ogg', 'snd/planckfarewell.ogg'],
+                        ['snd/thomsongreeting.ogg', 'snd/thomsonfarewell.ogg'],
+                        ['snd/curiegreeting.ogg', 'snd/curiefarewell.ogg'],
                         ['snd/teslagreeting.ogg', 'snd/teslafarewell.ogg'],
-                        ['snd/thomsongreeting.ogg', 'snd/thomsonfarewell.ogg']],
-                        [['snd/igoryeth.ogg', 'snd/igordirection.ogg']],
-                        [['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
-                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
+                        ['snd/einsteingreeting.ogg', 'snd/einsteinfarewell.ogg'],
+                        ['snd/newtongreeting.ogg', 'snd/newtonfarewell.ogg']],
+                       [['snd/igoryeth.ogg', 'snd/igordirection.ogg']],
+                       [['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
+                        ['snd/dextergreeting.ogg', 'snd/dexterfarewell.ogg'],
+                        ['snd/browngreeting.ogg', 'snd/brownfarewell.ogg'],   
                         ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
                         ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg'],
-                        ['snd/browngreeting.ogg', 'snd/brownfarewell.ogg'],
-                        ['snd/dextergreeting.ogg', 'snd/dexterfarewell.ogg'],
+                        ['snd/clientgreeting1.ogg', 'snd/clientfarewell1.ogg'],
                         ['snd/elfmangreeting.ogg', 'snd/elfmanfarewell.ogg'],
-                        ['snd/farnsworthgreeting.ogg', 'snd/farnsworthfarewell.ogg'],
                         ['snd/frankensteingreeting.ogg', 'snd/frankensteinfarewell.ogg'],
-                        ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg']]  
-           ]    
+                        ['snd/franknfurtergreeting.ogg', 'snd/franknfurterfarewell.ogg'],  
+                        ['snd/clientgreeting2.ogg', 'snd/clientfarewell2.ogg']]
+                      
+          ]    
     
     roomsources = ['snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/informatics', 'snd/meeting.ogg', 'snd/psycho.ogg', 'snd/reception.ogg']
     bgmsources = ['snd/sciencegroove.ogg', 'snd/sciencegroove2.ogg']
