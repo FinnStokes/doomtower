@@ -213,8 +213,6 @@ class Render:
                 self.get_room(oldy).entities.discard(self.entities[id])
             if y in range(settings.BOTTOM_FLOOR, settings.TOP_FLOOR):
                 self.get_room(y).entities.add(self.entities[id])
-                print y
-                print self.get_room(y).entities
             if x < oldx:
                 self.entities[id].face_left = True
                 self.entities[id].walking = True
