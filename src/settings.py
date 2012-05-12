@@ -36,11 +36,11 @@ IGOR_COST = 200
 ROOM_PAYS = [ 0,
     0, # LOBBY
     0, # WAITING
-    2000, # BIO
-    1000, # BOOM
+    6000, # BIO
+    2000, # BOOM
     8000, # COSMO
-    2500, # PSYCH
-    500, # INFO
+    4000, # PSYCH
+    1000, # INFO
     0, # MEETING
 ]
 ROOM_UPKEEP = [ 0,
@@ -55,10 +55,10 @@ ROOM_UPKEEP = [ 0,
 ]
 
 # Period of staff wages (secs)
-WAGE_PERIOD = 30
+WAGE_PERIOD = 90
 
 # Period of room upkeep costs (secs)
-UPKEEP_PERIOD = 60
+UPKEEP_PERIOD = 120
 
 # The number of seconds spent on each frame of the animation
 ANIMATION_TIME = 0.2
