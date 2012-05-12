@@ -84,7 +84,7 @@ class DoomMixer:
         sprite = self.peeps[id][0]
         character = self.peeps[id][1]
         self.vox[sprite][character][1].play()
-
+        peeps.pop(id)
          
 
     # play new background music, current track faded out or cut
