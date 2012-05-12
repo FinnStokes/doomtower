@@ -66,6 +66,7 @@ class Render:
             col += entity.anim_frame
             if entity.walking:
                 row += 1
+                entity.walking = False
             if entity.face_left:
                 col += entity.anim_length
                 if entity.character >= 0:
@@ -104,16 +105,16 @@ class Render:
             for entity in room.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     (x_offset + entity.x*704, y_offset + self.room_height - entity.height),
+                                     (x_offset + entity.x*(704-settings.ENTITY_WIDTH), y_offset + self.room_height - entity.height),
                                      entity.sub_rect)
     
     def get_screen_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
-        return (screen_width-704)/2 + pos[0]*704, screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
+        return (screen_width-704)/2 + pos[0]*(704-settings.ENTITY_WIDTH), screen_height + self.y_pan - (self.room_height+self.room_padding)*pos[1] - self.room_padding
 
     def get_world_pos(self, pos):
         screen_width, screen_height = self.window.get_size()
@@ -215,7 +216,6 @@ class Render:
     
     def update_elevator(self, id, y):
         pass # move elevator to floor y (may be non-integer)
-    
 
 class Room:
     def __init__(self):

@@ -18,6 +18,10 @@ SPAWN_FLOOR = 0
 # The horizontal speed the entities should move at in rooms per second
 ENTITY_SPEED = 0.2
 
+# The size of the bounding rectangle for each entity
+ENTITY_WIDTH = 100
+ENTITY_HEIGHT = 160
+
 # The height of the drag bar for pop-up windows in pixels
 DRAGBAR_HEIGHT = 75
 
