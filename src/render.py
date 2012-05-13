@@ -134,17 +134,19 @@ class Render:
             for entity in elevator.entities:
                 if entity.sprite:
                     self.window.blit(entity.sprite,
-                                     ((x_offset - (elevator.width if elevator.left else -self.room_width), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -self.room_width),
+                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
                                      entity.main_rect)
                 if entity.subsprite:
                     self.window.blit(entity.subsprite,
-                                     ((x_offset - (elevator.width if elevator.left else -self.room_width), screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20)),
+                                     ((x_offset - (elevator.width if elevator.left else -self.room_width),
+                                     screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)+20 + (self.room_height - elevator.height))),
                                      entity.sub_rect)
             
             # Draws Elevator
             self.window.blit(elevator.sprite,
                              (x_offset - (elevator.width if elevator.left else -self.room_width), 
-                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)))
+                              screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1) + (self.room_height - elevator.height)))
             liftx = x_offset -2-42
             lifty = screen_height + self.y_pan - (self.room_height+self.room_padding)*(elevator.y+1)
             # Draws Elevator Pulley
@@ -226,8 +228,8 @@ class Render:
             if y in range(len(self.rooms)):
                 self.get_room(y).entities.remove(self.entities[id])
             del self.entities[id]
-        else:
-            raise ValueError("Invalid entity id.")
+        #else:
+            #raise ValueError("Invalid entity id.")
     
     def update_entity(self, id, x, y): # change entity position
         if id in self.entities:
@@ -248,8 +250,8 @@ class Render:
                 entity.walking = False
             entity.x = x
             entity.y = y
-        else:
-            raise ValueError("Invalid entity id.")
+        #else:
+            #raise ValueError("Invalid entity id.")
     
     def entity_carrying(self, carrying_value):
         self.entities[id] = carrying_value
@@ -319,4 +321,5 @@ class Elevator:
         self.sprite_pulley = elevator_pulley
         self.sprite_rope = elevator_rope
         self.width = 100
+        self.height = 197
         self.entities = set()
