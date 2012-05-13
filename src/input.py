@@ -118,6 +118,13 @@ class Input:
             del self.pressed[button]
     
     def draw(self):
+        screen_width, screen_height = self.window.get_size()
+        # Draw bottom panel of HUD
+        self.window.fill(settings.BOTTOM_PANEL_COLOUR, pygame.Rect(0,
+            screen_height - settings.BOTTOM_PANEL_HEIGHT,
+            screen_width,
+            screen_height))
+        
         for widget in reversed(self.widgets):
             sprite = widget.sprite()
             if sprite:
@@ -302,7 +309,7 @@ class PopupWindow:
                                    out=close_sprite.subsurface(pygame.Rect(0,28,39,28)),
                                    over=close_sprite.subsurface(pygame.Rect(39,28,39,28)),
                                    on_press=self.up))
-        self.widgets.append(Button(pygame.Rect(rect.right-49,rect.bottom-43,39,28),
+        self.widgets.append(Button(pygame.Rect(rect.right-49,rect.bottom-38,39,28),
                                    out=close_sprite.subsurface(pygame.Rect(0,56,39,28)),
                                    over=close_sprite.subsurface(pygame.Rect(39,56,39,28)),
                                    on_press=self.down))
