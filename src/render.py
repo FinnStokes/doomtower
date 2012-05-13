@@ -316,7 +316,7 @@ class Render:
     def set_entity_request(self, entity_id, request):
         if entity_id in self.entities:
             entity = self.entities[entity_id]
-            if request in range(3,7):
+            if request in range(3,8):
                 entity.thought = request - 2
     def new_elevator(self, id, left, floors, y): 
         # create lift servicing given floors, on the left if left is true and on the right if it is false, starting at floor y (may be non-integer)

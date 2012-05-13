@@ -29,9 +29,8 @@ class Manager:
         event.register("create_igor", self.create_igor)
 
     def create_client(self):
-        if self.nextId <= 20:
-            client_range = 2 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
-        else:
+        client_range = 2 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
+        if client_range >= 10:
             client_range = 10
         self.entities[self.nextId] = Client(self.event, self.nextId, random.randint(0,client_range), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, self)
         self.nextId = self.nextId + 1
