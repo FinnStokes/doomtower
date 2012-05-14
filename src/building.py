@@ -75,12 +75,7 @@ class Building:
     
     def build_room(self, top, room_id):
         # construct new room at floor (check that this is next above or below)
-        if top:
-            floor = self.next_up
-            self.next_up = self.next_up + 1
-        else:
-            floor = self.next_down
-            self.next_down = self.next_down - 1
+        floor = self.next_up if top else self.next_down
 
         if floor in range(settings.BOTTOM_FLOOR,settings.TOP_FLOOR):
             if self.get_funds() >= settings.ROOM_COSTS[room_id]:
@@ -89,6 +84,10 @@ class Building:
                 floor_index = floor-settings.BOTTOM_FLOOR
                 self.event.notify('update_room', floor_index, room_id)
                 self.floors[floor_index] = Room(self.event, room_id)
+                if top:
+                    self.next_up = self.next_up + 1
+                else:
+                    self.next_down = self.next_down - 1
             else:
                 self.event.notify("insufficient_funds")
  
