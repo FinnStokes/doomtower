@@ -2,14 +2,7 @@ import settings, random, path, math
 client_patience = []
 client_requests = []
 
-def clamp(arg, minimum, maximum):
-    if arg < minimum:
-        return minimum
-    elif arg > maximum:
-        return maximum
-    else:
-        return arg    
-        
+      
 #Set the patience and potential requests for each client
 for i in range(10):
     client_patience.append(30)
@@ -32,14 +25,22 @@ class Manager:
         self.building = building
         self.nextId = 0
         self.entities = dict()
+        self.endgame = False
         event.register("create_client", self.create_client)
         event.register("create_scientist", self.create_scientist)
         event.register("create_igor", self.create_igor)
 
     def create_client(self):
-        client_range = 1 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
-        client_range = clamp(client_range, 1, 9)
-  
+        client_range = settings.CLIENT_RANGE
+
+        if not self.endgame:
+            client_range = 1 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
+      
+        #lock range at maximum
+        if client_range >= settings.CLIENT_RANGE:
+            client_range = settings.CLIENT_RANGE
+            self.endgame = True
+    
         self.entities[self.nextId] = Client(self.event, self.nextId, random.randint(0,client_range), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, self)
         self.nextId = self.nextId + 1
     

@@ -32,6 +32,9 @@ SCIENTIST_COSTS = [
 ]
 IGOR_COST = 200
 
+# Number of possible clients (can eventually be size of array containing individual MS lab biases
+CLIENT_RANGE = 9
+
 # Pays
 ROOM_PAYS = [ 0,
     0, # LOBBY
