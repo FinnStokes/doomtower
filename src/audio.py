@@ -35,7 +35,7 @@ class DoomMixer:
                         ['snd/nogreeting.ogg', 'snd/nofarewell.ogg']]                     
           ]    
     
-    roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics', 'snd/meeting.ogg']
+    roomsources = ['snd/meeting.ogg', 'snd/reception.ogg', 'snd/bio.ogg', 'snd/boom.ogg', 'snd/cosmic.ogg', 'snd/psycho.ogg', 'snd/informatics.ogg', 'snd/meeting.ogg']
     bgmsources = ['snd/sciencegroove.ogg', 'snd/sciencegroove2.ogg']
     sfxsources = ['snd/gain_funds.ogg', 'snd/spend_funds.ogg', 'snd/deny.ogg']
     
