@@ -10,9 +10,6 @@ def clamp(arg, minimum, maximum):
     else:
         return arg    
         
-        
-
-
 #Set the patience and potential requests for each client
 for i in range(10):
     client_patience.append(30)
@@ -41,7 +38,7 @@ class Manager:
 
     def create_client(self):
         client_range = 1 + int( (-0.0126*self.nextId + 0.6372) * self.nextId)
-        client_range = clamp(client_range, 0, 9)
+        client_range = clamp(client_range, 1, 9)
   
         self.entities[self.nextId] = Client(self.event, self.nextId, random.randint(0,client_range), settings.SPAWN_POSITION, settings.SPAWN_FLOOR, self.building, self)
         self.nextId = self.nextId + 1
